@@ -1,5 +1,5 @@
 {
-  "name": "@ts-packages/security",
+  "name": "@naman_deep_singh/security",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
@@ -16,6 +16,7 @@
     "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
-    "@types/jsonwebtoken": "^9.0.10"
+    "@types/jsonwebtoken": "^9.0.10",
+    "typescript": "^5.9.3"
   }
 }

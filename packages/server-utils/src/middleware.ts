@@ -259,14 +259,14 @@ export function withAuth(config: AuthConfig): ServerPlugin {
 }
 
 // Convenience functions for route-specific middleware
-export function validateFields(rules: ValidationRule[]) {
+export function validateFields(rules: ValidationRule[]): express.RequestHandler {
   return createValidationMiddleware(rules);
 }
 
-export function rateLimit(config: RateLimitConfig = {}) {
+export function rateLimit(config: RateLimitConfig = {}): express.RequestHandler {
   return createRateLimitMiddleware(config);
 }
 
-export function requireAuth(config: AuthConfig) {
+export function requireAuth(config: AuthConfig): express.RequestHandler {
   return createAuthMiddleware(config);
 }

@@ -1,6 +1,6 @@
 {
   "name": "@naman_deep_singh/response-utils",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "TypeScript utilities for standardized HTTP API responses with common status codes and error handling",
   "type": "module",
   "main": "dist/index.js",
@@ -8,7 +8,12 @@
   "scripts": {
     "build": "tsc"
   },
-  "keywords": ["response", "http", "api", "utils"],
+  "keywords": [
+    "response",
+    "http",
+    "api",
+    "utils"
+  ],
   "author": "Naman Deep Singh",
   "license": "ISC",
   "packageManager": "pnpm@10.20.0",

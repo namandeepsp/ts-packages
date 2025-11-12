@@ -1,6 +1,10 @@
 {
   "name": "@naman_deep_singh/response-utils",
+<<<<<<< Updated upstream
   "version": "1.0.2",
+=======
+  "version": "1.0.1",
+>>>>>>> Stashed changes
   "description": "TypeScript utilities for standardized HTTP API responses with common status codes and error handling",
   "type": "module",
   "main": "dist/index.js",

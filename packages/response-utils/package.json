@@ -1,8 +1,7 @@
 {
   "name": "@naman_deep_singh/response-utils",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "TypeScript utilities for standardized HTTP API responses with common status codes and error handling",
-  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

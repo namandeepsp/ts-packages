@@ -83,6 +83,7 @@ export class ExpressServer implements ServerInstance {
       cors: config.cors ?? true,
       helmet: config.helmet ?? true,
       json: config.json ?? true,
+      cookieParser: config.cookieParser ?? false,
       customMiddleware: config.customMiddleware || [],
       healthCheck: config.healthCheck ?? true,
       gracefulShutdown: config.gracefulShutdown ?? true,
@@ -118,6 +119,16 @@ export class ExpressServer implements ServerInstance {
     // Apply JSON parser if enabled
     if (this.config.json) {
       this.app.use(express.json());
+    }
+
+    // Apply cookie parser if enabled
+    if (this.config.cookieParser) {
+      try {
+        const cookieParser = require('cookie-parser');
+        this.app.use(cookieParser());
+      } catch (error) {
+        console.warn(`${this.config.name}: Cookie parser middleware not available. Install cookie-parser package.`);
+      }
     }
 
     // Apply custom middleware

@@ -16,6 +16,7 @@ export interface ServerConfig {
   cors?: boolean | CorsOptions;
   helmet?: boolean;
   json?: boolean;
+  cookieParser?: boolean;
   customMiddleware?: express.RequestHandler[];
   healthCheck?: boolean | string;
   gracefulShutdown?: boolean;

@@ -2,13 +2,14 @@ import { Server } from 'http';
 import { GracefulShutdownConfig, ServerPlugin } from './types';
 
 export function createGracefulShutdown(server: Server, config: GracefulShutdownConfig = {}): void {
-  const { timeout = 10000, onShutdown } = config;
+  const { timeout = 10000, onShutdown, serverName, serverVersion } = config;
+  const nameVersion = serverName && serverVersion ? `${serverName} v${serverVersion}` : 'Server';
 
   const shutdown = async (signal: string) => {
-    console.log(`🛑 Received ${signal}, shutting down gracefully...`);
+    console.log(`🛑 ${nameVersion} received ${signal}, shutting down gracefully...`);
     
     const shutdownTimer = setTimeout(() => {
-      console.log('⏰ Shutdown timeout reached, forcing exit');
+      console.log(`⏰ ${nameVersion} shutdown timeout reached, forcing exit`);
       process.exit(1);
     }, timeout);
 
@@ -21,12 +22,12 @@ export function createGracefulShutdown(server: Server, config: GracefulShutdownC
       // Close server
       server.close(() => {
         clearTimeout(shutdownTimer);
-        console.log('👋 Server closed. Exiting now.');
+        console.log(`👋 ${nameVersion} closed. Exiting now.`);
         process.exit(0);
       });
     } catch (error) {
       clearTimeout(shutdownTimer);
-      console.error('❌ Error during shutdown:', error);
+      console.error(`❌ ${nameVersion} error during shutdown:`, error);
       process.exit(1);
     }
   };
@@ -46,15 +47,23 @@ export function withGracefulShutdown(config: GracefulShutdownConfig = {}): Serve
 export function startServerWithShutdown(
   app: any, 
   port: number, 
-  shutdownConfig: GracefulShutdownConfig = {}
+  shutdownConfig: GracefulShutdownConfig = {},
+  serverName?: string,
+  serverVersion?: string
 ): Server {
   const server = app.listen(port, () => {
-    console.log(`🚀 Server running on http://localhost:${port}`);
+    const nameVersion = serverName && serverVersion ? `${serverName} v${serverVersion}` : 'Server';
+    console.log(`🚀 ${nameVersion} running on http://localhost:${port}`);
   });
 
   // Apply graceful shutdown from stored config or provided config
   const config = app.__gracefulShutdownConfig || shutdownConfig;
-  createGracefulShutdown(server, config);
+  const enhancedConfig = {
+    ...config,
+    serverName,
+    serverVersion
+  };
+  createGracefulShutdown(server, enhancedConfig);
 
   return server;
 }

@@ -49,6 +49,8 @@ export interface HealthCheck {
 export interface GracefulShutdownConfig {
   timeout?: number;
   onShutdown?: () => Promise<void>;
+  serverName?: string;
+  serverVersion?: string;
 }
 
 export interface SocketInstance {

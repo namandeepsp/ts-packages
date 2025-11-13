@@ -2,6 +2,10 @@
 export { ExpressServer, createServer } from './server';
 export type { ServerInstance, ServerInfo, GrpcService, RpcMethod, WebhookConfig } from './server';
 
+// Express re-exports (to avoid direct Express dependency in services)
+export { Request, Response, NextFunction, Router, Application } from 'express';
+export type { RequestHandler, ErrorRequestHandler } from 'express';
+
 // Health check utilities
 export { createHealthCheck, withHealthCheck, addHealthCheck } from './health';
 

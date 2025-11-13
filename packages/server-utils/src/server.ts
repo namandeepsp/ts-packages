@@ -101,7 +101,7 @@ export class ExpressServer implements ServerInstance {
         const corsOptions = typeof this.config.cors === 'object' ? this.config.cors : undefined;
         this.app.use(cors(corsOptions));
       } catch (error) {
-        console.warn('CORS middleware not available. Install cors package.');
+        console.warn(`${this.config.name}: CORS middleware not available. Install cors package.`);
       }
     }
 
@@ -111,7 +111,7 @@ export class ExpressServer implements ServerInstance {
         const helmet = require('helmet');
         this.app.use(helmet());
       } catch (error) {
-        console.warn('Helmet middleware not available. Install helmet package.');
+        console.warn(`${this.config.name}: Helmet middleware not available. Install helmet package.`);
       }
     }
 
@@ -236,11 +236,11 @@ export class ExpressServer implements ServerInstance {
           grpc.ServerCredentials.createInsecure(),
           () => {
             this.grpcServer!.start();
-            console.log(`🔗 gRPC server running on port ${port}`);
+            console.log(`🔗 ${this.config.name} gRPC server running on port ${port}`);
           }
         );
       } catch (error: unknown) {
-        console.warn('gRPC not available. Install @grpc/grpc-js to use gRPC features.');
+        console.warn(`${this.config.name}: gRPC not available. Install @grpc/grpc-js to use gRPC features.`);
       }
     }
   }
@@ -257,9 +257,9 @@ export class ExpressServer implements ServerInstance {
       };
       const rpcServer = jayson.server(this.rpcMethods);
       this.app.use(path, rpcServer.middleware());
-      console.log(`📡 JSON-RPC server mounted on ${path}`);
+      console.log(`📡 ${this.config.name} JSON-RPC server mounted on ${path}`);
     } catch (error: unknown) {
-      console.warn('JSON-RPC not available. Install jayson to use RPC features.');
+      console.warn(`${this.config.name}: JSON-RPC not available. Install jayson to use RPC features.`);
     }
   }
 
@@ -295,12 +295,12 @@ export class ExpressServer implements ServerInstance {
       }
     });
 
-    console.log(`🪝 Webhook registered at ${config.path}`);
+    console.log(`🪝 ${this.config.name} webhook registered at ${config.path}${config.secret ? ' (with signature verification)' : ''}`);
   }
 
   addSocketIO(config: SocketIOConfig = {}): unknown {
     if (!this.server) {
-      throw new Error('Server must be started before adding Socket.IO');
+      throw new Error(`${this.config.name}: Server must be started before adding Socket.IO`);
     }
 
     try {
@@ -336,7 +336,7 @@ export class ExpressServer implements ServerInstance {
       // Handle connections
       io.on('connection', (socket: unknown) => {
         const typedSocket = socket as SocketInstance;
-        console.log(`🔌 Socket connected: ${typedSocket.id}`);
+        console.log(`🔌 ${this.config.name}: Socket connected [${typedSocket.id}]`);
 
         // Call user-defined connection handler
         if (config.onConnection) {
@@ -345,7 +345,7 @@ export class ExpressServer implements ServerInstance {
 
         // Handle disconnection
         typedSocket.on('disconnect', (reason) => {
-          console.log(`🔌 Socket disconnected: ${typedSocket.id} - ${reason}`);
+          console.log(`🔌 ${this.config.name}: Socket disconnected [${typedSocket.id}] - ${reason}`);
 
           // Call user-defined disconnection handler
           if (config.onDisconnection) {
@@ -354,10 +354,10 @@ export class ExpressServer implements ServerInstance {
         });
       });
 
-      console.log(`🔌 Socket.IO server attached${config.path ? ` at ${config.path}` : ''}`);
+      console.log(`🔌 ${this.config.name} Socket.IO server attached${config.path ? ` at ${config.path}` : ''}${config.cors ? ' (CORS enabled)' : ''}`);
       return io;
     } catch (error: unknown) {
-      console.warn('Socket.IO not available. Install socket.io to use WebSocket features.');
+      console.warn(`${this.config.name}: Socket.IO not available. Install socket.io to use WebSocket features.`);
       return null;
     }
   }

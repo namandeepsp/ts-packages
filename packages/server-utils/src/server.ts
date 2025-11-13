@@ -88,6 +88,58 @@ export class ExpressServer implements ServerInstance {
       gracefulShutdown: config.gracefulShutdown ?? true,
       socketIO: config.socketIO
     };
+
+    // Apply middleware based on configuration
+    this.setupMiddleware();
+  }
+
+  private setupMiddleware(): void {
+    // Apply CORS if enabled
+    if (this.config.cors) {
+      try {
+        const cors = require('cors');
+        const corsOptions = typeof this.config.cors === 'object' ? this.config.cors : undefined;
+        this.app.use(cors(corsOptions));
+      } catch (error) {
+        console.warn('CORS middleware not available. Install cors package.');
+      }
+    }
+
+    // Apply Helmet if enabled
+    if (this.config.helmet) {
+      try {
+        const helmet = require('helmet');
+        this.app.use(helmet());
+      } catch (error) {
+        console.warn('Helmet middleware not available. Install helmet package.');
+      }
+    }
+
+    // Apply JSON parser if enabled
+    if (this.config.json) {
+      this.app.use(express.json());
+    }
+
+    // Apply custom middleware
+    if (this.config.customMiddleware && this.config.customMiddleware.length > 0) {
+      this.config.customMiddleware.forEach(middleware => {
+        this.app.use(middleware);
+      });
+    }
+
+    // Add health check if enabled
+    if (this.config.healthCheck) {
+      const healthPath = typeof this.config.healthCheck === 'string' ? this.config.healthCheck : '/health';
+      this.app.get(healthPath, (req, res) => {
+        res.status(200).json({
+          status: 'healthy',
+          service: this.config.name,
+          version: this.config.version,
+          uptime: Date.now() - this.config.startTime.getTime(),
+          timestamp: new Date().toISOString()
+        });
+      });
+    }
   }
 
   async start(): Promise<ServerInstance> {

@@ -1,6 +1,6 @@
 {
   "name": "@naman_deep_singh/server-utils",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Extensible server utilities for Express.js microservices with TypeScript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

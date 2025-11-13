@@ -1,238 +1,281 @@
 # @naman_deep_singh/server-utils
 
-Extensible server utilities for Express.js microservices with TypeScript. Provides a plugin-based architecture for building consistent and maintainable server applications.
-
-## Features
-
-- 🚀 **Express Server Factory** - Quick server setup with sensible defaults
-- 🔌 **Plugin System** - Extensible architecture for custom functionality
-- 🏥 **Health Checks** - Built-in health monitoring with custom checks
-- 🛑 **Graceful Shutdown** - Proper cleanup and shutdown handling
-- 📝 **Logging Middleware** - Request logging with customizable formats
-- 🛡️ **Error Handling** - Centralized error handling middleware
-- 🆔 **Request ID** - Automatic request ID generation and tracking
+Extensible server utilities for Express.js microservices with multi-protocol support and TypeScript.
 
 ## Installation
 
 ```bash
 npm install @naman_deep_singh/server-utils
-# or
-pnpm add @naman_deep_singh/server-utils
 ```
+
+## Features
+
+- ✅ **Multi-protocol support** - HTTP, gRPC, JSON-RPC, WebSockets, Webhooks
+- ✅ **Express.js integration** with middleware collection
+- ✅ **Graceful shutdown** handling
+- ✅ **Health checks** with custom checks support
+- ✅ **TypeScript support** with full type safety
+- ✅ **Hybrid exports** - use named imports or namespace imports
+- ✅ **Plugin architecture** for extensibility
+- ✅ **Built-in middleware** - logging, validation, rate limiting, auth
 
 ## Quick Start
 
-### Basic Server
+### Named Imports
 ```typescript
-import { createServer, startServerWithShutdown } from '@naman_deep_singh/server-utils';
+import { createServer } from '@naman_deep_singh/server-utils';
 
-const app = createServer({
+const server = createServer('My API', '1.0.0', {
+  port: 3000,
   cors: true,
-  helmet: true,
-  healthCheck: true
+  helmet: true
 });
 
-app.get('/', (req, res) => {
-  res.json({ message: 'Hello World!' });
-});
-
-startServerWithShutdown(app, 3000);
-```
-
-### Plugin-Based Architecture
-```typescript
-import { 
-  createServerWithPlugins, 
-  withHealthCheck, 
-  withLogging, 
-  withErrorHandler,
-  withGracefulShutdown,
-  startServerWithShutdown 
-} from '@naman_deep_singh/server-utils';
-
-const app = createServerWithPlugins(
-  { cors: true, helmet: true },
-  withLogging('detailed'),
-  withHealthCheck('/health', {
-    customChecks: [
-      {
-        name: 'database',
-        check: async () => {
-          // Your database health check
-          return true;
-        }
-      }
-    ]
-  }),
-  withErrorHandler(),
-  withGracefulShutdown({
-    timeout: 15000,
-    onShutdown: async () => {
-      console.log('Cleaning up resources...');
-      // Your cleanup logic
-    }
-  })
-);
-
-// Add your routes
-app.get('/api/users', (req, res) => {
+// Add routes
+server.app.get('/users', (req, res) => {
   res.json({ users: [] });
 });
 
-startServerWithShutdown(app, 3000);
+// Start server
+await server.start();
+```
+
+### Namespace Import
+```typescript
+import ServerUtils from '@naman_deep_singh/server-utils';
+
+const server = ServerUtils.createServer('My API', '1.0.0');
+```
+
+## Multi-Protocol Support
+
+### HTTP + Express Routes
+```typescript
+const server = createServer('Multi-Protocol Server', '1.0.0');
+
+server.app.get('/api/users', (req, res) => {
+  res.json({ users: [] });
+});
+
+await server.start();
+```
+
+### gRPC Support
+```typescript
+// Add gRPC service (requires @grpc/grpc-js)
+server.addGrpcService(userProto.UserService.service, {
+  getUser: (call, callback) => {
+    callback(null, { id: call.request.id, name: 'John' });
+  }
+}, 50051); // Custom port
+```
+
+### JSON-RPC Support
+```typescript
+// Add JSON-RPC methods (requires jayson)
+server.addRpcMethods({
+  add: (params, callback) => {
+    callback(null, params[0] + params[1]);
+  },
+  getUser: (id, callback) => {
+    callback(null, { id, name: 'John' });
+  }
+}, '/rpc'); // Custom path
+```
+
+### WebSocket Support
+```typescript
+// Add Socket.IO (requires socket.io)
+const io = server.addSocketIO({
+  cors: true,
+  onConnection: (socket) => {
+    console.log('Client connected:', socket.id);
+    
+    socket.on('message', (data) => {
+      socket.broadcast.emit('message', data);
+    });
+  },
+  onDisconnection: (socket, reason) => {
+    console.log('Client disconnected:', socket.id, reason);
+  }
+});
+```
+
+### Webhook Support
+```typescript
+// Add secure webhooks
+server.addWebhook({
+  path: '/webhooks/github',
+  secret: process.env.GITHUB_WEBHOOK_SECRET,
+  handler: async (payload, headers) => {
+    if (payload.action === 'opened') {
+      console.log('New PR opened:', payload.pull_request.title);
+    }
+  }
+});
+
+server.addWebhook({
+  path: '/webhooks/stripe',
+  secret: process.env.STRIPE_WEBHOOK_SECRET,
+  handler: async (payload) => {
+    if (payload.type === 'payment_intent.succeeded') {
+      // Handle successful payment
+    }
+  }
+});
+```
+
+## Built-in Middleware
+
+### Logging Middleware
+```typescript
+import { createLoggingMiddleware, withLogging } from '@naman_deep_singh/server-utils';
+
+// Direct usage
+server.app.use(createLoggingMiddleware('detailed'));
+
+// Plugin usage
+const server = createServerWithPlugins('My API', '1.0.0', [
+  withLogging('detailed')
+]);
+```
+
+### Validation Middleware
+```typescript
+import { validateFields } from '@naman_deep_singh/server-utils';
+
+server.app.post('/users', validateFields([
+  { field: 'email', required: true, type: 'email' },
+  { field: 'password', required: true, minLength: 8 },
+  { field: 'age', type: 'number', custom: (value) => value >= 18 || 'Must be 18+' }
+]), (req, res) => {
+  // Validation passed
+  res.json({ success: true });
+});
+```
+
+### Rate Limiting
+```typescript
+import { rateLimit } from '@naman_deep_singh/server-utils';
+
+server.app.use('/api', rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  maxRequests: 100,
+  message: 'Too many requests'
+}));
+```
+
+### Authentication Middleware
+```typescript
+import { requireAuth } from '@naman_deep_singh/server-utils';
+
+server.app.use('/protected', requireAuth({
+  tokenExtractor: (req) => req.headers.authorization?.substring(7),
+  tokenValidator: async (token) => {
+    // Verify JWT token
+    return jwt.verify(token, process.env.JWT_SECRET);
+  }
+}));
+```
+
+## Health Checks
+
+```typescript
+import { addHealthCheck } from '@naman_deep_singh/server-utils';
+
+addHealthCheck(server.app, '/health', {
+  customChecks: [
+    {
+      name: 'database',
+      check: async () => {
+        // Check database connection
+        return await db.ping();
+      }
+    },
+    {
+      name: 'redis',
+      check: async () => {
+        return await redis.ping() === 'PONG';
+      }
+    }
+  ]
+});
+```
+
+## Server Management
+
+### Server Information
+```typescript
+const info = server.getInfo();
+console.log(info);
+// {
+//   name: 'My API',
+//   version: '1.0.0',
+//   port: 3000,
+//   uptime: 12345,
+//   status: 'running',
+//   startTime: Date
+// }
+```
+
+### Graceful Shutdown
+```typescript
+const server = createServer('My API', '1.0.0', {
+  gracefulShutdown: true // Enabled by default
+});
+
+// Handles SIGINT and SIGTERM
+process.on('SIGINT', async () => {
+  await server.stop();
+  process.exit(0);
+});
+```
+
+## Configuration Options
+
+```typescript
+interface ServerConfig {
+  port?: number;                    // Default: 3000
+  cors?: boolean | CorsOptions;     // Default: true
+  helmet?: boolean;                 // Default: true
+  json?: boolean;                   // Default: true
+  customMiddleware?: RequestHandler[];
+  healthCheck?: boolean | string;   // Default: true
+  gracefulShutdown?: boolean;       // Default: true
+  socketIO?: SocketIOConfig;
+}
 ```
 
 ## API Reference
 
-### Server Factory
+### Core Functions
+- `createServer(name?, version?, config?)` - Create server instance
+- `ExpressServer` - Server class for advanced usage
 
-#### `createServer(config?: ServerConfig)`
-Creates an Express application with default middleware.
+### Middleware Functions
+- `createLoggingMiddleware(format?)` - Request logging
+- `createErrorHandler()` - Error handling
+- `createValidationMiddleware(rules)` - Input validation
+- `createRateLimitMiddleware(config?)` - Rate limiting
+- `createAuthMiddleware(config)` - Authentication
 
-```typescript
-interface ServerConfig {
-  port?: number;
-  cors?: boolean | CorsOptions;
-  helmet?: boolean;
-  json?: boolean;
-  customMiddleware?: express.RequestHandler[];
-  healthCheck?: boolean | string;
-  gracefulShutdown?: boolean;
-}
-```
-
-#### `createServerWithPlugins(config, ...plugins)`
-Creates a server and applies multiple plugins.
-
-### Health Checks
-
-#### `withHealthCheck(path?, config?)`
-Adds health check endpoint as a plugin.
-
-```typescript
-withHealthCheck('/health', {
-  customChecks: [
-    {
-      name: 'redis',
-      check: async () => await redis.ping()
-    }
-  ]
-})
-```
-
-#### `addHealthCheck(app, path?, config?)`
-Directly adds health check to existing app.
+### Health & Monitoring
+- `createHealthCheck(config?)` - Health check endpoint
+- `addHealthCheck(app, path?, config?)` - Add health check to app
 
 ### Graceful Shutdown
+- `createGracefulShutdown(server, config?)` - Setup graceful shutdown
+- `startServerWithShutdown(app, port, config?)` - Start with shutdown handling
 
-#### `withGracefulShutdown(config?)`
-Adds graceful shutdown as a plugin.
+## Dependencies
 
-```typescript
-withGracefulShutdown({
-  timeout: 10000,
-  onShutdown: async () => {
-    await database.close();
-    await redis.disconnect();
-  }
-})
-```
+### Required
+- **express** - Web framework
+- **cors** - CORS middleware
+- **helmet** - Security middleware
+- **cookie-parser** - Cookie parsing
 
-#### `startServerWithShutdown(app, port, config?)`
-Starts server with automatic graceful shutdown setup.
-
-### Middleware Plugins
-
-#### `withLogging(format?)`
-Adds request logging middleware.
-- `format`: 'simple' | 'detailed'
-
-#### `withErrorHandler()`
-Adds centralized error handling middleware.
-
-#### `withRequestId()`
-Adds request ID generation and tracking.
-
-### Custom Plugins
-
-Create your own plugins:
-
-```typescript
-import { ServerPlugin } from '@naman_deep_singh/server-utils';
-
-const withCustomAuth = (secretKey: string): ServerPlugin => {
-  return (app, config) => {
-    app.use((req, res, next) => {
-      // Your custom auth logic
-      next();
-    });
-  };
-};
-
-// Use it
-const app = createServerWithPlugins(
-  {},
-  withCustomAuth('my-secret'),
-  withLogging()
-);
-```
-
-## Examples
-
-### Microservice Template
-```typescript
-import { 
-  createServerWithPlugins,
-  withHealthCheck,
-  withLogging,
-  withErrorHandler,
-  withRequestId,
-  startServerWithShutdown
-} from '@naman_deep_singh/server-utils';
-
-const app = createServerWithPlugins(
-  {
-    cors: {
-      origin: process.env.ALLOWED_ORIGINS?.split(',') || '*',
-      credentials: true
-    },
-    helmet: true
-  },
-  withRequestId(),
-  withLogging(process.env.NODE_ENV === 'production' ? 'simple' : 'detailed'),
-  withHealthCheck('/health', {
-    customChecks: [
-      {
-        name: 'database',
-        check: async () => {
-          try {
-            await prisma.$queryRaw`SELECT 1`;
-            return true;
-          } catch {
-            return false;
-          }
-        }
-      }
-    ]
-  }),
-  withErrorHandler()
-);
-
-// Your routes
-app.use('/api', apiRoutes);
-
-const PORT = Number(process.env.PORT) || 3000;
-startServerWithShutdown(app, PORT, {
-  onShutdown: async () => {
-    await prisma.$disconnect();
-  }
-});
-```
-
-## TypeScript Support
-
-Full TypeScript support with comprehensive type definitions for all utilities and plugins.
-
-## License
-
-ISC
+### Optional (for specific features)
+- **@grpc/grpc-js** - For gRPC support
+- **jayson** - For JSON-RPC support
+- **socket.io** - For WebSocket support

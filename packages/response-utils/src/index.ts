@@ -8,7 +8,7 @@ export interface ApiResponse<T = any> {
 
 export interface ResponseObject {
   status: (code: number) => ResponseObject;
-  json: (data: any) => any;
+  json: (data: unknown) => any;
 }
 
 export const success = <T>(data: T, message = 'Success', statusCode = 200, res?: ResponseObject): ApiResponse<T> => {
@@ -144,3 +144,25 @@ export const getErrorMessage = (error: unknown): string => {
   if (typeof error === 'string') return error;
   return 'An unknown error occurred';
 };
+
+// Default export for namespace usage
+const ResponseUtils = {
+  success,
+  error,
+  created,
+  notFound,
+  badRequest,
+  unauthorized,
+  forbidden,
+  serverError,
+  noContent,
+  conflict,
+  validationError,
+  paginated,
+  tooManyRequests,
+  timeout,
+  logError,
+  getErrorMessage
+};
+
+export default ResponseUtils;

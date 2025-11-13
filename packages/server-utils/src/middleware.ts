@@ -22,22 +22,25 @@ export function createLoggingMiddleware(format: 'simple' | 'detailed' = 'simple'
 
 // Error handling middleware
 export function createErrorHandler(): express.ErrorRequestHandler {
-  return (err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  return (err: unknown, req: express.Request, res: express.Response, next: express.NextFunction) => {
     console.error('Error:', err);
     
     if (res.headersSent) {
       return next(err);
     }
     
-    const status = err.status || err.statusCode || 500;
+    // Type guard for error objects
+    const errorObj = err as { status?: number; statusCode?: number; message?: string; stack?: string };
+    
+    const status = errorObj.status || errorObj.statusCode || 500;
     const message = process.env.NODE_ENV === 'production' 
       ? 'Internal Server Error' 
-      : err.message;
+      : errorObj.message || 'Unknown error';
     
     res.status(status).json({
       status: false,
       message,
-      ...(process.env.NODE_ENV !== 'production' && { stack: err.stack })
+      ...(process.env.NODE_ENV !== 'production' && { stack: errorObj.stack })
     });
   };
 }
@@ -46,7 +49,7 @@ export function createErrorHandler(): express.ErrorRequestHandler {
 export function createRequestIdMiddleware(): express.RequestHandler {
   return (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const requestId = Math.random().toString(36).substring(2, 15);
-    (req as any).requestId = requestId;
+    (req as express.Request & { requestId: string }).requestId = requestId;
     res.setHeader('X-Request-ID', requestId);
     next();
   };
@@ -60,7 +63,7 @@ export interface ValidationRule {
   minLength?: number;
   maxLength?: number;
   pattern?: RegExp;
-  custom?: (value: any) => boolean | string;
+  custom?: (value: unknown) => boolean | string;
 }
 
 export function createValidationMiddleware(rules: ValidationRule[]): express.RequestHandler {
@@ -181,7 +184,7 @@ export function createRateLimitMiddleware(config: RateLimitConfig = {}): express
 // Authentication middleware helper
 export interface AuthConfig {
   tokenExtractor?: (req: express.Request) => string | null;
-  tokenValidator?: (token: string) => Promise<any> | any;
+  tokenValidator?: (token: string) => Promise<unknown> | unknown;
   unauthorizedMessage?: string;
 }
 
@@ -210,7 +213,7 @@ export function createAuthMiddleware(config: AuthConfig): express.RequestHandler
       }
       
       const user = await tokenValidator(token);
-      (req as any).user = user;
+      (req as express.Request & { user: unknown }).user = user;
       next();
     } catch (error) {
       return res.status(401).json({

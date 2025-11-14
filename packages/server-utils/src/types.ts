@@ -21,8 +21,21 @@ export interface ServerConfig {
   healthCheck?: boolean | string;
   gracefulShutdown?: boolean;
   socketIO?: SocketIOConfig;
+  periodicHealthCheck?: PeriodicHealthCheckConfig;
   name?: string;
   version?: string;
+}
+
+export interface PeriodicHealthCheckConfig {
+  enabled?: boolean;
+  interval?: number;
+  services?: HealthCheckService[];
+}
+
+export interface HealthCheckService {
+  name: string;
+  url: string;
+  timeout?: number;
 }
 
 export interface SocketIOConfig {

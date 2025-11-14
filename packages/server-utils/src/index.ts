@@ -41,6 +41,9 @@ export {
   getEnvBoolean
 } from './utils';
 
+// Periodic health monitoring
+export { PeriodicHealthMonitor, createPeriodicHealthMonitor } from './periodic-health';
+
 // Types
 export type { 
   ServerConfig, 
@@ -49,7 +52,9 @@ export type {
   GracefulShutdownConfig, 
   ServerPlugin,
   SocketIOConfig,
-  SocketInstance 
+  SocketInstance,
+  PeriodicHealthCheckConfig,
+  HealthCheckService
 } from './types';
 
 // Import all exports for default export
@@ -74,6 +79,7 @@ import {
   requireAuth
 } from './middleware';
 import { getEnv, getEnvNumber, getEnvBoolean } from './utils';
+import { PeriodicHealthMonitor, createPeriodicHealthMonitor } from './periodic-health';
 
 // Default export for namespace usage
 const ServerUtils = {
@@ -111,7 +117,11 @@ const ServerUtils = {
   // Utils
   getEnv,
   getEnvNumber,
-  getEnvBoolean
+  getEnvBoolean,
+  
+  // Periodic Health Monitoring
+  PeriodicHealthMonitor,
+  createPeriodicHealthMonitor
 };
 
 export default ServerUtils;

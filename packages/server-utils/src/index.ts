@@ -13,15 +13,15 @@ export { createHealthCheck, withHealthCheck, addHealthCheck } from './health';
 export { createGracefulShutdown, withGracefulShutdown, startServerWithShutdown } from './shutdown';
 
 // Middleware utilities
-export { 
-  createLoggingMiddleware, 
-  createErrorHandler, 
+export {
+  createLoggingMiddleware,
+  createErrorHandler,
   createRequestIdMiddleware,
   createValidationMiddleware,
   createRateLimitMiddleware,
   createAuthMiddleware,
-  withLogging, 
-  withErrorHandler, 
+  withLogging,
+  withErrorHandler,
   withRequestId,
   withValidation,
   withRateLimit,
@@ -42,14 +42,14 @@ export {
 } from './utils';
 
 // Periodic health monitoring
-export { PeriodicHealthMonitor, createPeriodicHealthMonitor } from './periodic-health';
+export { PeriodicHealthMonitor } from './periodic-health';
 
 // Types
-export type { 
-  ServerConfig, 
-  HealthCheckConfig, 
-  HealthCheck, 
-  GracefulShutdownConfig, 
+export type {
+  ServerConfig,
+  HealthCheckConfig,
+  HealthCheck,
+  GracefulShutdownConfig,
   ServerPlugin,
   SocketIOConfig,
   SocketInstance,
@@ -61,15 +61,15 @@ export type {
 import { ExpressServer, createServer } from './server';
 import { createHealthCheck, withHealthCheck, addHealthCheck } from './health';
 import { createGracefulShutdown, withGracefulShutdown, startServerWithShutdown } from './shutdown';
-import { 
-  createLoggingMiddleware, 
-  createErrorHandler, 
+import {
+  createLoggingMiddleware,
+  createErrorHandler,
   createRequestIdMiddleware,
   createValidationMiddleware,
   createRateLimitMiddleware,
   createAuthMiddleware,
-  withLogging, 
-  withErrorHandler, 
+  withLogging,
+  withErrorHandler,
   withRequestId,
   withValidation,
   withRateLimit,
@@ -79,24 +79,24 @@ import {
   requireAuth
 } from './middleware';
 import { getEnv, getEnvNumber, getEnvBoolean } from './utils';
-import { PeriodicHealthMonitor, createPeriodicHealthMonitor } from './periodic-health';
+import { PeriodicHealthMonitor } from './periodic-health';
 
 // Default export for namespace usage
 const ServerUtils = {
   // Server creation
   createServer,
   ExpressServer,
-  
+
   // Health checks
   createHealthCheck,
   withHealthCheck,
   addHealthCheck,
-  
+
   // Graceful shutdown
   createGracefulShutdown,
   withGracefulShutdown,
   startServerWithShutdown,
-  
+
   // Middleware
   createLoggingMiddleware,
   createErrorHandler,
@@ -113,15 +113,14 @@ const ServerUtils = {
   validateFields,
   rateLimit,
   requireAuth,
-  
+
   // Utils
   getEnv,
   getEnvNumber,
   getEnvBoolean,
-  
+
   // Periodic Health Monitoring
   PeriodicHealthMonitor,
-  createPeriodicHealthMonitor
 };
 
 export default ServerUtils;

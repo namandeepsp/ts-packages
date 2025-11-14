@@ -2,7 +2,7 @@ import express from 'express';
 import { Server } from 'http';
 import { ServerConfig, SocketIOConfig, SocketInstance } from './types';
 import { createGracefulShutdown } from './shutdown';
-import { PeriodicHealthMonitor, createPeriodicHealthMonitor } from './periodic-health';
+import { PeriodicHealthMonitor } from './periodic-health';
 import crypto from 'crypto';
 
 export interface GrpcService {
@@ -95,7 +95,7 @@ export class ExpressServer implements ServerInstance {
 
     // Apply middleware based on configuration
     this.setupMiddleware();
-    
+
     // Setup periodic health monitoring
     this.setupPeriodicHealthMonitoring();
   }
@@ -161,7 +161,7 @@ export class ExpressServer implements ServerInstance {
 
   private setupPeriodicHealthMonitoring(): void {
     if (this.config.periodicHealthCheck?.enabled) {
-      this.healthMonitor = createPeriodicHealthMonitor(
+      this.healthMonitor = new PeriodicHealthMonitor(
         this.config.periodicHealthCheck,
         this.config.name
       );
@@ -360,7 +360,7 @@ export class ExpressServer implements ServerInstance {
       };
 
       // Configure CORS
-      const corsConfig = config.cors === true 
+      const corsConfig = config.cors === true
         ? { origin: '*', methods: ['GET', 'POST'] }
         : config.cors || undefined;
 

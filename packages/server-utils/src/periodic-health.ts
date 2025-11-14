@@ -16,12 +16,12 @@ export class PeriodicHealthMonitor {
     }
 
     const interval = this.config.interval || 30000;
-    
+
     this.config.services.forEach(service => {
       const intervalId = setInterval(async () => {
         await this.checkServiceHealth(service);
       }, interval);
-      
+
       this.intervals.push(intervalId);
     });
 
@@ -49,7 +49,7 @@ export class PeriodicHealthMonitor {
       });
 
       clearTimeout(timeoutId);
-      
+
       if (response.ok) {
         console.log(`🟢 ${service.name} is healthy`);
         return true;
@@ -71,7 +71,7 @@ export class PeriodicHealthMonitor {
     }
 
     const results: Record<string, boolean> = {};
-    
+
     await Promise.all(
       this.config.services.map(async service => {
         results[service.name] = await this.checkServiceHealth(service);
@@ -80,8 +80,4 @@ export class PeriodicHealthMonitor {
 
     return results;
   }
-}
-
-export function createPeriodicHealthMonitor(config: PeriodicHealthCheckConfig, serviceName: string): PeriodicHealthMonitor {
-  return new PeriodicHealthMonitor(config, serviceName);
 }

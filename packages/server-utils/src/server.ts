@@ -2,6 +2,7 @@ import express from 'express';
 import { Server } from 'http';
 import { ServerConfig, SocketIOConfig, SocketInstance } from './types';
 import { createGracefulShutdown } from './shutdown';
+import { PeriodicHealthMonitor, createPeriodicHealthMonitor } from './periodic-health';
 import crypto from 'crypto';
 
 export interface GrpcService {
@@ -68,6 +69,7 @@ export class ExpressServer implements ServerInstance {
   private grpcServer?: GrpcServerInstance;
   private rpcMethods: RpcMethod = {};
   private socketIO?: { close(): void };
+  private healthMonitor?: PeriodicHealthMonitor;
 
   constructor(
     name: string = 'Express Server',
@@ -87,11 +89,15 @@ export class ExpressServer implements ServerInstance {
       customMiddleware: config.customMiddleware || [],
       healthCheck: config.healthCheck ?? true,
       gracefulShutdown: config.gracefulShutdown ?? true,
-      socketIO: config.socketIO
+      socketIO: config.socketIO,
+      periodicHealthCheck: config.periodicHealthCheck || { enabled: false }
     };
 
     // Apply middleware based on configuration
     this.setupMiddleware();
+    
+    // Setup periodic health monitoring
+    this.setupPeriodicHealthMonitoring();
   }
 
   private setupMiddleware(): void {
@@ -153,6 +159,15 @@ export class ExpressServer implements ServerInstance {
     }
   }
 
+  private setupPeriodicHealthMonitoring(): void {
+    if (this.config.periodicHealthCheck?.enabled) {
+      this.healthMonitor = createPeriodicHealthMonitor(
+        this.config.periodicHealthCheck,
+        this.config.name
+      );
+    }
+  }
+
   async start(): Promise<ServerInstance> {
     this.status = 'starting';
 
@@ -166,8 +181,17 @@ export class ExpressServer implements ServerInstance {
             createGracefulShutdown(this.server!, {
               onShutdown: async () => {
                 this.status = 'stopping';
+                // Stop health monitoring during shutdown
+                if (this.healthMonitor) {
+                  this.healthMonitor.stop();
+                }
               }
             });
+          }
+
+          // Start periodic health monitoring after server is running
+          if (this.healthMonitor) {
+            this.healthMonitor.start();
           }
 
           resolve(this);
@@ -187,6 +211,11 @@ export class ExpressServer implements ServerInstance {
     // Stop gRPC server if running
     if (this.grpcServer) {
       this.grpcServer.forceShutdown();
+    }
+
+    // Stop periodic health monitoring
+    if (this.healthMonitor) {
+      this.healthMonitor.stop();
     }
 
     // Stop Socket.IO server if running

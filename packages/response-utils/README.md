@@ -1,110 +1,162 @@
 # @naman_deep_singh/response-utils
 
-TypeScript utilities for standardized HTTP API responses with common status codes and error handling. Supports both standalone usage and Express.js integration.
+A flexible, framework-agnostic **TypeScript** response utility library for building consistent and configurable API responses.  
+Supports **Express.js**, pagination, typed payloads, and expandable response adapters.
 
-## Installation
+---
+
+## 🚀 Features
+
+| Feature                                        | Status |
+| ---------------------------------------------- | :----: |
+| Fully Typesafe Response Envelopes              |   ✅   |
+| Framework-Agnostic Core                        |   ✅   |
+| Express.js Adapter + Middleware                |   ✅   |
+| Automatic HTTP Status Handling                 |   ✅   |
+| Pagination Responses                           |   ✅   |
+| Centralized Response Config                    |   ✅   |
+| Legacy API (`success`, `error`, etc.)          |   ⚠️ Deprecated   |
+
+---
+
+## 📦 Installation
 
 ```bash
 npm install @naman_deep_singh/response-utils
-```
 
-## Features
+🧠 Architecture Overview
 
-- ✅ **Standardized API responses** with consistent format
-- ✅ **Express.js integration** - automatically sets HTTP status codes
-- ✅ **TypeScript support** with full type safety
-- ✅ **Hybrid exports** - use named imports or namespace imports
-- ✅ **Pagination support** with metadata
-- ✅ **Common HTTP status codes** (200, 201, 400, 401, 403, 404, 408, 409, 422, 429, 500)
-
-## Usage
-
-### Named Imports (Tree-shakable)
-```typescript
-import { success, error, created, notFound, paginated } from '@naman_deep_singh/response-utils';
-
-// Success responses
-const userResponse = success({ id: 1, name: 'John' }, 'User found');
-const createdResponse = created({ id: 2, name: 'Jane' });
-
-// Error responses
-const errorResponse = notFound('User not found');
-const validationResponse = validationError('Invalid input', ['Name is required']);
-
-// Paginated responses
-const paginatedUsers = paginated([{id: 1}, {id: 2}], 1, 10, 25);
-```
-
-### Namespace Import
-```typescript
-import ResponseUtils from '@naman_deep_singh/response-utils';
-
-const response = ResponseUtils.success({ id: 1 }, 'Success');
-```
-
-### Express.js Integration
-```typescript
-import { success, notFound } from '@naman_deep_singh/response-utils';
-import { Request, Response } from 'express';
-
-app.get('/users/:id', (req: Request, res: Response) => {
-  const user = findUser(req.params.id);
-  
-  if (!user) {
-    return notFound('User not found', res); // Sets status 404 and sends response
-  }
-  
-  return success(user, 'User found', 200, res); // Sets status 200 and sends response
-});
-```
-
-## API Reference
-
-### Success Responses
-- `success<T>(data: T, message?, statusCode?, res?)` - Generic success response (200)
-- `created<T>(data: T, message?, res?)` - 201 Created response
-- `noContent(message?, res?)` - 204 No Content response
-- `paginated<T>(data: T[], page, limit, total, message?, res?)` - Paginated response with metadata
-
-### Error Responses
-- `error(message, statusCode?, error?, res?)` - Generic error response
-- `badRequest(message?, validationError?, res?)` - 400 Bad Request
-- `unauthorized(message?, res?)` - 401 Unauthorized
-- `forbidden(message?, res?)` - 403 Forbidden
-- `notFound(message?, res?)` - 404 Not Found
-- `timeout(message?, res?)` - 408 Request Timeout
-- `conflict(message?, res?)` - 409 Conflict
-- `validationError(message?, errors[], res?)` - 422 Validation Error
-- `tooManyRequests(message?, res?)` - 429 Too Many Requests
-- `serverError(message?, res?)` - 500 Internal Server Error
-
-### Utility Functions
-- `logError(context: string, error: unknown)` - Structured error logging
-- `getErrorMessage(error: unknown)` - Extract error message safely
-
-## Response Format
-
-All responses follow the `ApiResponse<T>` interface:
-
-```typescript
-interface ApiResponse<T = any> {
+response-utils
+  ├─ core/          → BaseResponder + config + factory (framework-independent)
+  ├─ adapters/
+  │   └─ express/   → ExpressResponder + middleware
+  └─ legacy/        → success(), error(), etc. (optional migration layer)
+📄 Response Format (Default Envelope)
+interface ResponseEnvelope<P = unknown, M = Record<string, unknown>> {
   success: boolean;
-  message: string;
-  data?: T;
-  error?: string;
-  statusCode: number;
+  message?: string;
+  data?: P;
+  error: { message: string; code?: string; details?: unknown } | null;
+  meta: M | null;
 }
-```
 
-## Paginated Response Format
+🛠️ Usage Examples
 
-```typescript
-interface PaginatedResponse<T> extends ApiResponse<T[]> {
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
+✔ Framework-Agnostic Base Usage
+import { BaseResponder } from '@naman_deep_singh/response-utils';
+
+const r = new BaseResponder();
+
+// Returns envelope only → no HTTP involvement
+const result = r.ok({ user: "John" }, "Loaded");
+console.log(result);
+
+🌐 Express Integration (Recommended)
+
+Middleware Setup
+
+import express from 'express';
+import { responderMiddleware } from '@naman_deep_singh/response-utils/adapters/express';
+
+const app = express();
+app.use(responderMiddleware());
+Controller Usage
+app.get('/user', (req, res) => {
+  const r = (res as any).responder();
+
+  return r.okAndSend({ id: 1, name: "John Doe" }, "User found");
+});
+okAndSend() automatically applies HTTP status + JSON response
+
+⚙️ Configurable Response Metadata
+
+app.use(responderMiddleware({
+  timestamp: true,
+  extra: { service: "user-service" }
+}));
+
+Example output:
+
+{
+  "success": true,
+  "data": {...},
+  "error": null,
+  "meta": {
+    "timestamp": "2025-11-22T12:00:00Z",
+    "service": "user-service"
+  }
 }
+
+🔢 Pagination
+
+const r = (res as any).responder();
+
+r.paginatedAndSend(
+  [{ id: 1 }],
+  "Loaded",
+  { page: 1, limit: 10, total: 42 }
+);
+
+📚 Supported Methods
+
+BaseResponder Success Methods
+Method	Status Code
+ok()	200
+created()	201
+noContent()	204
+paginated()	200
+BaseResponder Error Methods
+Method	Status Code
+badRequest()	400
+unauthorized()	401
+forbidden()	403
+notFound()	404
+timeout()	408
+conflict()	409
+validationError()	422
+tooManyRequests()	429
+serverError()	500
+Each has a matching *AndSend Express variant.
+Example → notFoundAndSend(), createdAndSend()
+
+🧩 Extendable Adapter-Friendly Design
+
+You can write responders for:
+
+Fastify
+
+Hono
+
+AWS Lambda
+
+WebSockets
+
+GraphQL
+
+RPC Frameworks
+
+Example:
+
+class HonoResponder extends BaseResponder {
+  // custom send logic...
+}
+
+🕘 Legacy API Support (Optional)
+
+import { success, error } from '@naman_deep_singh/response-utils/legacy';
+
+success({ id: 1 });
+⚠ Best for quick scripts or migration — new API recommended
+
+🔜 Roadmap
+
+Feature	Status
+Fastify Adapter	Planned
+Hono Adapter	Planned
+Custom Error Classes	Planned
+Standardized Status Enums	Planned
+
+📄 License
+
+MIT © Naman Deep Singh
 ```

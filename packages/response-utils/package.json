@@ -1,22 +1,50 @@
 {
   "name": "@naman_deep_singh/response-utils",
-  "version": "1.0.7",
-  "description": "TypeScript utilities for standardized HTTP API responses with common status codes and error handling",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "version": "2.0.0",
+  "description": "TypeScript utilities for standardized API responses",
+  "author": "Naman Deep Singh",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./express": {
+      "import": "./dist/esm/adapters/express/index.js",
+      "require": "./dist/cjs/adapters/express/index.js",
+      "types": "./dist/types/adapters/express/index.d.ts"
+    },
+    "./legacy": {
+      "import": "./dist/esm/legacy/index.js",
+      "require": "./dist/cjs/legacy/index.js",
+      "types": "./dist/types/legacy/index.d.ts"
+    }
+  },
+  "sideEffects": false,
   "scripts": {
-    "build": "tsc"
+    "build": "pnpm run build:types && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json",
+    "build:types": "tsc -p tsconfig.base.json --emitDeclarationOnly --outDir dist/types",
+    "clean": "rimraf dist"
   },
   "keywords": [
     "response",
     "http",
     "api",
-    "utils"
+    "utils",
+    "express",
+    "typescript"
   ],
-  "author": "Naman Deep Singh",
-  "license": "ISC",
-  "packageManager": "pnpm@10.20.0",
+  "peerDependencies": {
+    "express": "^5.1.0"
+  },
   "devDependencies": {
-    "typescript": "^5.9.3"
+    "@types/express": "^5.0.5",
+    "express": "^5.1.0",
+    "typescript": "^5.9.3",
+    "rimraf": "^5.0.5"
   }
 }

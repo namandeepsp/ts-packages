@@ -1,39 +1,13 @@
-import jwt, { Secret, JwtPayload } from "jsonwebtoken";
-import bcrypt from "bcryptjs";
+export * from "./core/password";
+export * from "./core/jwt";
+export * from "./core/crypto";
 
-// 🧱 Password helpers
-export const hashPassword = async (password: string): Promise<string> => {
-  const salt = await bcrypt.genSalt(10);
-  return bcrypt.hash(password, salt);
+import * as PasswordUtils from "./core/password";
+import * as JWTUtils from "./core/jwt";
+import * as CryptoUtils from "./core/crypto";
+
+export default {
+  ...PasswordUtils,
+  ...JWTUtils,
+  ...CryptoUtils,
 };
-
-export const verifyPassword = async (password: string, hash: string): Promise<boolean> => {
-  return bcrypt.compare(password, hash);
-};
-
-// For backward compatibility
-export const comparePassword = verifyPassword;
-
-// 🧩 JWT helpers
-export const generateToken = (payload: Record<string, unknown>, secret: Secret, expiresIn = "1h"): string => {
-  return jwt.sign(payload, secret, { expiresIn, algorithm: "HS256" } as jwt.SignOptions);
-};
-
-export const verifyToken = (token: string, secret: Secret): string | JwtPayload => {
-  return jwt.verify(token, secret);
-};
-
-// For backward compatibility
-export const signToken = generateToken;
-
-// Default export for namespace usage
-const SecurityUtils = {
-  hashPassword,
-  verifyPassword,
-  comparePassword,
-  generateToken,
-  verifyToken,
-  signToken
-};
-
-export default SecurityUtils;

@@ -1,116 +1,268 @@
-# @naman_deep_singh/security
+A complete, lightweight security toolkit for Node.js & TypeScript providing:
 
-Security utilities for password hashing and JWT token management with TypeScript support.
-
-## Installation
+🔐 Password hashing & validation
+🔑 JWT signing & verification (no deprecated expiresIn)
+🧮 Duration parser ("15m", "7d", etc.)
+🪪 Token generator (access + refresh pair)
+♻️ Refresh token rotation helper
+🧰 Robust token extraction (Headers, Cookies, Query, Body, WebSocket)
+🧩 Safe & strict JWT decode utilities
+✔ Fully typed with TypeScript
+✔ Zero dependencies except bcrypt + jsonwebtoken
+✔ Works in both ESM and CommonJS
 
 ```bash
+
+📦 Installation
 npm install @naman_deep_singh/security
-```
 
-## Features
+🔧 Features
 
-- ✅ **Password hashing** with bcrypt (salt rounds: 10)
-- ✅ **JWT token management** with configurable expiration
-- ✅ **TypeScript support** with full type safety
-- ✅ **Hybrid exports** - use named imports or namespace imports
-- ✅ **Backward compatibility** with legacy function names
-- ✅ **Async/await support** for all operations
+🔥 Password Hashing — secure & async (bcrypt with 10 salt rounds)
 
-## Usage
+🔥 Custom Expiry JWT — manual exp support using duration strings
 
-### Named Imports (Tree-shakable)
-```typescript
-import { hashPassword, verifyPassword, generateToken, verifyToken } from '@naman_deep_singh/security';
+🔥 Token Pair Generation (accessToken + refreshToken)
 
-// Password hashing
-const hashedPassword = await hashPassword('mypassword');
-const isValid = await verifyPassword('mypassword', hashedPassword);
+🔥 Refresh Token Rotation
 
-// JWT tokens
-const token = generateToken({ userId: 1, role: 'admin' }, 'your-secret-key', '24h');
-const decoded = verifyToken(token, 'your-secret-key');
-```
+🔥 Safe & Unsafe JWT Verification
 
-### Namespace Import
-```typescript
-import SecurityUtils from '@naman_deep_singh/security';
+🔥 Strict vs Flexible Decoding
 
-const hashedPassword = await SecurityUtils.hashPassword('mypassword');
-const token = SecurityUtils.generateToken({ userId: 1 }, 'secret');
-```
+🔥 Universal Token Extraction (Headers, Cookies, Query, Body, WebSocket)
 
-### Backward Compatibility
-```typescript
-import { comparePassword, signToken } from '@naman_deep_singh/security';
+🔥 Duration Parser ("15m", "1h", "7d")
 
-// Legacy function names still work
-const isValid = await comparePassword('password', 'hash');
-const token = signToken({ userId: 1 }, 'secret');
-```
+🔥 Production-grade types
 
-## API Reference
+📘 Quick Start
+import {
+  hashPassword,
+  verifyPassword,
+  generateTokens,
+  verifyToken,
+  safeVerifyToken,
+  extractToken
+} from "@naman_deep_singh/security";
 
-### Password Functions
-- `hashPassword(password: string): Promise<string>` - Hash a password using bcrypt with salt rounds 10
-- `verifyPassword(password: string, hash: string): Promise<boolean>` - Verify password against hash
-- `comparePassword(password: string, hash: string): Promise<boolean>` - Alias for verifyPassword (backward compatibility)
+📚 API Documentation
 
-### JWT Functions
-- `generateToken(payload: Record<string, unknown>, secret: Secret, expiresIn?: string): string` - Generate JWT token
-- `verifyToken(token: string, secret: Secret): string | JwtPayload` - Verify and decode JWT token
-- `signToken(payload: Record<string, unknown>, secret: Secret, expiresIn?: string): string` - Alias for generateToken (backward compatibility)
+Below is a complete reference with full usage examples.
 
-## Examples
+🧂 1. Password Utilities
+hashPassword(password: string): Promise<string>
+const hashed = await hashPassword("mypassword");
+console.log(hashed); // $2a$10$...
 
-### Complete Authentication Flow
-```typescript
-import { hashPassword, verifyPassword, generateToken, verifyToken } from '@naman_deep_singh/security';
+verifyPassword(password: string, hash: string): Promise<boolean>
+const isValid = await verifyPassword("mypassword", hashed);
+if (isValid) console.log("Correct password");
 
-// Registration
-async function registerUser(email: string, password: string) {
-  const hashedPassword = await hashPassword(password);
-  // Save user with hashedPassword to database
-  return { email, password: hashedPassword };
+comparePassword()
+
+Alias for backward compatibility.
+
+🔑 2. JWT Signing
+signToken(payload, secret, expiresIn, options)
+
+Creates a JWT with custom exp logic ("15m", "1h", "7d")
+
+const token = signToken(
+  { userId: 1 },
+  process.env.JWT_SECRET!,
+  "1h"
+);
+
+console.log(token);
+
+
+✔ No deprecated expiresIn from jsonwebtoken
+✔ Expiration is injected manually via exp
+
+🧮 3. parseDuration()
+
+Parses duration strings into seconds.
+
+parseDuration("15m"); // 900
+parseDuration("2h");  // 7200
+parseDuration("7d");  // 604800
+
+
+Useful for token expiry, cache expiry, rate limiting, etc.
+
+🪪 4. generateTokens()
+
+Generates access + refresh token pair.
+
+const tokens = generateTokens(
+  { userId: 42 },
+  process.env.ACCESS_SECRET!,
+  process.env.REFRESH_SECRET!,
+  "15m",
+  "7d"
+);
+
+console.log(tokens.accessToken);
+console.log(tokens.refreshToken);
+
+♻️ 5. rotateRefreshToken()
+
+Creates a new refresh token using the old one:
+
+import { rotateRefreshToken } from "@naman_deep_singh/security";
+
+const newRefreshToken = rotateRefreshToken(
+  oldRefreshToken,
+  process.env.REFRESH_SECRET!
+);
+
+
+✔ Automatically removes old exp and iat
+✔ Generates fresh expiration
+
+🔍 6. verifyToken()
+
+Throws if token is invalid or expired.
+
+try {
+  const payload = verifyToken(token, process.env.ACCESS_SECRET!);
+  console.log("User authenticated:", payload);
+} catch (err) {
+  console.error("Invalid or expired token");
 }
 
-// Login
-async function loginUser(email: string, password: string, storedHash: string) {
-  const isValid = await verifyPassword(password, storedHash);
-  
-  if (!isValid) {
-    throw new Error('Invalid credentials');
-  }
-  
-  const token = generateToken(
-    { email, loginTime: Date.now() },
-    process.env.JWT_SECRET!,
-    '7d'
-  );
-  
-  return { token };
+🛡 7. safeVerifyToken()
+
+Never throws — returns { valid, payload?, error? }
+
+const result = safeVerifyToken(token, process.env.ACCESS_SECRET!);
+
+if (!result.valid) {
+  console.log("Token invalid:", result.error);
+} else {
+  console.log("Token OK:", result.payload);
 }
 
-// Verify JWT
-function authenticateRequest(token: string) {
+🧬 8. Decoding Helpers
+decodeToken(token)
+
+Flexible — returns null | string | JwtPayload
+
+const decoded = decodeToken(token);
+console.log(decoded);
+
+decodeTokenStrict(token)
+
+Throws if payload is not an object.
+
+try {
+  const payload = decodeTokenStrict(token);
+  console.log(payload.userId);
+} catch (e) {
+  console.error("Invalid token payload");
+}
+
+🛰 9. extractToken()
+
+Extracts tokens from:
+
+Headers (Authorization: Bearer <token>)
+
+Cookies (token, accessToken)
+
+Query (?token=...)
+
+Body ({ token: "" })
+
+WebSocket messages (string or object)
+
+Example: Express middleware
+export function authMiddleware(req, res, next) {
+  const token = extractToken({
+    header: req.headers.authorization,
+    cookies: req.cookies,
+    query: req.query,
+    body: req.body
+  });
+
+  if (!token) return res.status(401).json({ error: "Token missing" });
+
   try {
-    const decoded = verifyToken(token, process.env.JWT_SECRET!);
-    return decoded;
-  } catch (error) {
-    throw new Error('Invalid token');
+    req.user = verifyToken(token, process.env.ACCESS_SECRET!);
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: "Invalid token" });
   }
 }
+
+Example: WebSocket (ws library)
+ws.on("message", (msg) => {
+  const token = extractToken({ wsMessage: msg });
+
+  if (!token) return;
+
+  const result = safeVerifyToken(token, process.env.ACCESS_SECRET!);
+
+  if (result.valid) {
+    console.log("WS authenticated user:", result.payload);
+  }
+});
+
+🧩 10. Full Authentication Example
+Registration
+async function registerUser(email: string, password: string) {
+  const hash = await hashPassword(password);
+
+  return {
+    email,
+    passwordHash: hash
+  };
+}
+
+Login
+async function loginUser(email, password, storedHash) {
+  const valid = await verifyPassword(password, storedHash);
+
+  if (!valid) throw new Error("Invalid credentials");
+
+  return generateTokens(
+    { email },
+    process.env.ACCESS_SECRET!,
+    process.env.REFRESH_SECRET!,
+    "15m",
+    "7d"
+  );
+}
+
+Token Refresh
+function refresh(oldRefreshToken) {
+  const newRefreshToken = rotateRefreshToken(
+    oldRefreshToken,
+    process.env.REFRESH_SECRET!
+  );
+
+  const decoded = decodeTokenStrict(oldRefreshToken);
+
+  const newAccessToken = signToken(
+    { userId: decoded.userId },
+    process.env.ACCESS_SECRET!,
+    "15m"
+  );
+
+  return { accessToken: newAccessToken, refreshToken: newRefreshToken };
+}
+
+🔐 Security Best Practices
+
+✔ Use 32+ character secrets
+✔ Store secrets in environment variables
+✔ Always use HTTPS in production
+✔ Keep refresh tokens secure (HttpOnly cookie recommended)
+✔ Do not store passwords in plain text—ever
+
+📜 License
+
+MIT — free to use & modify.
+
 ```
-
-## Dependencies
-
-- **bcryptjs** - For secure password hashing
-- **jsonwebtoken** - For JWT token management
-
-## Security Best Practices
-
-1. **Use strong secrets** for JWT signing (minimum 32 characters)
-2. **Set appropriate expiration times** for tokens
-3. **Store JWT secrets in environment variables**
-4. **Never log or expose hashed passwords**
-5. **Use HTTPS** in production for token transmission

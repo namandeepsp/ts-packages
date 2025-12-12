@@ -21,8 +21,8 @@ importers:
   packages/errors-utils:
     dependencies:
       '@naman_deep_singh/response-utils':
-        specifier: ^2.0.2
-        version: 2.0.2(express@5.1.0)
+        specifier: ^2.0.3
+        version: 2.0.3(express@5.1.0)
     devDependencies:
       '@types/express':
         specifier: ^5.0.5
@@ -162,8 +162,8 @@ packages:
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
     engines: {node: '>=12'}
 
-  '@naman_deep_singh/response-utils@2.0.2':
-    resolution: {integrity: sha512-jIQHlGKC1xWWH+XlUc/YV5Bz4DnNSdMP9NiaTRBaVG4L472qS4N2Ce3/04XeJrbaARP3VPUL9ONEVFJTXhuYeA==}
+  '@naman_deep_singh/response-utils@2.0.3':
+    resolution: {integrity: sha512-cHlQzIdMry796/5Lop8Hj6In8SMmchLKM3VPrj6/K9bdrEE2CCrk///ZN4iCzs7ZALzKVyJ7h7t91I8YrNrU7g==}
     peerDependencies:
       express: ^5.1.0
 
@@ -982,7 +982,7 @@ snapshots:
       wrap-ansi: 8.1.0
       wrap-ansi-cjs: wrap-ansi@7.0.0
 
-  '@naman_deep_singh/response-utils@2.0.2(express@5.1.0)':
+  '@naman_deep_singh/response-utils@2.0.3(express@5.1.0)':
     dependencies:
       express: 5.1.0
 

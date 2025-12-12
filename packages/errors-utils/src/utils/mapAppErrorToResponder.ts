@@ -24,7 +24,6 @@ export function mapAppErrorToResponder(responder: ExpressResponder<any>, err: Ap
         case HTTP_STATUS.CLIENT_ERROR.TOO_MANY_REQUESTS:
             return responder.tooManyRequests(err.message);
 
-
         default:
             // Any other custom status maps to a generic server error
             return responder.serverError(err.message, { details: err.details });

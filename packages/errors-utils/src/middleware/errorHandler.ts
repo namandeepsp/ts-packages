@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { AppError } from "../error/AppError";
 import { ExpressResponder } from "@naman_deep_singh/response-utils";
-import { mapAppErrorToResponder } from "src/utils";
+import { mapAppErrorToResponder } from "src/utils/mapAppErrorToResponder";
 
 export function errorHandler(
     err: unknown,

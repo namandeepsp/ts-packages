@@ -37,6 +37,6 @@
         "rimraf": "^5.0.5"
     },
     "dependencies": {
-        "@naman_deep_singh/response-utils": "^2.0.3"
+        "@naman_deep_singh/response-utils": "^2.0.4"
     }
 }

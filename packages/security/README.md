@@ -1,15 +1,20 @@
+# @naman_deep_singh/security
+
+**Version:** 1.1.0
+
 A complete, lightweight security toolkit for Node.js & TypeScript providing:
 
-🔐 Password hashing & validation
-🔑 JWT signing & verification (no deprecated expiresIn)
-🧮 Duration parser ("15m", "7d", etc.)
-🪪 Token generator (access + refresh pair)
-♻️ Refresh token rotation helper
-🧰 Robust token extraction (Headers, Cookies, Query, Body, WebSocket)
-🧩 Safe & strict JWT decode utilities
-✔ Fully typed with TypeScript
-✔ Zero dependencies except bcrypt + jsonwebtoken
-✔ Works in both ESM and CommonJS
+🔐 **Password hashing & validation** with bcrypt
+🔑 **JWT signing & verification** (no deprecated expiresIn)
+🧮 **Duration parser** ("15m", "7d", etc.)
+🪪 **Token generator** (access + refresh pair)
+♻️ **Refresh token rotation** helper
+🧰 **Robust token extraction** (Headers, Cookies, Query, Body, WebSocket)
+🧩 **Safe & strict JWT decode** utilities
+🚨 **Standardized error handling** with @naman_deep_singh/errors-utils
+✔ **Fully typed** with TypeScript
+✔ **Consistent errors** across your application ecosystem
+✔ **Works in both ESM and CommonJS**
 
 ```bash
 
@@ -253,6 +258,48 @@ function refresh(oldRefreshToken) {
   return { accessToken: newAccessToken, refreshToken: newRefreshToken };
 }
 
+🚨 Error Handling
+
+This package uses standardized errors from `@naman_deep_singh/errors-utils`:
+
+```typescript
+import { 
+  hashPassword, 
+  verifyPassword,
+  BadRequestError, 
+  UnauthorizedError,
+  ValidationError,
+  InternalServerError 
+} from '@naman_deep_singh/security';
+
+try {
+  const hash = await hashPassword('mypassword');
+} catch (error) {
+  if (error instanceof BadRequestError) {
+    // Invalid password input (400)
+    console.log('Invalid password provided');
+  } else if (error instanceof InternalServerError) {
+    // Hashing failed (500)
+    console.log('Server error during hashing');
+  }
+}
+
+try {
+  const isValid = await verifyPassword('password', hash);
+} catch (error) {
+  if (error instanceof UnauthorizedError) {
+    // Password verification failed (401)
+    console.log('Invalid credentials');
+  }
+}
+```
+
+**Error Types:**
+- `BadRequestError` (400) - Invalid input data
+- `UnauthorizedError` (401) - Authentication failures
+- `ValidationError` (422) - Password strength validation
+- `InternalServerError` (500) - Server-side processing errors
+
 🔐 Security Best Practices
 
 ✔ Use 32+ character secrets
@@ -260,9 +307,41 @@ function refresh(oldRefreshToken) {
 ✔ Always use HTTPS in production
 ✔ Keep refresh tokens secure (HttpOnly cookie recommended)
 ✔ Do not store passwords in plain text—ever
+✔ Handle errors appropriately with proper HTTP status codes
+
+🔗 Integration with Other Packages
+
+### With @naman_deep_singh/server-utils
+
+```typescript
+import { createServer } from '@naman_deep_singh/server-utils';
+import { hashPassword, verifyPassword } from '@naman_deep_singh/security';
+
+const server = createServer('Auth API', '1.0.0');
+
+server.app.post('/register', async (req, res) => {
+  try {
+    const { password } = req.body;
+    const hash = await hashPassword(password);
+    // Save user with hash...
+    res.json({ success: true });
+  } catch (error) {
+    // Errors automatically handled by server-utils middleware
+    throw error; // Will be caught and formatted consistently
+  }
+});
+```
+
+### With @naman_deep_singh/errors-utils + @naman_deep_singh/response-utils
+
+```typescript
+import { expressErrorHandler } from '@naman_deep_singh/errors-utils';
+import { responderMiddleware } from '@naman_deep_singh/response-utils';
+
+server.app.use(responderMiddleware());
+server.app.use(expressErrorHandler); // Handles security errors consistently
+```
 
 📜 License
 
 MIT — free to use & modify.
-
-```

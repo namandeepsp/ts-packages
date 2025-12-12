@@ -2,13 +2,18 @@ import { extendString } from './string-extensions';
 import { extendArray } from './array-extensions';
 import { extendObject } from './object-extensions';
 import { extendNumber } from './number-extensions';
+import { setPerformanceConfig, getPerformanceConfig, type PerformanceConfig, withCache } from './performance';
 import './types';
+
+// Export withCache for use in extensions
+export { withCache };
 
 export interface ExtensionOptions {
   string?: boolean;
   array?: boolean;
   object?: boolean;
   number?: boolean;
+  performance?: PerformanceConfig;
 }
 
 /**
@@ -20,8 +25,13 @@ export function initExtensions(options: ExtensionOptions = {}): void {
     string = true,
     array = true,
     object = true,
-    number = true
+    number = true,
+    performance
   } = options;
+
+  if (performance) {
+    setPerformanceConfig(performance);
+  }
 
   if (string) extendString();
   if (array) extendArray();
@@ -48,8 +58,13 @@ export const extend = {
 
 
 
+// Export performance utilities
+export { setPerformanceConfig, getPerformanceConfig, type PerformanceConfig };
+
 export default {
   initExtensions,
   extendAll,
-  extend
+  extend,
+  setPerformanceConfig,
+  getPerformanceConfig
 };

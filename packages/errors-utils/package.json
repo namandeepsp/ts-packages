@@ -1,7 +1,7 @@
 {
     "name": "@naman_deep_singh/errors-utils",
-    "version": "1.0.0",
-    "description": "Security utilities for password hashing and JWT token management with TypeScript",
+    "version": "1.0.1",
+    "description": "Standardized error classes and Express middleware for consistent error handling with TypeScript",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
@@ -20,6 +20,6 @@
         "typescript": "^5.9.3"
     },
     "dependencies": {
-        "@naman_deep_singh/response-utils": "^2.0.3"
+        "@naman_deep_singh/response-utils": "^2.0.4"
     }
 }

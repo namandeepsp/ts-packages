@@ -60,6 +60,9 @@ importers:
 
   packages/security:
     dependencies:
+      '@naman_deep_singh/errors-utils':
+        specifier: ^1.0.0
+        version: 1.0.0(express@5.1.0)
       bcryptjs:
         specifier: ^3.0.3
         version: 3.0.3
@@ -161,6 +164,9 @@ packages:
   '@isaacs/cliui@8.0.2':
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
     engines: {node: '>=12'}
+
+  '@naman_deep_singh/errors-utils@1.0.0':
+    resolution: {integrity: sha512-djfAavOuU/ZS3qpAuKWeyOwb5K7TJwrK2j1s5Rap3lH1ZafSMCIbp5oKkjsaflM9rpAOGdiC042hoL+jl73JGA==}
 
   '@naman_deep_singh/response-utils@2.0.3':
     resolution: {integrity: sha512-cHlQzIdMry796/5Lop8Hj6In8SMmchLKM3VPrj6/K9bdrEE2CCrk///ZN4iCzs7ZALzKVyJ7h7t91I8YrNrU7g==}
@@ -981,6 +987,12 @@ snapshots:
       strip-ansi-cjs: strip-ansi@6.0.1
       wrap-ansi: 8.1.0
       wrap-ansi-cjs: wrap-ansi@7.0.0
+
+  '@naman_deep_singh/errors-utils@1.0.0(express@5.1.0)':
+    dependencies:
+      '@naman_deep_singh/response-utils': 2.0.3(express@5.1.0)
+    transitivePeerDependencies:
+      - express
 
   '@naman_deep_singh/response-utils@2.0.3(express@5.1.0)':
     dependencies:

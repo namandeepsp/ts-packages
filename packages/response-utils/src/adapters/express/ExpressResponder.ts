@@ -15,8 +15,49 @@ export class ExpressResponder<P = unknown> extends BaseResponder<P> {
         void this.ok(data, message);
     }
 
-
     createdAndSend(data?: P, message?: string) {
         void this.created(data, message);
+    }
+
+    badRequestAndSend(message?: string, error?: unknown) {
+        void this.badRequest(message, error);
+    }
+
+    unauthorizedAndSend(message?: string) {
+        void this.unauthorized(message);
+    }
+
+    forbiddenAndSend(message?: string) {
+        void this.forbidden(message);
+    }
+
+    notFoundAndSend(message?: string) {
+        void this.notFound(message);
+    }
+
+    conflictAndSend(message?: string) {
+        void this.conflict(message);
+    }
+
+    unprocessableEntityAndSend(message?: string, error?: unknown) {
+        void this.unprocessableEntity(message, error);
+    }
+
+    tooManyRequestsAndSend(message?: string) {
+        void this.tooManyRequests(message);
+    }
+
+    serverErrorAndSend(message?: string, error?: unknown) {
+        void this.serverError(message, error);
+    }
+
+    paginateAndSend(
+        data: P[],
+        page: number,
+        limit: number,
+        total: number,
+        message?: string
+    ) {
+        void this.paginate(data, page, limit, total, message);
     }
 }

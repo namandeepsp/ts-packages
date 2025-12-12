@@ -60,4 +60,24 @@ export function extendString() {
   String.prototype.stripHtml = function(): string {
     return this.replace(/<[^>]*>/g, '');
   };
+
+  String.prototype.padStart = function(targetLength: number, padString: string = ' '): string {
+    return this.toString().padStart(targetLength, padString);
+  };
+
+  String.prototype.padEnd = function(targetLength: number, padString: string = ' '): string {
+    return this.toString().padEnd(targetLength, padString);
+  };
+
+  String.prototype.count = function(substring: string): number {
+    return (this.match(new RegExp(substring, 'g')) || []).length;
+  };
+
+  String.prototype.words = function(): string[] {
+    return this.trim().split(/\s+/).filter(word => word.length > 0);
+  };
+
+  String.prototype.lines = function(): string[] {
+    return this.split(/\r?\n/);
+  };
 }

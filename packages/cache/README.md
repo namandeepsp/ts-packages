@@ -1,5 +1,7 @@
 # @naman_deep_singh/cache
 
+**Version:** 1.2.0 (with Redis Clustering support)
+
 A flexible, extensible caching layer with support for Redis, Memcache, and in-memory caches. Includes session management, health checks, and Express middleware.
 
 ## Features
@@ -207,6 +209,51 @@ await cache.get('key');
 await cache.delete('key');
 // ... and all other methods
 ```
+
+### Redis Cluster Support
+
+```typescript
+import { CacheFactory } from '@naman_deep_singh/cache';
+
+// Single cluster configuration with array notation
+const clusterCache = CacheFactory.create({
+  adapter: 'redis',
+  cluster: [
+    { host: 'redis-node-1.example.com', port: 6379 },
+    { host: 'redis-node-2.example.com', port: 6379 },
+    { host: 'redis-node-3.example.com', port: 6379 }
+  ],
+  namespace: 'myapp',
+  ttl: 3600
+});
+
+// Or with detailed cluster config
+const clusterCacheAlt = CacheFactory.create({
+  adapter: 'redis',
+  cluster: {
+    nodes: [
+      { host: 'redis-node-1.example.com', port: 6379 },
+      { host: 'redis-node-2.example.com', port: 6379 }
+    ],
+    options: {
+      enableReadyCheck: true,
+      maxRedirections: 3,
+      retryDelayOnFailover: 100,
+      retryDelayOnClusterDown: 300
+    }
+  }
+});
+
+// Use exactly like single instance - same ICache interface
+await clusterCache.set('key', value);
+const data = await clusterCache.get('key');
+await clusterCache.delete('key');
+
+// Cluster automatically handles key distribution across nodes
+// No changes needed to your application logic
+```
+
+**Note:** Cannot mix single-instance (`host`/`port`) and cluster (`cluster`) config. Choose one or the other.
 
 ### Memcache Adapter
 
@@ -563,33 +610,38 @@ All adapters implement the same `ICache<T>` interface and work identically. Choo
 | **Best For** | Production (distributed systems) | High-traffic scenarios | Development & testing |
 | **Cost** | Free (open source) | Free (open source) | Free |
 | **Performance** | Fast | Very Fast | Fastest (in-memory) |
-| **Cluster Support** | Yes (v2 planned) | Yes | N/A |
+| **Cluster Support** | Yes (v1.2+) | Yes | N/A |
 | **Authentication** | Username/Password/TLS | Optional | N/A |
 
 ### When to Use Each
 
 ```typescript
 // Development: quick setup, no dependencies
-const devCache = new MemoryCache({ adapter: 'memory' });
+const devCache = CacheFactory.create({ adapter: 'memory' });
 
 // Testing: mock external services
-const testCache = new MemoryCache({ adapter: 'memory' });
+const testCache = CacheFactory.create({ adapter: 'memory' });
 
-// Production: single server, high performance
-const prodCache = new RedisCache({
+// Production single instance: single server, high performance
+const prodCache = CacheFactory.create({
   adapter: 'redis',
   host: process.env.REDIS_HOST,
+  port: process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT) : 6379,
   password: process.env.REDIS_PASSWORD
 });
 
-// High-traffic distributed system
-const distributedCache = new RedisCache({
+// Production cluster: distributed Redis cluster
+const clusterCache = CacheFactory.create({
   adapter: 'redis',
-  host: process.env.REDIS_CLUSTER_ENDPOINT
+  cluster: [
+    { host: 'redis-node-1', port: 6379 },
+    { host: 'redis-node-2', port: 6379 },
+    { host: 'redis-node-3', port: 6379 }
+  ]
 });
 
-// Legacy system with Memcache
-const legacyCache = new MemcacheCache({
+// High-traffic with Memcache multi-server
+const memcacheCache = CacheFactory.create({
   adapter: 'memcache',
   servers: ['memcache1:11211', 'memcache2:11211']
 });

@@ -9,12 +9,31 @@ export interface CacheConfig {
 }
 
 /**
+ * Redis-cluster configuration
+ */
+export interface RedisClusterConfig {
+  nodes: Array<{
+    host: string;
+    port: number;
+  }>;
+  options?: {
+    enableReadyCheck?: boolean;
+    maxRedirections?: number;
+    retryDelayOnFailover?: number;
+    retryDelayOnClusterDown?: number;
+  };
+}
+
+/**
  * Redis-specific configuration
  */
 export interface RedisCacheConfig extends CacheConfig {
   adapter: 'redis';
+  // Existing single-instance
   host?: string;
   port?: number;
+  // New cluster support
+  cluster?: RedisClusterConfig | Array<{ host: string; port: number }>;
   username?: string;
   password?: string;
   db?: number;

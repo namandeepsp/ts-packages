@@ -15,7 +15,24 @@ export class CacheFactory {
   static create<T = unknown>(config: CacheConfig): ICache<T> {
     switch (config.adapter) {
       case 'redis':
-        return new RedisCache<T>(config as RedisCacheConfig);
+        const redisConfig = config as RedisCacheConfig;
+
+        // Validate: can't use both single + cluster
+        if (redisConfig.host && redisConfig.cluster) {
+          throw new CacheError(
+            'Cannot specify both host and cluster config',
+            'INVALID_CONFIG'
+          );
+        }
+
+        // Require either single or cluster
+        if (!redisConfig.host && !redisConfig.cluster) {
+          throw new CacheError(
+            'Redis requires either host or cluster config',
+            'INVALID_CONFIG'
+          );
+        }
+        return new RedisCache<T>(redisConfig);
 
       case 'memcache':
         return new MemcacheCache<T>(config as MemcacheCacheConfig);

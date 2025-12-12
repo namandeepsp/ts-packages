@@ -20,6 +20,6 @@
         "typescript": "^5.9.3"
     },
     "dependencies": {
-        "@naman_deep_singh/response-utils": "^2.0.1"
+        "@naman_deep_singh/response-utils": "^2.0.2"
     }
 }

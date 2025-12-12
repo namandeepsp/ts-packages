@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { AppError } from "../error/AppError";
 import { ExpressResponder } from "@naman_deep_singh/response-utils";
-import { mapAppErrorToResponder } from "src/utils";
+import { mapAppErrorToResponder } from "src/utils/mapAppErrorToResponder";
 
 export function errorHandler(
     err: unknown,
@@ -19,5 +19,7 @@ export function errorHandler(
     // Unexpected / programming / unknown error
     console.error("UNEXPECTED ERROR:", err);
 
-    return responder.serverError("Internal server error", { details: err });
+    return responder.serverError("Internal server error", {
+        details: process.env.NODE_ENV === "production" ? undefined : err,
+    });
 }

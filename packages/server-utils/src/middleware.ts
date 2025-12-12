@@ -38,9 +38,14 @@ export function createErrorHandler(): express.ErrorRequestHandler {
       : errorObj.message || 'Unknown error';
     
     res.status(status).json({
-      status: false,
+      success: false,
       message,
-      ...(process.env.NODE_ENV !== 'production' && { stack: errorObj.stack })
+      data: undefined,
+      error: {
+        message,
+        ...(process.env.NODE_ENV !== 'production' && { details: { stack: errorObj.stack } })
+      },
+      meta: null
     });
   };
 }
@@ -127,9 +132,14 @@ export function createValidationMiddleware(rules: ValidationRule[]): express.Req
     
     if (errors.length > 0) {
       return res.status(400).json({
-        status: false,
+        success: false,
         message: 'Validation failed',
-        errors
+        data: undefined,
+        error: {
+          message: 'Validation failed',
+          details: errors
+        },
+        meta: null
       });
     }
     
@@ -170,9 +180,16 @@ export function createRateLimitMiddleware(config: RateLimitConfig = {}): express
     
     if (record.count >= maxRequests) {
       return res.status(429).json({
-        status: false,
+        success: false,
         message,
-        retryAfter: Math.ceil((record.resetTime - now) / 1000)
+        data: undefined,
+        error: {
+          message,
+          details: {
+            retryAfter: Math.ceil((record.resetTime - now) / 1000)
+          }
+        },
+        meta: null
       });
     }
     
@@ -207,8 +224,13 @@ export function createAuthMiddleware(config: AuthConfig): express.RequestHandler
       
       if (!token) {
         return res.status(401).json({
-          status: false,
-          message: unauthorizedMessage
+          success: false,
+          message: unauthorizedMessage,
+          data: undefined,
+          error: {
+            message: unauthorizedMessage
+          },
+          meta: null
         });
       }
       
@@ -217,8 +239,13 @@ export function createAuthMiddleware(config: AuthConfig): express.RequestHandler
       next();
     } catch (error) {
       return res.status(401).json({
-        status: false,
-        message: unauthorizedMessage
+        success: false,
+        message: unauthorizedMessage,
+        data: undefined,
+        error: {
+          message: unauthorizedMessage
+        },
+        meta: null
       });
     }
   };

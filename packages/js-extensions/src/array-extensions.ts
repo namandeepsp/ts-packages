@@ -70,4 +70,28 @@ export function extendArray() {
     return this.reduce((acc, val) => 
       acc.concat(Array.isArray(val) ? val.deepFlatten() : val), []);
   };
+
+  Array.prototype.difference = function<T>(other: T[]): T[] {
+    return this.filter(item => !other.includes(item));
+  };
+
+  Array.prototype.intersection = function<T>(other: T[]): T[] {
+    return this.filter(item => other.includes(item));
+  };
+
+  Array.prototype.union = function<T>(other: T[]): T[] {
+    return [...new Set([...this, ...other])];
+  };
+
+  Array.prototype.sample = function<T>(): T | undefined {
+    return this.length > 0 ? this[Math.floor(Math.random() * this.length)] : undefined;
+  };
+
+  Array.prototype.take = function<T>(count: number): T[] {
+    return this.slice(0, Math.max(0, count));
+  };
+
+  Array.prototype.drop = function<T>(count: number): T[] {
+    return this.slice(Math.max(0, count));
+  };
 }

@@ -1,5 +1,7 @@
 # @naman_deep_singh/server-utils
 
+**Version:** 1.1.0
+
 Extensible server utilities for Express.js microservices with multi-protocol support and TypeScript.
 
 ## Installation
@@ -180,9 +182,24 @@ server.app.use('/protected', requireAuth({
 
 ## Health Checks
 
+### Basic Health Check
 ```typescript
-import { addHealthCheck } from '@naman_deep_singh/server-utils';
+import { addHealthCheck, createHealthCheck, withHealthCheck } from '@naman_deep_singh/server-utils';
 
+// Method 1: Direct addition
+addHealthCheck(server.app, '/health');
+
+// Method 2: As middleware
+server.app.get('/health', createHealthCheck());
+
+// Method 3: As plugin
+const server = createServerWithPlugins('My API', '1.0.0', [
+  withHealthCheck('/health')
+]);
+```
+
+### Advanced Health Checks
+```typescript
 addHealthCheck(server.app, '/health', {
   customChecks: [
     {
@@ -200,6 +217,17 @@ addHealthCheck(server.app, '/health', {
     }
   ]
 });
+
+// Response format:
+// {
+//   "status": "healthy",
+//   "checks": {
+//     "server": true,
+//     "timestamp": 1640995200000,
+//     "database": true,
+//     "redis": false
+//   }
+// }
 ```
 
 ## Server Management
@@ -246,11 +274,77 @@ interface ServerConfig {
 }
 ```
 
+## Environment Utilities
+
+```typescript
+import { getEnv, getEnvNumber, getEnvBoolean } from '@naman_deep_singh/server-utils';
+
+// Get string environment variable
+const dbUrl = getEnv('DATABASE_URL'); // Throws if missing
+const dbUrl = getEnv('DATABASE_URL', 'localhost'); // With default
+
+// Get number environment variable
+const port = getEnvNumber('PORT', 3000);
+const maxConnections = getEnvNumber('MAX_CONNECTIONS'); // Throws if missing
+
+// Get boolean environment variable
+const enableLogging = getEnvBoolean('ENABLE_LOGGING', true);
+const isProduction = getEnvBoolean('NODE_ENV'); // Must be 'true' or 'false'
+```
+
+## Periodic Health Monitoring
+
+```typescript
+import { PeriodicHealthMonitor } from '@naman_deep_singh/server-utils';
+
+const server = createServer('My API', '1.0.0', {
+  periodicHealthCheck: {
+    enabled: true,
+    interval: 30000, // 30 seconds
+    services: [
+      {
+        name: 'database',
+        url: 'http://localhost:5432/health',
+        timeout: 5000
+      },
+      {
+        name: 'redis',
+        url: 'http://localhost:6379/ping'
+      }
+    ]
+  }
+});
+
+// Manual health check
+const monitor = new PeriodicHealthMonitor(config, 'My Service');
+monitor.start();
+const status = await monitor.getHealthStatus();
+console.log(status); // { database: true, redis: false }
+```
+
+## Express Re-exports
+
+```typescript
+// Import Express types and classes directly from server-utils
+import { Request, Response, NextFunction, Router, Application } from '@naman_deep_singh/server-utils';
+import type { RequestHandler, ErrorRequestHandler } from '@naman_deep_singh/server-utils';
+
+// No need to install Express separately in your services
+```
+
 ## API Reference
 
 ### Core Functions
 - `createServer(name?, version?, config?)` - Create server instance
 - `ExpressServer` - Server class for advanced usage
+
+### Environment Utilities
+- `getEnv(key, defaultValue?)` - Get string environment variable
+- `getEnvNumber(key, defaultValue?)` - Get number environment variable  
+- `getEnvBoolean(key, defaultValue?)` - Get boolean environment variable
+
+### Health Monitoring
+- `PeriodicHealthMonitor` - Automated service health checking
 
 ### Middleware Functions
 - `createLoggingMiddleware(format?)` - Request logging
@@ -260,8 +354,10 @@ interface ServerConfig {
 - `createAuthMiddleware(config)` - Authentication
 
 ### Health & Monitoring
-- `createHealthCheck(config?)` - Health check endpoint
+- `createHealthCheck(config?)` - Create health check middleware
+- `withHealthCheck(path?, config?)` - Health check plugin
 - `addHealthCheck(app, path?, config?)` - Add health check to app
+- `PeriodicHealthMonitor` - Automated service health checking
 
 ### Graceful Shutdown
 - `createGracefulShutdown(server, config?)` - Setup graceful shutdown
@@ -270,12 +366,56 @@ interface ServerConfig {
 ## Dependencies
 
 ### Required
-- **express** - Web framework
-- **cors** - CORS middleware
-- **helmet** - Security middleware
-- **cookie-parser** - Cookie parsing
+- **express** - Web framework (v5.1.0+)
 
 ### Optional (for specific features)
+- **cors** - CORS middleware (if using CORS)
+- **helmet** - Security middleware (if using Helmet)
+- **cookie-parser** - Cookie parsing (if using cookies)
 - **@grpc/grpc-js** - For gRPC support
 - **jayson** - For JSON-RPC support
 - **socket.io** - For WebSocket support
+
+## Response Format
+
+All middleware responses follow the consistent format:
+
+```json
+{
+  "success": true/false,
+  "message": "Operation message",
+  "data": {...} | undefined,
+  "error": {
+    "message": "Error message",
+    "details": {...}
+  } | null,
+  "meta": {...} | null
+}
+```
+
+### Integration with @naman_deep_singh/response-utils
+
+For advanced error handling, use with `@naman_deep_singh/errors-utils`:
+
+```typescript
+import { expressErrorHandler } from '@naman_deep_singh/errors-utils';
+
+// Replace basic error handler with advanced one
+server.app.use(expressErrorHandler);
+```
+
+### Integration with @naman_deep_singh/response-utils
+
+For consistent API responses, use with `@naman_deep_singh/response-utils`:
+
+```typescript
+import { responderMiddleware } from '@naman_deep_singh/response-utils';
+
+server.app.use(responderMiddleware());
+
+// Now use responder in routes
+server.app.get('/users', (req, res) => {
+  const responder = (res as any).responder();
+  return responder.okAndSend({ users: [] });
+});
+```

@@ -1,12 +1,24 @@
 {
   "name": "@naman_deep_singh/js-extensions",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Universal JavaScript prototype extensions for common development utilities",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "browser": "dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build"
   },
   "keywords": [
     "javascript",

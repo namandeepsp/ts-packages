@@ -1,9 +1,9 @@
 import crypto from "crypto";
-import { InvalidPasswordError } from "src/error";
+import { BadRequestError } from "@naman_deep_singh/errors-utils";
 
 export function ensureValidPassword(password: string) {
     if (!password || typeof password !== "string") {
-        throw new InvalidPasswordError();
+        throw new BadRequestError('Invalid password provided');
     }
 }
 

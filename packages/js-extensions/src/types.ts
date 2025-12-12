@@ -13,6 +13,11 @@ declare global {
     isPalindrome(): boolean;
     toTitleCase(): string;
     stripHtml(): string;
+    padStart(targetLength: number, padString?: string): string;
+    padEnd(targetLength: number, padString?: string): string;
+    count(substring: string): number;
+    words(): string[];
+    lines(): string[];
   }
 
   interface Array<T> {
@@ -28,6 +33,12 @@ declare global {
     partition(predicate: (item: T) => boolean): [T[], T[]];
     flatten(depth?: number): any[];
     deepFlatten(): any[];
+    difference(other: T[]): T[];
+    intersection(other: T[]): T[];
+    union(other: T[]): T[];
+    sample(): T | undefined;
+    take(count: number): T[];
+    drop(count: number): T[];
   }
 
   interface Object {
@@ -37,6 +48,9 @@ declare global {
     deepClone<T>(): T;
     merge(other: Record<string, any>): Record<string, any>;
     deepFreeze<T>(): T;
+    hasPath(path: string): boolean;
+    getPath(path: string, defaultValue?: any): any;
+    setPath(path: string, value: any): any;
   }
 
   interface Number {
@@ -50,6 +64,12 @@ declare global {
     toOrdinal(): string;
     toRoman(): string;
     inRange(min: number, max: number): boolean;
+    round(decimals?: number): number;
+    ceil(decimals?: number): number;
+    floor(decimals?: number): number;
+    abs(): number;
+    sign(): number;
+    times(callback: (index: number) => void): void;
   }
 }
 

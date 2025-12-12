@@ -8,5 +8,4 @@ export * from "./error/ConflictError";
 export * from "./error/ValidationError";
 export * from "./error/InternalServerError";
 
-export * from "./middleware/errorConverter";
-export * from "./middleware/errorHandler";
+export * from "./middleware/express";

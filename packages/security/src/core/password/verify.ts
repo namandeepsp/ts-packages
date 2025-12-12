@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { VerificationError } from "src/error";
+import { UnauthorizedError } from "@naman_deep_singh/errors-utils";
 
 /**
  * Compare a password with a stored hash asynchronously.
@@ -7,10 +7,10 @@ import { VerificationError } from "src/error";
 export const verifyPassword = async (password: string, hash: string): Promise<boolean> => {
     try {
         const result = await bcrypt.compare(password, hash);
-        if (!result) throw new VerificationError();
+        if (!result) throw new UnauthorizedError('Password verification failed');
         return result;
     } catch {
-        throw new VerificationError();
+        throw new UnauthorizedError('Password verification failed');
     }
 };
 
@@ -25,10 +25,10 @@ export async function verifyPasswordWithPepper(password: string, pepper: string,
 export const verifyPasswordSync = (password: string, hash: string): boolean => {
     try {
         const result = bcrypt.compareSync(password, hash);
-        if (!result) throw new VerificationError();
+        if (!result) throw new UnauthorizedError('Password verification failed');
         return result;
     } catch (error) {
-        throw new VerificationError();
+        throw new UnauthorizedError('Password verification failed');
     }
 };
 

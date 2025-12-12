@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { ensureValidPassword } from "./utils";
-import { HashingError } from "src/error";
+import { InternalServerError } from "@naman_deep_singh/errors-utils";
 
 /**
  * Hash a password asynchronously using bcrypt.
@@ -11,7 +11,7 @@ export const hashPassword = async (password: string, saltRounds = 10): Promise<s
         const salt = await bcrypt.genSalt(saltRounds);
         return bcrypt.hash(password, salt);
     } catch (err) {
-        throw new HashingError();
+        throw new InternalServerError('Password hashing failed');
     }
 };
 
@@ -29,7 +29,7 @@ export const hashPasswordSync = (password: string, saltRounds = 10): string => {
         const salt = bcrypt.genSaltSync(saltRounds);
         return bcrypt.hashSync(password, salt);
     } catch (error) {
-        throw new HashingError();
+        throw new InternalServerError('Password hashing failed');
     }
 };
 

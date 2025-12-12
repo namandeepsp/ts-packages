@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { AppError } from "../error/AppError";
+import { AppError } from "../../error/AppError";
 
 export function errorConverter(err: any, req: Request, res: Response, next: NextFunction) {
     if (err instanceof AppError) {

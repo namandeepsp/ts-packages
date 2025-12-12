@@ -53,39 +53,80 @@ export class BaseResponder<P = unknown, M = PaginationMeta> {
      *  Standard REST Response Helpers
      * ----------------------------- */
     ok(data?: P, message = 'Success') {
-        return this.send(HTTP_STATUS.SUCCESS.OK, this.buildEnvelope(data, message));
+        return this.send(
+            HTTP_STATUS.SUCCESS.OK,
+            this.buildEnvelope(data, message)
+        );
     }
 
     created(data?: P, message = 'Created successfully') {
-        return this.send(HTTP_STATUS.SUCCESS.CREATED, this.buildEnvelope(data, message));
+        return this.send(
+            HTTP_STATUS.SUCCESS.CREATED,
+            this.buildEnvelope(data, message)
+        );
     }
 
     noContent(message = 'No Content') {
-        return this.send(HTTP_STATUS.SUCCESS.NO_CONTENT, this.buildEnvelope(undefined, message));
+        return this.send(
+            HTTP_STATUS.SUCCESS.NO_CONTENT,
+            this.buildEnvelope(undefined, message)
+        );
     }
 
     badRequest(message = 'Bad request', error?: unknown) {
-        return this.send(HTTP_STATUS.CLIENT_ERROR.BAD_REQUEST, this.buildEnvelope(undefined, message, error));
+        return this.send(
+            HTTP_STATUS.CLIENT_ERROR.BAD_REQUEST,
+            this.buildEnvelope(undefined, message, error)
+        );
     }
 
     unauthorized(message = 'Unauthorized') {
-        return this.send(HTTP_STATUS.CLIENT_ERROR.UNAUTHORIZED, this.buildEnvelope(undefined, message));
+        return this.send(
+            HTTP_STATUS.CLIENT_ERROR.UNAUTHORIZED,
+            this.buildEnvelope(undefined, message)
+        );
     }
 
     forbidden(message = 'Forbidden') {
-        return this.send(HTTP_STATUS.CLIENT_ERROR.FORBIDDEN, this.buildEnvelope(undefined, message));
+        return this.send(
+            HTTP_STATUS.CLIENT_ERROR.FORBIDDEN,
+            this.buildEnvelope(undefined, message)
+        );
     }
 
     notFound(message = 'Not found') {
-        return this.send(HTTP_STATUS.CLIENT_ERROR.NOT_FOUND, this.buildEnvelope(undefined, message));
+        return this.send(
+            HTTP_STATUS.CLIENT_ERROR.NOT_FOUND,
+            this.buildEnvelope(undefined, message)
+        );
     }
 
     conflict(message = 'Conflict') {
-        return this.send(HTTP_STATUS.CLIENT_ERROR.CONFLICT, this.buildEnvelope(undefined, message));
+        return this.send(
+            HTTP_STATUS.CLIENT_ERROR.CONFLICT,
+            this.buildEnvelope(undefined, message)
+        );
+    }
+
+    unprocessableEntity(message = 'Unprocessable Entity', error?: unknown) {
+        return this.send(
+            HTTP_STATUS.CLIENT_ERROR.UNPROCESSABLE_ENTITY,
+            this.buildEnvelope(undefined, message, error)
+        );
+    }
+
+    tooManyRequests(message = 'Too Many Requests') {
+        return this.send(
+            HTTP_STATUS.CLIENT_ERROR.TOO_MANY_REQUESTS,
+            this.buildEnvelope(undefined, message)
+        );
     }
 
     serverError(message = 'Internal server error', error?: unknown) {
-        return this.send(HTTP_STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR, this.buildEnvelope(undefined, message, error));
+        return this.send(
+            HTTP_STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
+            this.buildEnvelope(undefined, message, error)
+        );
     }
 
     paginate(

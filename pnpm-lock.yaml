@@ -20,9 +20,6 @@ importers:
 
   packages/cache:
     dependencies:
-      '@naman_deep_singh/response-utils':
-        specifier: ^2.0.4
-        version: 2.0.4(express@5.2.1)
       memcached:
         specifier: ^2.2.2
         version: 2.2.2
@@ -122,6 +119,9 @@ importers:
 
   packages/server-utils:
     dependencies:
+      '@naman_deep_singh/cache':
+        specifier: ^1.2.0
+        version: 1.2.0
       '@types/express':
         specifier: ^5.0.5
         version: 5.0.6
@@ -207,6 +207,9 @@ packages:
   '@isaacs/cliui@8.0.2':
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
     engines: {node: '>=12'}
+
+  '@naman_deep_singh/cache@1.2.0':
+    resolution: {integrity: sha512-GKe67wCjpKDt0wv9VWuKDBhnZsCPUnSuvNtKanaavSl24iBt1JnZ0v8hp4WGR22U0zrbUs2/x0wGFmajKYc4Jw==}
 
   '@naman_deep_singh/errors-utils@1.0.0':
     resolution: {integrity: sha512-djfAavOuU/ZS3qpAuKWeyOwb5K7TJwrK2j1s5Rap3lH1ZafSMCIbp5oKkjsaflM9rpAOGdiC042hoL+jl73JGA==}
@@ -1084,6 +1087,11 @@ snapshots:
       strip-ansi-cjs: strip-ansi@6.0.1
       wrap-ansi: 8.1.0
       wrap-ansi-cjs: wrap-ansi@7.0.0
+
+  '@naman_deep_singh/cache@1.2.0':
+    dependencies:
+      memcached: 2.2.2
+      redis: 4.7.1
 
   '@naman_deep_singh/errors-utils@1.0.0(express@5.2.1)':
     dependencies:

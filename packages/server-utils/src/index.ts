@@ -29,6 +29,8 @@ export {
   validateFields,
   rateLimit,
   requireAuth,
+  cacheResponse,
+  useSession,
   type ValidationRule,
   type RateLimitConfig,
   type AuthConfig

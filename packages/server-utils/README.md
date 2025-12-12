@@ -1,8 +1,8 @@
 # @naman_deep_singh/server-utils
 
-**Version:** 1.1.0
+**Version:** 1.2.0 (with integrated cache & session support)
 
-Extensible server utilities for Express.js microservices with multi-protocol support and TypeScript.
+Extensible server utilities for Express.js microservices with multi-protocol support, integrated caching, session management, and TypeScript.
 
 ## Installation
 
@@ -13,13 +13,15 @@ npm install @naman_deep_singh/server-utils
 ## Features
 
 - ✅ **Multi-protocol support** - HTTP, gRPC, JSON-RPC, WebSockets, Webhooks
+- ✅ **Integrated caching** - Redis, Memcache, in-memory with automatic fallback
+- ✅ **Session management** - Distributed session store with configurable TTL
 - ✅ **Express.js integration** with middleware collection
-- ✅ **Graceful shutdown** handling
-- ✅ **Health checks** with custom checks support
+- ✅ **Graceful shutdown** handling with cache/session cleanup
+- ✅ **Health checks** with custom checks and cache health integration
 - ✅ **TypeScript support** with full type safety
 - ✅ **Hybrid exports** - use named imports or namespace imports
 - ✅ **Plugin architecture** for extensibility
-- ✅ **Built-in middleware** - logging, validation, rate limiting, auth
+- ✅ **Built-in middleware** - logging, validation, rate limiting, auth, caching, sessions
 
 ## Quick Start
 
@@ -417,5 +419,253 @@ server.app.use(responderMiddleware());
 server.app.get('/users', (req, res) => {
   const responder = (res as any).responder();
   return responder.okAndSend({ users: [] });
+});
+```
+
+## Cache & Session Integration
+
+Built-in support for distributed caching and session management (disabled by default).
+
+### Enable Redis Cache
+
+```typescript
+const server = createServer('My API', '1.0.0', {
+  port: 3000,
+  cache: {
+    enabled: true,
+    adapter: 'redis',
+    options: {
+      host: 'localhost',
+      port: 6379,
+      password: 'your_password'
+    },
+    defaultTTL: 3600 // seconds
+  }
+});
+
+// Access cache in routes
+server.app.get('/user/:id', async (req, res) => {
+  const key = `user:${req.params.id}`;
+  const cached = await (req as any).cache.get(key);
+  if (cached) return res.json(cached);
+
+  // Fetch from DB, then cache
+  const user = { id: req.params.id, name: 'John' };
+  await (req as any).cache.set(key, user, 3600);
+  return res.json(user);
+});
+```
+
+### Enable Redis Cluster Cache
+
+```typescript
+const server = createServer('My API', '1.0.0', {
+  port: 3000,
+  cache: {
+    enabled: true,
+    adapter: 'redis',
+    options: {
+      cluster: [
+        { host: 'redis-node-1', port: 6379 },
+        { host: 'redis-node-2', port: 6379 },
+        { host: 'redis-node-3', port: 6379 }
+      ]
+    }
+  }
+});
+```
+
+### Enable Memcache
+
+```typescript
+const server = createServer('My API', '1.0.0', {
+  port: 3000,
+  cache: {
+    enabled: true,
+    adapter: 'memcache',
+    options: {
+      servers: ['localhost:11211', 'localhost:11212']
+    }
+  }
+});
+```
+
+### Enable Sessions
+
+```typescript
+const server = createServer('My API', '1.0.0', {
+  port: 3000,
+  cache: {
+    enabled: true,
+    adapter: 'redis',
+    options: { host: 'localhost', port: 6379 }
+  },
+  session: {
+    enabled: true,
+    cookieName: 'my_app.sid', // Defaults to {servername}.sid
+    ttl: 3600, // 1 hour
+    cookieOptions: {
+      httpOnly: true,
+      secure: true, // HTTPS only
+      sameSite: 'strict'
+    }
+  }
+});
+
+// Use sessions in routes
+server.app.post('/login', async (req, res) => {
+  const sessionStore = (req.app as any).locals.sessionStore;
+  const sessionId = Math.random().toString(36).substring(7);
+
+  await sessionStore.create(sessionId, {
+    userId: 123,
+    username: 'john_doe',
+    loginTime: new Date()
+  });
+
+  res.cookie((req.app as any).locals.sessionCookieName, sessionId, {
+    httpOnly: true,
+    secure: true
+  });
+
+  return res.json({ message: 'Logged in' });
+});
+
+server.app.get('/profile', async (req, res) => {
+  const sessionId = (req as any).sessionId;
+  if (!sessionId) return res.status(401).json({ error: 'No session' });
+
+  const session = await (req as any).getSession();
+  if (!session) return res.status(401).json({ error: 'Session expired' });
+
+  return res.json({ user: session.username, loginTime: session.loginTime });
+});
+```
+
+### Per-Route Response Caching
+
+```typescript
+import { cacheResponse } from '@naman_deep_singh/server-utils';
+
+// Cache GET response for 1 hour (3600 seconds)
+server.app.get('/api/posts', cacheResponse(3600), (req, res) => {
+  // This endpoint's response is cached
+  res.json({ posts: [...] });
+});
+
+// Cache with default TTL from server config
+server.app.get('/api/trending', cacheResponse(), (req, res) => {
+  res.json({ trending: [...] });
+});
+```
+
+### Health Check with Cache Status
+
+```typescript
+const server = createServer('My API', '1.0.0', {
+  healthCheck: '/health', // Automatic health endpoint
+  cache: { enabled: true, adapter: 'redis', ... }
+});
+
+// Health endpoint now includes cache status
+// GET /health returns:
+// {
+//   "status": "healthy",
+//   "service": "My API",
+//   "version": "1.0.0",
+//   "uptime": 12345,
+//   "timestamp": "2025-12-12T...",
+//   "cache": {
+//     "isAlive": true,
+//     "adapter": "redis",
+//     "timestamp": "2025-12-12T..."
+//   }
+// }
+```
+
+### Cache Configuration Options
+
+All configuration is optional — cache and session are disabled by default:
+
+```typescript
+interface CacheConfig {
+  enabled?: boolean;          // Default: false
+  adapter?: 'redis' | 'memcache' | 'memory'; // Default: 'memory'
+  options?: {
+    // Redis single instance
+    host?: string;           // Default: 'localhost'
+    port?: number;           // Default: 6379
+    username?: string;
+    password?: string;
+    db?: number;             // 0-15
+    tls?: boolean;
+    
+    // Redis cluster
+    cluster?: Array<{ host: string; port: number }> | {
+      nodes: Array<{ host: string; port: number }>;
+      options?: { maxRedirections?: number; ... };
+    };
+    
+    // Memcache
+    servers?: string | string[]; // e.g., 'localhost:11211'
+    
+    namespace?: string;      // Key prefix
+    ttl?: number;           // Default TTL in seconds
+  };
+  defaultTTL?: number;        // Fallback TTL for routes
+}
+
+interface SessionConfig {
+  enabled?: boolean;          // Default: false
+  cookieName?: string;        // Default: {servername}.sid
+  ttl?: number;              // Default: 3600 (1 hour)
+  cookieOptions?: {
+    path?: string;
+    httpOnly?: boolean;      // Default: true
+    secure?: boolean;        // HTTPS only
+    sameSite?: 'lax' | 'strict' | 'none';
+  };
+}
+```
+
+### Graceful Shutdown
+
+Cache and session stores are automatically closed on graceful shutdown:
+
+```typescript
+const server = createServer('My API', '1.0.0', {
+  gracefulShutdown: true, // Enabled by default
+  cache: { enabled: true, adapter: 'redis', ... },
+  session: { enabled: true, ... }
+});
+
+// On SIGTERM/SIGINT, server will:
+// 1. Stop accepting requests
+// 2. Close cache connection (Redis/Memcache)
+// 3. Close session store
+// 4. Exit gracefully
+```
+
+## Feature Flags
+
+All major features can be toggled independently:
+
+```typescript
+const server = createServer('My API', '1.0.0', {
+  port: 3000,
+  cors: true,              // Default: true
+  helmet: true,            // Default: true
+  json: true,              // Default: true
+  cookieParser: false,     // Default: false
+  healthCheck: '/health',  // Default: true
+  gracefulShutdown: true,  // Default: true
+  cache: { enabled: false }, // Default: disabled
+  session: { enabled: false }, // Default: disabled
+  socketIO: { enabled: false }, // Default: disabled
+  periodicHealthCheck: { // Default: disabled
+    enabled: false,
+    interval: 30000,
+    services: [...]
+  }
 });
 ```

@@ -1,6 +1,6 @@
 {
   "name": "@naman_deep_singh/server-utils",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Extensible server utilities for Express.js microservices with TypeScript",
   "type": "module",
   "main": "./dist/cjs/index.js",
@@ -34,15 +34,16 @@
   "license": "ISC",
   "packageManager": "pnpm@10.20.0",
   "dependencies": {
-    "express": "^5.1.0",
-    "cors": "^2.8.5",
-    "helmet": "^8.1.0",
+    "@naman_deep_singh/cache": "^1.2.0",
+    "@types/express": "^5.0.5",
     "cookie-parser": "^1.4.6",
-    "@types/express": "^5.0.5"
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
-    "typescript": "^5.9.3",
-    "rimraf": "^5.0.5"
+    "rimraf": "^5.0.5",
+    "typescript": "^5.9.3"
   }
 }

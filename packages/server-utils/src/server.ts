@@ -4,6 +4,7 @@ import { ServerConfig, SocketIOConfig, SocketInstance } from './types';
 import { createGracefulShutdown } from './shutdown';
 import { PeriodicHealthMonitor } from './periodic-health';
 import crypto from 'crypto';
+import { CacheFactory, SessionStore } from '@naman_deep_singh/cache';
 
 export interface GrpcService {
   service: Record<string, unknown>;
@@ -91,7 +92,15 @@ export class ExpressServer implements ServerInstance {
       gracefulShutdown: config.gracefulShutdown ?? true,
       socketIO: config.socketIO,
       periodicHealthCheck: config.periodicHealthCheck || { enabled: false }
+      ,
+      cache: config.cache || { enabled: false },
+      session: config.session || { enabled: false }
     };
+
+    // Initialize locals for cache/session
+    (this.app as any).locals.cache = undefined;
+    (this.app as any).locals.sessionStore = undefined;
+    (this.app as any).locals.cacheDefaultTTL = config.cache?.defaultTTL;
 
     // Apply middleware based on configuration
     this.setupMiddleware();
@@ -147,15 +156,107 @@ export class ExpressServer implements ServerInstance {
     // Add health check if enabled
     if (this.config.healthCheck) {
       const healthPath = typeof this.config.healthCheck === 'string' ? this.config.healthCheck : '/health';
-      this.app.get(healthPath, (req, res) => {
-        res.status(200).json({
+      this.app.get(healthPath, async (req, res) => {
+        const base = {
           status: 'healthy',
           service: this.config.name,
           version: this.config.version,
           uptime: Date.now() - this.config.startTime.getTime(),
           timestamp: new Date().toISOString()
-        });
+        } as any;
+
+        // If cache is enabled, include its health
+        const cache = (req.app as any).locals.cache;
+        if (cache && typeof cache.isAlive === 'function') {
+          try {
+            base.cache = await cache.isAlive();
+          } catch (e) {
+            base.cache = { isAlive: false, adapter: 'unknown', timestamp: new Date(), error: (e as Error).message };
+          }
+        }
+
+        res.status(200).json(base);
       });
+    }
+  }
+
+  private async setupCacheAndSession(config: ServerConfig, serverName: string): Promise<void> {
+    try {
+      // Initialize cache if enabled
+      if (config.cache && config.cache.enabled) {
+        try {
+          const provided = config.cache.options as any;
+          let cacheConfig: any = provided && typeof provided === 'object' ? provided : undefined;
+          if (!cacheConfig) {
+            cacheConfig = { adapter: config.cache.adapter || 'memory' };
+          }
+
+          console.log(`🔄 [${serverName}] Initializing cache adapter: ${config.cache.adapter || 'memory'}...`);
+
+          // Use createWithFallback to prefer primary and fall back to memory when configured
+          const cache = await CacheFactory.createWithFallback<any>({
+            ...(cacheConfig || {}),
+            ttl: cacheConfig?.ttl ?? config.cache?.defaultTTL
+          });
+
+          (this.app as any).locals.cache = cache;
+          (this as any).cache = cache;
+          (this.app as any).locals.cacheDefaultTTL = config.cache?.defaultTTL;
+
+          // attach per-request helper middleware
+          this.app.use((req, _res, next) => {
+            (req as any).cache = cache;
+            next();
+          });
+
+          console.log(`✅ [${serverName}] Cache initialized successfully (adapter: ${(cacheConfig.adapter || 'memory')})`);
+        } catch (err) {
+          console.error(`❌ [${serverName}] Failed to initialize cache (fallback to memory if enabled):`, err instanceof Error ? err.message : err);
+          // Cache initialization error is critical but we continue to allow graceful fallback
+        }
+      }
+
+      // Initialize session if enabled
+      if (config.session && config.session.enabled) {
+        const cookieName = config.session.cookieName || `${serverName.replace(/\s+/g, '_').toLowerCase()}.sid`;
+        const ttl = config.session.ttl ?? 3600;
+        let cache = (this.app as any).locals.cache;
+
+        if (!cache) {
+          // fallback to in-memory cache for session store
+          try {
+            cache = CacheFactory.create({ adapter: 'memory' });
+            (this.app as any).locals.cache = cache;
+            (this as any).cache = cache;
+            console.log(`📝 [${serverName}] Session store using in-memory cache`);
+          } catch (e) {
+            console.error(`❌ [${serverName}] Failed to create in-memory cache for sessions:`, e instanceof Error ? e.message : e);
+          }
+        } else {
+          console.log(`📝 [${serverName}] Session store initialized with configured cache adapter`);
+        }
+
+        if (!cache) {
+          console.error(`❌ [${serverName}] CRITICAL: Session enabled but no cache available to store sessions. Session functionality will be unavailable.`);
+        } else {
+          const store = new SessionStore(cache, { ttl });
+          (this.app as any).locals.sessionStore = store;
+          (this.app as any).locals.sessionCookieName = cookieName;
+          (this as any).sessionStore = store;
+
+          // attach session middleware globally so req.sessionStore is available
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const { useSession } = require('./middleware') as typeof import('./middleware');
+            this.app.use(useSession(cookieName));
+            console.log(`✅ [${serverName}] Session middleware enabled (cookie: ${cookieName}, TTL: ${ttl}s)`);
+          } catch (err) {
+            console.error(`❌ [${serverName}] Session middleware not available:`, err instanceof Error ? err.message : err);
+          }
+        }
+      }
+    } catch (err) {
+      console.error(`❌ [${serverName}] Error during cache/session setup:`, err instanceof Error ? err.message : err);
     }
   }
 
@@ -171,6 +272,9 @@ export class ExpressServer implements ServerInstance {
   async start(): Promise<ServerInstance> {
     this.status = 'starting';
 
+    // Initialize cache and session before starting the server
+    await this.setupCacheAndSession(this.config, this.config.name);
+
     return new Promise((resolve, reject) => {
       try {
         this.server = this.app.listen(this.config.port, () => {
@@ -184,6 +288,24 @@ export class ExpressServer implements ServerInstance {
                 // Stop health monitoring during shutdown
                 if (this.healthMonitor) {
                   this.healthMonitor.stop();
+                }
+                // Close cache and session store if present
+                try {
+                  const cache = (this.app as any).locals.cache;
+                  if (cache && typeof cache.close === 'function') {
+                    await cache.close();
+                  }
+                } catch (e) {
+                  console.warn(`${this.config.name}: Error closing cache`, e);
+                }
+
+                try {
+                  const store = (this.app as any).locals.sessionStore;
+                  if (store && typeof store.close === 'function') {
+                    await store.close();
+                  }
+                } catch (e) {
+                  // SessionStore may not have close; ignore
                 }
               }
             });

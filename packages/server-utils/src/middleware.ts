@@ -5,17 +5,17 @@ import { ServerPlugin } from './types';
 export function createLoggingMiddleware(format: 'simple' | 'detailed' = 'simple'): express.RequestHandler {
   return (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const start = Date.now();
-    
+
     res.on('finish', () => {
       const duration = Date.now() - start;
-      
+
       if (format === 'detailed') {
         console.log(`${req.method} ${req.url} - ${res.statusCode} - ${duration}ms - ${req.ip}`);
       } else {
         console.log(`${req.method} ${req.url} - ${res.statusCode}`);
       }
     });
-    
+
     next();
   };
 }
@@ -24,19 +24,19 @@ export function createLoggingMiddleware(format: 'simple' | 'detailed' = 'simple'
 export function createErrorHandler(): express.ErrorRequestHandler {
   return (err: unknown, req: express.Request, res: express.Response, next: express.NextFunction) => {
     console.error('Error:', err);
-    
+
     if (res.headersSent) {
       return next(err);
     }
-    
+
     // Type guard for error objects
     const errorObj = err as { status?: number; statusCode?: number; message?: string; stack?: string };
-    
+
     const status = errorObj.status || errorObj.statusCode || 500;
-    const message = process.env.NODE_ENV === 'production' 
-      ? 'Internal Server Error' 
+    const message = process.env.NODE_ENV === 'production'
+      ? 'Internal Server Error'
       : errorObj.message || 'Unknown error';
-    
+
     res.status(status).json({
       success: false,
       message,
@@ -74,17 +74,17 @@ export interface ValidationRule {
 export function createValidationMiddleware(rules: ValidationRule[]): express.RequestHandler {
   return (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const errors: string[] = [];
-    
+
     for (const rule of rules) {
       const value = req.body[rule.field];
-      
+
       if (rule.required && (value === undefined || value === null || value === '')) {
         errors.push(`${rule.field} is required`);
         continue;
       }
-      
+
       if (value === undefined || value === null) continue;
-      
+
       if (rule.type) {
         switch (rule.type) {
           case 'email':
@@ -110,18 +110,18 @@ export function createValidationMiddleware(rules: ValidationRule[]): express.Req
             break;
         }
       }
-      
+
       if (rule.minLength && value.length < rule.minLength) {
         errors.push(`${rule.field} must be at least ${rule.minLength} characters`);
       }
       if (rule.maxLength && value.length > rule.maxLength) {
         errors.push(`${rule.field} must be no more than ${rule.maxLength} characters`);
       }
-      
+
       if (rule.pattern && !rule.pattern.test(value)) {
         errors.push(`${rule.field} format is invalid`);
       }
-      
+
       if (rule.custom) {
         const result = rule.custom(value);
         if (result !== true) {
@@ -129,7 +129,7 @@ export function createValidationMiddleware(rules: ValidationRule[]): express.Req
         }
       }
     }
-    
+
     if (errors.length > 0) {
       return res.status(400).json({
         success: false,
@@ -142,7 +142,7 @@ export function createValidationMiddleware(rules: ValidationRule[]): express.Req
         meta: null
       });
     }
-    
+
     next();
   };
 }
@@ -164,12 +164,12 @@ export function createRateLimitMiddleware(config: RateLimitConfig = {}): express
     message = 'Too many requests, please try again later',
     keyGenerator = (req) => req.ip || 'unknown'
   } = config;
-  
+
   return (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const key = keyGenerator(req);
     const now = Date.now();
     const record = rateLimitStore.get(key);
-    
+
     if (!record || now > record.resetTime) {
       rateLimitStore.set(key, {
         count: 1,
@@ -177,7 +177,7 @@ export function createRateLimitMiddleware(config: RateLimitConfig = {}): express
       });
       return next();
     }
-    
+
     if (record.count >= maxRequests) {
       return res.status(429).json({
         success: false,
@@ -192,7 +192,7 @@ export function createRateLimitMiddleware(config: RateLimitConfig = {}): express
         meta: null
       });
     }
-    
+
     record.count++;
     next();
   };
@@ -217,11 +217,11 @@ export function createAuthMiddleware(config: AuthConfig): express.RequestHandler
     tokenValidator = () => { throw new Error('Token validator not implemented'); },
     unauthorizedMessage = 'Unauthorized access'
   } = config;
-  
+
   return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     try {
       const token = tokenExtractor(req);
-      
+
       if (!token) {
         return res.status(401).json({
           success: false,
@@ -233,7 +233,7 @@ export function createAuthMiddleware(config: AuthConfig): express.RequestHandler
           meta: null
         });
       }
-      
+
       const user = await tokenValidator(token);
       (req as express.Request & { user: unknown }).user = user;
       next();
@@ -299,4 +299,102 @@ export function rateLimit(config: RateLimitConfig = {}): express.RequestHandler 
 
 export function requireAuth(config: AuthConfig): express.RequestHandler {
   return createAuthMiddleware(config);
+}
+
+// Cache response middleware (per-route opt-in)
+export function cacheResponse(ttl?: number): express.RequestHandler {
+  return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    try {
+      if (req.method !== 'GET') return next();
+
+      const cache: any = (req as any).cache || req.app.locals.cache;
+      const defaultTTL = req.app.locals.cacheDefaultTTL as number | undefined;
+      if (!cache) return next();
+
+      const key = `${req.originalUrl}`;
+      try {
+        const cached = await cache.get(key);
+        if (cached !== null && cached !== undefined) {
+          res.setHeader('X-Cache', 'HIT');
+          return res.json(cached);
+        }
+      } catch (cacheErr) {
+        console.error(`[Cache] Failed to retrieve key "${key}":`, cacheErr);
+        // Continue without cache hit
+      }
+
+      const originalJson = res.json.bind(res);
+      res.json = (body: any) => {
+        try {
+          const expiry = ttl ?? defaultTTL;
+          if (expiry && cache) {
+            cache.set(key, body, expiry).catch((err: unknown) => {
+              console.error(`[Cache] Failed to set key "${key}" with TTL ${expiry}:`, err);
+            });
+          } else if (cache) {
+            cache.set(key, body).catch((err: unknown) => {
+              console.error(`[Cache] Failed to set key "${key}":`, err);
+            });
+          }
+        } catch (e) {
+          console.error(`[Cache] Error during cache.set operation:`, e);
+        }
+        res.setHeader('X-Cache', 'MISS');
+        return originalJson(body);
+      };
+
+      next();
+    } catch (err) {
+      console.error('[Cache] Unexpected error in cacheResponse middleware:', err);
+      next();
+    }
+  };
+}
+
+// Session middleware helper (attaches sessionStore and helpers to req)
+export function useSession(cookieName?: string): express.RequestHandler {
+  return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    try {
+      const store: any = req.app.locals.sessionStore;
+      if (!store) return next();
+
+      const name = cookieName || (req.app.locals.sessionCookieName as string) || 'sid';
+      let sid: string | undefined = (req as any).cookies?.[name] || (req.cookies as any)?.[name];
+
+      if (!sid) {
+        const cookieHeader = req.headers.cookie;
+        if (cookieHeader) {
+          const match = cookieHeader.split(';').map(s => s.trim()).find(s => s.startsWith(name + '='));
+          if (match) sid = match.split('=')[1];
+        }
+      }
+
+      (req as any).sessionId = sid;
+      (req as any).sessionStore = store;
+
+      (req as any).getSession = async () => {
+        if (!sid) return null;
+        try {
+          return await store.get(sid);
+        } catch (err) {
+          console.error(`[Session] Failed to get session "${sid}":`, err);
+          throw err;
+        }
+      };
+
+      (req as any).createSession = async (id: string, data: Record<string, unknown>, ttl?: number) => {
+        try {
+          return await store.create(id, data, ttl);
+        } catch (err) {
+          console.error(`[Session] Failed to create session "${id}":`, err);
+          throw err;
+        }
+      };
+
+      next();
+    } catch (err) {
+      console.error('[Session] Unexpected error in useSession middleware:', err);
+      next();
+    }
+  };
 }

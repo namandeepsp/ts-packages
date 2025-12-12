@@ -24,6 +24,27 @@ export interface ServerConfig {
   periodicHealthCheck?: PeriodicHealthCheckConfig;
   name?: string;
   version?: string;
+  // Cache integration (disabled by default)
+  cache?: {
+    enabled?: boolean;
+    // adapter specific options passed to CacheFactory.create
+    adapter?: 'redis' | 'memcache' | 'memory';
+    options?: unknown;
+    defaultTTL?: number;
+  };
+  // Session integration (disabled by default)
+  session?: {
+    enabled?: boolean;
+    // cookie name pattern will be generated as {servername}.sid unless overridden
+    cookieName?: string;
+    ttl?: number;
+    cookieOptions?: {
+      path?: string;
+      httpOnly?: boolean;
+      secure?: boolean;
+      sameSite?: 'lax' | 'strict' | 'none';
+    };
+  };
 }
 
 export interface PeriodicHealthCheckConfig {

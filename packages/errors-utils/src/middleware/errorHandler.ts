@@ -19,5 +19,7 @@ export function errorHandler(
     // Unexpected / programming / unknown error
     console.error("UNEXPECTED ERROR:", err);
 
-    return responder.serverError("Internal server error", { details: err });
+    return responder.serverError("Internal server error", {
+        details: process.env.NODE_ENV === "production" ? undefined : err,
+    });
 }

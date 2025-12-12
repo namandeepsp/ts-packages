@@ -6,6 +6,11 @@ export function errorConverter(err: any, req: Request, res: Response, next: Next
         return next(err);
     }
 
-    const convertedError = new AppError(err.message || "Internal Error", 500);
+    const convertedError = new AppError(
+        err.message || "Internal Error",
+        err.statusCode || 500,
+        err.details || undefined
+    );
+
     next(convertedError);
 }

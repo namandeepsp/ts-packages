@@ -103,21 +103,33 @@ export function cacheResponseMiddleware(
         const originalSend = res.send;
 
         // Override send method to cache response
-        res.send = function (data: any) {
+        res.send = function (data: unknown) {
           // Check if response should be cached
           if (
             res.statusCode >= 200 &&
             res.statusCode < 300 &&
             !excludeStatusCodes.includes(res.statusCode)
           ) {
-            const responseData = typeof data === 'string' ? data : JSON.stringify(data);
-            cache.set(cacheKey, responseData, ttl).catch((err) => {
-              console.error('Failed to cache response:', err);
-            });
+            let responseData: string | null = null;
+            if (typeof data === 'string') {
+              responseData = data;
+            } else {
+              try {
+                responseData = JSON.stringify(data);
+              } catch (e) {
+                responseData = null;
+              }
+            }
+
+            if (responseData !== null) {
+              cache.set(cacheKey, responseData, ttl).catch((err) => {
+                console.error('Failed to cache response:', err);
+              });
+            }
           }
 
           res.set('X-Cache', 'MISS');
-          return originalSend.call(this, data);
+          return originalSend.call(this, data as any);
         };
 
         next();

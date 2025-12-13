@@ -2,11 +2,11 @@
 import { withCache } from './performance';
 
 export function extendObject() {
-  Object.prototype.isEmpty = function(): boolean {
+  Object.prototype.isEmpty = function (): boolean {
     return Object.keys(this).length === 0;
   };
 
-  Object.prototype.pick = function<T extends Record<string, any>, K extends keyof T>(keys: K[]): Pick<T, K> {
+  Object.prototype.pick = function <T extends Record<string, any>, K extends keyof T>(keys: K[]): Pick<T, K> {
     const result = {} as Pick<T, K>;
     const obj = this as T;
     keys.forEach(key => {
@@ -17,7 +17,7 @@ export function extendObject() {
     return result;
   };
 
-  Object.prototype.omit = function<T extends Record<string, any>, K extends keyof T>(keys: K[]): Omit<T, K> {
+  Object.prototype.omit = function <T extends Record<string, any>, K extends keyof T>(keys: K[]): Omit<T, K> {
     const result = { ...this } as T;
     keys.forEach(key => {
       delete result[key];
@@ -25,27 +25,44 @@ export function extendObject() {
     return result as Omit<T, K>;
   };
 
-  Object.prototype.deepClone = function<T>(): T {
-    const objStr = JSON.stringify(this);
-    return withCache(`clone_${objStr}`, () => {
+
+  Object.prototype.deepClone = function <T>(): T {
+    return withCache(`clone_${JSON.stringify(this)}`, () => {
       if (this === null || typeof this !== 'object') return this;
-      if (this instanceof Date) return new Date(this.getTime()) as any;
-      if (this instanceof Array) return this.map(item => item?.deepClone?.() || item) as any;
-      
-      const cloned = {} as T;
+
+      // Handle Date objects
+      if (this instanceof Date) return new Date(this.getTime()) as unknown as T;
+
+      // Handle Array objects  
+      if (Array.isArray(this)) {
+        return this.map(item => {
+          if (item && typeof item === 'object' && typeof (item as any).deepClone === 'function') {
+            return (item as any).deepClone();
+          }
+          return item;
+        }) as unknown as T;
+      }
+
+      // Handle regular objects
+      const cloned = {} as Record<string, unknown>;
       Object.keys(this).forEach(key => {
-        const value = (this as any)[key];
-        (cloned as any)[key] = value?.deepClone?.() || value;
+        const value = (this as Record<string, unknown>)[key];
+        if (value && typeof value === 'object' && typeof (value as any).deepClone === 'function') {
+          cloned[key] = (value as any).deepClone();
+        } else {
+          cloned[key] = value;
+        }
       });
-      return cloned;
+      return cloned as T;
     });
   };
 
-  Object.prototype.merge = function(other: Record<string, any>): Record<string, any> {
-    return { ...this, ...other };
+
+  Object.prototype.merge = function <T extends Record<string, unknown>>(other: Partial<T>): T {
+    return { ...this, ...other } as T;
   };
 
-  Object.prototype.deepFreeze = function<T>(): T {
+  Object.prototype.deepFreeze = function <T>(): T {
     const propNames = Object.getOwnPropertyNames(this);
     for (const name of propNames) {
       const value = (this as any)[name];
@@ -56,7 +73,7 @@ export function extendObject() {
     return Object.freeze(this) as T;
   };
 
-  Object.prototype.hasPath = function(path: string): boolean {
+  Object.prototype.hasPath = function (path: string): boolean {
     const keys = path.split('.');
     let current: any = this;
     for (const key of keys) {
@@ -66,7 +83,7 @@ export function extendObject() {
     return true;
   };
 
-  Object.prototype.getPath = function(path: string, defaultValue?: any): any {
+  Object.prototype.getPath = function (path: string, defaultValue?: any): any {
     const keys = path.split('.');
     let current: any = this;
     for (const key of keys) {
@@ -76,7 +93,7 @@ export function extendObject() {
     return current;
   };
 
-  Object.prototype.setPath = function(path: string, value: any): any {
+  Object.prototype.setPath = function (path: string, value: any): any {
     const keys = path.split('.');
     let current: any = this;
     for (let i = 0; i < keys.length - 1; i++) {

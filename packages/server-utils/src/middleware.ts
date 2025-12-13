@@ -307,13 +307,13 @@ export function cacheResponse(ttl?: number): express.RequestHandler {
     try {
       if (req.method !== 'GET') return next();
 
-      const cache: any = (req as any).cache || req.app.locals.cache;
+      const cache = (req.cache ?? req.app.locals.cache) as { get?: Function; set?: Function } | undefined;
       const defaultTTL = req.app.locals.cacheDefaultTTL as number | undefined;
-      if (!cache) return next();
+      if (!cache || typeof cache.get !== 'function') return next();
 
       const key = `${req.originalUrl}`;
       try {
-        const cached = await cache.get(key);
+        const cached = await (cache.get as Function)(key);
         if (cached !== null && cached !== undefined) {
           res.setHeader('X-Cache', 'HIT');
           return res.json(cached);
@@ -324,17 +324,19 @@ export function cacheResponse(ttl?: number): express.RequestHandler {
       }
 
       const originalJson = res.json.bind(res);
-      res.json = (body: any) => {
+      res.json = (body: unknown) => {
         try {
           const expiry = ttl ?? defaultTTL;
-          if (expiry && cache) {
-            cache.set(key, body, expiry).catch((err: unknown) => {
+          if (expiry && cache && typeof cache.set === 'function') {
+            (cache.set as Function)(key, body, expiry).catch((err: unknown) => {
               console.error(`[Cache] Failed to set key "${key}" with TTL ${expiry}:`, err);
             });
           } else if (cache) {
-            cache.set(key, body).catch((err: unknown) => {
-              console.error(`[Cache] Failed to set key "${key}":`, err);
-            });
+            if (typeof cache.set === 'function') {
+              (cache.set as Function)(key, body).catch((err: unknown) => {
+                console.error(`[Cache] Failed to set key "${key}":`, err);
+              });
+            }
           }
         } catch (e) {
           console.error(`[Cache] Error during cache.set operation:`, e);
@@ -355,11 +357,11 @@ export function cacheResponse(ttl?: number): express.RequestHandler {
 export function useSession(cookieName?: string): express.RequestHandler {
   return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     try {
-      const store: any = req.app.locals.sessionStore;
+      const store = req.app.locals.sessionStore as { get?: Function; create?: Function } | undefined;
       if (!store) return next();
 
       const name = cookieName || (req.app.locals.sessionCookieName as string) || 'sid';
-      let sid: string | undefined = (req as any).cookies?.[name] || (req.cookies as any)?.[name];
+      let sid: string | undefined = (req.cookies as Record<string, string> | undefined)?.[name];
 
       if (!sid) {
         const cookieHeader = req.headers.cookie;
@@ -369,22 +371,22 @@ export function useSession(cookieName?: string): express.RequestHandler {
         }
       }
 
-      (req as any).sessionId = sid;
-      (req as any).sessionStore = store;
+      req.sessionId = sid;
+      req.sessionStore = store;
 
-      (req as any).getSession = async () => {
+      req.getSession = async () => {
         if (!sid) return null;
         try {
-          return await store.get(sid);
+          return await (store.get as Function)(sid);
         } catch (err) {
           console.error(`[Session] Failed to get session "${sid}":`, err);
           throw err;
         }
       };
 
-      (req as any).createSession = async (id: string, data: Record<string, unknown>, ttl?: number) => {
+      req.createSession = async (id: string, data: Record<string, unknown>, ttl?: number) => {
         try {
-          return await store.create(id, data, ttl);
+          return await (store.create as Function)(id, data, ttl);
         } catch (err) {
           console.error(`[Session] Failed to create session "${id}":`, err);
           throw err;

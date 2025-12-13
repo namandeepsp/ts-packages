@@ -7,7 +7,7 @@ export interface TokenRequirements {
 }
 
 export function validateTokenPayload(
-    payload: Record<string, any>,
+    payload: Record<string, unknown>,
     rules: TokenRequirements = {
         requiredFields: ["exp", "iat"]
     }

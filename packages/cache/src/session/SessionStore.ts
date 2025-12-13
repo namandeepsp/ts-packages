@@ -218,4 +218,13 @@ export class SessionStore {
       );
     }
   }
+
+  /**
+   * Optional close hook for graceful shutdowns.
+   * Present to allow callers to call `close()` during shutdown without
+   * requiring every store implementation to provide one.
+   */
+  async close(): Promise<void> {
+    return;
+  }
 }

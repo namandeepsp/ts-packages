@@ -1,6 +1,6 @@
 # @naman_deep_singh/security
 
-**Version:** 1.1.0
+**Version:** 1.2.0
 
 A complete, lightweight security toolkit for Node.js & TypeScript providing:
 
@@ -12,7 +12,11 @@ A complete, lightweight security toolkit for Node.js & TypeScript providing:
 🧰 **Robust token extraction** (Headers, Cookies, Query, Body, WebSocket)
 🧩 **Safe & strict JWT decode** utilities
 🚨 **Standardized error handling** with @naman_deep_singh/errors-utils
+
 ✔ **Fully typed** with TypeScript
+✔ **Branded token types** for compile-time safety (AccessToken/RefreshToken)
+✔ **Structured verification results** for better error handling
+✔ **Enhanced verification options** with flexible configuration
 ✔ **Consistent errors** across your application ecosystem
 ✔ **Works in both ESM and CommonJS**
 
@@ -60,13 +64,13 @@ hashPassword(password: string): Promise<string>
 const hashed = await hashPassword("mypassword");
 console.log(hashed); // $2a$10$...
 
+
 verifyPassword(password: string, hash: string): Promise<boolean>
 const isValid = await verifyPassword("mypassword", hashed);
 if (isValid) console.log("Correct password");
 
-comparePassword()
-
-Alias for backward compatibility.
+// Synchronous version also available
+const isValidSync = verifyPasswordSync("mypassword", hashed);
 
 🔑 2. JWT Signing
 signToken(payload, secret, expiresIn, options)

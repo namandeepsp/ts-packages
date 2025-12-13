@@ -42,7 +42,7 @@ export class CacheFactory {
 
       default:
         throw new CacheError(
-          `Unknown cache adapter: ${(config as any).adapter}`,
+          `Unknown cache adapter: ${config.adapter}`,
           'UNKNOWN_ADAPTER'
         );
     }

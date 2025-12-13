@@ -1,7 +1,7 @@
 import { ExpressResponder, HTTP_STATUS } from "@naman_deep_singh/response-utils";
 import { AppError } from "src/error/AppError";
 
-export function mapAppErrorToResponder(responder: ExpressResponder<any>, err: AppError) {
+export function mapAppErrorToResponder(responder: ExpressResponder<unknown>, err: AppError) {
     switch (err.statusCode) {
         case HTTP_STATUS.CLIENT_ERROR.BAD_REQUEST:
             return responder.badRequest(err.message, { details: err.details });

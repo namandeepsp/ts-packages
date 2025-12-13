@@ -1,4 +1,6 @@
+
 import jwt, { Secret, JwtPayload, verify } from "jsonwebtoken";
+import { VerificationResult } from "./types";
 
 /**
  * Verify token (throws if invalid or expired)
@@ -11,20 +13,43 @@ export const verifyToken = (
 };
 
 /**
- * Safe verify — never throws, returns { valid, payload?, error? }
+ * Safe verify — never throws, returns structured result
  */
 export const safeVerifyToken = (
     token: string,
     secret: Secret
-): {
-    valid: boolean;
-    payload?: string | JwtPayload;
-    error?: unknown;
-} => {
+): VerificationResult => {
     try {
         const decoded = verify(token, secret);
         return { valid: true, payload: decoded };
     } catch (error) {
-        return { valid: false, error };
+        return { valid: false, error: error as Error };
+    }
+};
+
+/**
+ * Verify token with validation options
+ */
+export const verifyTokenWithOptions = (
+    token: string,
+    secret: Secret,
+    options: jwt.VerifyOptions = {}
+): string | JwtPayload => {
+    return verify(token, secret, options);
+};
+
+/**
+ * Safe verify with validation options
+ */
+export const safeVerifyTokenWithOptions = (
+    token: string,
+    secret: Secret,
+    options: jwt.VerifyOptions = {}
+): VerificationResult => {
+    try {
+        const decoded = verify(token, secret, options);
+        return { valid: true, payload: decoded };
+    } catch (error) {
+        return { valid: false, error: error as Error };
     }
 };

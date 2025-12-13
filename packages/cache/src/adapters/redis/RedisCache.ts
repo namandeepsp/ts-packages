@@ -1,4 +1,5 @@
-import { createClient, createCluster, RedisClientType, RedisClusterType } from 'redis';
+import { createClient, createCluster } from 'redis';
+import type { RedisClientOptions } from 'redis';
 import type { RedisCacheConfig, HealthCheckResponse } from '../../types';
 import { BaseCache } from '../../core/BaseCache';
 import { CacheError } from '../../errors';
@@ -7,7 +8,7 @@ import { CacheError } from '../../errors';
  * Redis cache adapter
  */
 export class RedisCache<T = unknown> extends BaseCache<T> {
-  private client: RedisClientType | RedisClusterType | null = null;
+  private client: ReturnType<typeof createClient> | ReturnType<typeof createCluster> | null = null;
   private isConnected = false;
 
   constructor(private redisConfig: RedisCacheConfig) {
@@ -34,7 +35,7 @@ export class RedisCache<T = unknown> extends BaseCache<T> {
 
         this.client = createCluster({
           rootNodes: nodes.map(node => ({ url: `redis://${node.host}:${node.port}` }))
-        }) as any;
+        });
       } else {
         // Single instance mode
         const options: Record<string, unknown> = {
@@ -55,7 +56,7 @@ export class RedisCache<T = unknown> extends BaseCache<T> {
           options.tls = true;
         }
 
-        this.client = createClient(options as any);
+        this.client = createClient(options as unknown as RedisClientOptions);
       }
 
       if (this.client) {
@@ -195,9 +196,9 @@ export class RedisCache<T = unknown> extends BaseCache<T> {
         console.warn('Cluster mode: namespace clear requires explicit key tracking');
       } else {
         // Clear all keys only in single-instance mode
-        const client = this.client as RedisClientType;
-        if (client.flushDb) {
-          await client.flushDb();
+        const client = this.client as ReturnType<typeof createClient>;
+        if (client && typeof (client as any).flushDb === 'function') {
+          await (client as any).flushDb();
         } else {
           console.warn('Clear operation not supported in cluster mode');
         }
@@ -345,7 +346,12 @@ export class RedisCache<T = unknown> extends BaseCache<T> {
     try {
       await this.ensureConnected();
       // Use sendCommand which works for both single and cluster
-      await (this.client as any).sendCommand(['PING']);
+      // `sendCommand` exists on both single and cluster clients in runtime; cast narrowly for the call
+      if (this.client && typeof (this.client as any).sendCommand === 'function') {
+        await (this.client as any).sendCommand(['PING']);
+      } else if (this.client && typeof (this.client as any).ping === 'function') {
+        await (this.client as any).ping();
+      }
       return {
         isAlive: true,
         adapter: 'redis',

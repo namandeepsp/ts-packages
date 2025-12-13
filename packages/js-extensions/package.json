@@ -1,6 +1,6 @@
 {
   "name": "@naman_deep_singh/js-extensions",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Universal JavaScript prototype extensions for common development utilities",
   "type": "module",
   "main": "./dist/cjs/index.js",

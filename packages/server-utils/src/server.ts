@@ -65,6 +65,8 @@ export class ExpressServer implements ServerInstance {
   public app: express.Application;
   public server?: Server;
   public config: ServerInstanceConfig;
+  public cache?: import('@naman_deep_singh/cache').ICache<unknown>;
+  public sessionStore?: import('@naman_deep_singh/cache').SessionStore | undefined;
   private status: 'starting' | 'running' | 'stopping' | 'stopped' = 'stopped';
   private grpcServices: GrpcService[] = [];
   private grpcServer?: GrpcServerInstance;
@@ -98,9 +100,9 @@ export class ExpressServer implements ServerInstance {
     };
 
     // Initialize locals for cache/session
-    (this.app as any).locals.cache = undefined;
-    (this.app as any).locals.sessionStore = undefined;
-    (this.app as any).locals.cacheDefaultTTL = config.cache?.defaultTTL;
+    this.app.locals.cache = undefined;
+    this.app.locals.sessionStore = undefined;
+    this.app.locals.cacheDefaultTTL = config.cache?.defaultTTL;
 
     // Apply middleware based on configuration
     this.setupMiddleware();
@@ -163,13 +165,13 @@ export class ExpressServer implements ServerInstance {
           version: this.config.version,
           uptime: Date.now() - this.config.startTime.getTime(),
           timestamp: new Date().toISOString()
-        } as any;
+        } as Record<string, unknown>;
 
         // If cache is enabled, include its health
-        const cache = (req.app as any).locals.cache;
-        if (cache && typeof cache.isAlive === 'function') {
+        const cache = req.app.locals.cache;
+        if (cache && typeof (cache as any).isAlive === 'function') {
           try {
-            base.cache = await cache.isAlive();
+            base.cache = await (cache as any).isAlive();
           } catch (e) {
             base.cache = { isAlive: false, adapter: 'unknown', timestamp: new Date(), error: (e as Error).message };
           }
@@ -185,8 +187,8 @@ export class ExpressServer implements ServerInstance {
       // Initialize cache if enabled
       if (config.cache && config.cache.enabled) {
         try {
-          const provided = config.cache.options as any;
-          let cacheConfig: any = provided && typeof provided === 'object' ? provided : undefined;
+          const provided = config.cache?.options as Record<string, unknown> | undefined;
+          let cacheConfig: Record<string, unknown> | undefined = provided && typeof provided === 'object' ? provided : undefined;
           if (!cacheConfig) {
             cacheConfig = { adapter: config.cache.adapter || 'memory' };
           }
@@ -194,18 +196,16 @@ export class ExpressServer implements ServerInstance {
           console.log(`🔄 [${serverName}] Initializing cache adapter: ${config.cache.adapter || 'memory'}...`);
 
           // Use createWithFallback to prefer primary and fall back to memory when configured
-          const cache = await CacheFactory.createWithFallback<any>({
-            ...(cacheConfig || {}),
-            ttl: cacheConfig?.ttl ?? config.cache?.defaultTTL
-          });
+          const cfg = ({ ...(cacheConfig as Record<string, any> || {}), ttl: (cacheConfig as Record<string, any>)?.ttl ?? config.cache?.defaultTTL } as unknown) as import('@naman_deep_singh/cache').CacheConfig;
+          const cache = await CacheFactory.createWithFallback<unknown>(cfg);
 
-          (this.app as any).locals.cache = cache;
-          (this as any).cache = cache;
-          (this.app as any).locals.cacheDefaultTTL = config.cache?.defaultTTL;
+          this.app.locals.cache = cache as unknown;
+          this.cache = cache as import('@naman_deep_singh/cache').ICache<unknown>;
+          this.app.locals.cacheDefaultTTL = config.cache?.defaultTTL;
 
           // attach per-request helper middleware
           this.app.use((req, _res, next) => {
-            (req as any).cache = cache;
+            req.cache = cache as unknown;
             next();
           });
 
@@ -220,14 +220,14 @@ export class ExpressServer implements ServerInstance {
       if (config.session && config.session.enabled) {
         const cookieName = config.session.cookieName || `${serverName.replace(/\s+/g, '_').toLowerCase()}.sid`;
         const ttl = config.session.ttl ?? 3600;
-        let cache = (this.app as any).locals.cache;
+        let cache = this.app.locals.cache as import('@naman_deep_singh/cache').ICache<unknown> | undefined;
 
         if (!cache) {
           // fallback to in-memory cache for session store
           try {
             cache = CacheFactory.create({ adapter: 'memory' });
-            (this.app as any).locals.cache = cache;
-            (this as any).cache = cache;
+            this.app.locals.cache = cache;
+            this.cache = cache as import('@naman_deep_singh/cache').ICache<unknown>;
             console.log(`📝 [${serverName}] Session store using in-memory cache`);
           } catch (e) {
             console.error(`❌ [${serverName}] Failed to create in-memory cache for sessions:`, e instanceof Error ? e.message : e);
@@ -239,10 +239,13 @@ export class ExpressServer implements ServerInstance {
         if (!cache) {
           console.error(`❌ [${serverName}] CRITICAL: Session enabled but no cache available to store sessions. Session functionality will be unavailable.`);
         } else {
-          const store = new SessionStore(cache, { ttl });
-          (this.app as any).locals.sessionStore = store;
-          (this.app as any).locals.sessionCookieName = cookieName;
-          (this as any).sessionStore = store;
+          const store = new SessionStore(
+            cache as import('@naman_deep_singh/cache').ICache<import('@naman_deep_singh/cache').SessionData>,
+            { ttl }
+          );
+          this.app.locals.sessionStore = store;
+          this.app.locals.sessionCookieName = cookieName;
+          this.sessionStore = store;
 
           // attach session middleware globally so req.sessionStore is available
           try {
@@ -291,7 +294,7 @@ export class ExpressServer implements ServerInstance {
                 }
                 // Close cache and session store if present
                 try {
-                  const cache = (this.app as any).locals.cache;
+                  const cache = this.app.locals.cache as import('@naman_deep_singh/cache').ICache<unknown> | undefined;
                   if (cache && typeof cache.close === 'function') {
                     await cache.close();
                   }
@@ -300,9 +303,9 @@ export class ExpressServer implements ServerInstance {
                 }
 
                 try {
-                  const store = (this.app as any).locals.sessionStore;
-                  if (store && typeof store.close === 'function') {
-                    await store.close();
+                  const store = this.app.locals.sessionStore as import('@naman_deep_singh/cache').SessionStore | undefined;
+                  if (store && typeof (store as any).close === 'function') {
+                    await (store as any).close();
                   }
                 } catch (e) {
                   // SessionStore may not have close; ignore

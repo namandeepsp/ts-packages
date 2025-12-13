@@ -6,7 +6,7 @@ function getExpiryTimestamp(seconds: number) {
 }
 
 export const signToken = (
-    payload: Record<string, any>,
+    payload: Record<string, unknown>,
     secret: Secret,
     expiresIn: string | number = "1h",
     options: SignOptions = {}

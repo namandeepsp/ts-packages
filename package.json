@@ -4,7 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "publishServerPkg": "pnpm --filter ./packages/server-utils build && pnpm --filter ./packages/server-utils publish",
+    "publishResponsePkg": "pnpm --filter ./packages/response-utils build && pnpm --filter ./packages/response-utils publish",
+    "publishErrorPkg": "pnpm --filter ./packages/error-utils build && pnpm --filter ./packages/error-utils publish",
+    "publishJSExtensionsPkg": "pnpm --filter ./packages/js-extensions build && pnpm --filter ./packages/js-extensions publish",
+    "publishSecurityPkg": "pnpm --filter ./packages/security build && pnpm --filter ./packages/security publish",
+    "publishCachePkg": "pnpm --filter ./packages/cache build && pnpm --filter ./packages/cache publish",
+    "publishAllPkg": "pnpm publishServerPkg && pnpm publishResponsePkg && pnpm publishErrorPkg && pnpm publishJSExtensionsPkg && pnpm publishSecurityPkg && pnpm publishCachePkg"
   },
   "keywords": [],
   "author": "",

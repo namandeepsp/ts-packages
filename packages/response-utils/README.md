@@ -1,6 +1,6 @@
 # @naman_deep_singh/response-utils
 
-**Version:** 2.0.4
+**Version:** 2.1.0
 
 A flexible, framework-agnostic **TypeScript** response utility library for building consistent and configurable API responses.  
 Supports **Express.js**, pagination, typed payloads, and expandable response adapters.
@@ -162,28 +162,28 @@ console.log(HTTP_STATUS.SUCCESS.CREATED); // 201
 
 **All fully readonly + literal typed** ✔
 
-## 🧩 Status Constants
 
+### 🧩 Status Constants
+
+```typescript
 import { HTTP_STATUS } from '@naman_deep_singh/response-utils';
 
 console.log(HTTP_STATUS.CLIENT_ERROR.NOT_FOUND); // 404
 console.log(HTTP_STATUS.SUCCESS.CREATED); // 201
+```
 
-Categories available:
+**Categories available:**
 
-SUCCESS
-
-REDIRECTION
-
-CLIENT_ERROR
-
-SERVER_ERROR
+- `SUCCESS`
+- `REDIRECTION`
+- `CLIENT_ERROR`
+- `SERVER_ERROR`
 
 All values are:
 
-✔ Object.freeze() protected
-✔ Strongly typed using as const
-✔ Auto-complete supported in IDEs
+✔ Object.freeze() protected  
+✔ Strongly typed using as const  
+✔ Auto-complete supported in IDEs  
 ✔ Works with any HTTP framework
 
 ### 🕘 Legacy API (Migration-friendly)

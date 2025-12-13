@@ -1,6 +1,6 @@
 # @naman_deep_singh/cache
 
-**Version:** 1.2.0 (with Redis Clustering support)
+**Version:** 1.3.0 (with Redis Clustering support)
 
 A flexible, extensible caching layer with support for Redis, Memcache, and in-memory caches. Includes session management, health checks, and Express middleware.
 
@@ -687,3 +687,9 @@ ISC
 ## Author
 
 Naman Deep Singh
+
+## TypeScript Notes
+
+- The package provides strong generics for `ICache<T>` and `SessionStore` so you can store typed values safely.
+- Middleware in this package may attach runtime properties (for example session data) to `Request` objects in Express. If you're using TypeScript, import the package into your project so the included type augmentations are picked up automatically — no need to cast `req` to `any` in most cases.
+

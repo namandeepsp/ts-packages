@@ -90,22 +90,31 @@ export class MemcacheCache<T = unknown> extends BaseCache<T> {
             const fullKey = this.buildKey(key);
 
             return new Promise((resolve, reject) => {
-                this.client!.get(fullKey, (err: Error | null, data: any) => {
+                this.client!.get(fullKey, (err: Error | null, data: unknown) => {
                     if (err) {
                         reject(err);
                         return;
                     }
 
-                    if (data === undefined) {
+                    if (data === undefined || data === null) {
                         this.recordMiss();
                         resolve(null);
-                    } else {
-                        this.recordHit();
-                        try {
-                            resolve(this.deserialize(data as string));
-                        } catch (parseErr) {
-                            reject(parseErr);
+                        return;
+                    }
+
+                    this.recordHit();
+                    try {
+                        if (typeof data === 'string') {
+                            resolve(this.deserialize(data));
+                        } else if (Buffer.isBuffer(data)) {
+                            resolve(this.deserialize(data.toString()));
+                        } else {
+                            // Unknown shape from memcached client - treat as miss
+                            this.recordMiss();
+                            resolve(null);
                         }
+                    } catch (parseErr) {
+                        reject(parseErr);
                     }
                 });
             });
@@ -229,25 +238,46 @@ export class MemcacheCache<T = unknown> extends BaseCache<T> {
             const fullKeys = keys.map(k => this.buildKey(k));
 
             return new Promise((resolve, reject) => {
-                this.client!.getMulti(fullKeys, (err: Error | null, data: any) => {
+                this.client!.getMulti(fullKeys, (err: Error | null, data: unknown) => {
                     if (err) {
                         reject(err);
                         return;
                     }
 
                     const result: Record<string, T | null> = {};
+
+                    if (!data || typeof data !== 'object') {
+                        // Treat as all misses
+                        for (const key of keys) {
+                            this.recordMiss();
+                            result[key] = null;
+                        }
+                        resolve(result);
+                        return;
+                    }
+
+                    const map = data as Record<string, unknown>;
                     keys.forEach((key) => {
                         const fullKey = this.buildKey(key);
-                        if (fullKey in data) {
+                        const value = map[fullKey];
+                        if (value === undefined || value === null) {
+                            this.recordMiss();
+                            result[key] = null;
+                        } else {
                             this.recordHit();
                             try {
-                                result[key] = this.deserialize(data[fullKey] as string);
+                                if (typeof value === 'string') {
+                                    result[key] = this.deserialize(value);
+                                } else if (Buffer.isBuffer(value)) {
+                                    result[key] = this.deserialize(value.toString());
+                                } else {
+                                    // Unknown, treat as miss
+                                    this.recordMiss();
+                                    result[key] = null;
+                                }
                             } catch (parseErr) {
                                 reject(parseErr);
                             }
-                        } else {
-                            this.recordMiss();
-                            result[key] = null;
                         }
                     });
 

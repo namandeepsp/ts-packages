@@ -1,29 +1,37 @@
+
 import { JwtPayload, Secret, verify } from "jsonwebtoken";
 import { signToken } from "./signToken";
 import { verifyToken } from "./verify";
+import { AccessToken, RefreshToken, TokenPair } from "./types";
 
-export interface TokenPair {
-    accessToken: string;
-    refreshToken: string;
-}
+// Helper function to create branded tokens
+const createBrandedToken = <T extends string>(token: string, _brand: T): T => {
+    return token as T;
+};
+
+
 
 export const generateTokens = (
-    payload: object,
+    payload: Record<string, unknown>,
     accessSecret: Secret,
     refreshSecret: Secret,
     accessExpiry: string | number = "15m",
     refreshExpiry: string | number = "7d"
 ): TokenPair => {
+    const accessToken = signToken(payload, accessSecret, accessExpiry, { algorithm: "HS256" });
+    const refreshToken = signToken(payload, refreshSecret, refreshExpiry, { algorithm: "HS256" });
+
     return {
-        accessToken: signToken(payload, accessSecret, accessExpiry, { algorithm: "HS256" }),
-        refreshToken: signToken(payload, refreshSecret, refreshExpiry, { algorithm: "HS256" }),
+        accessToken: accessToken as AccessToken,
+        refreshToken: refreshToken as RefreshToken,
     };
 };
+
 
 export function rotateRefreshToken(
     oldToken: string,
     secret: Secret
-): string {
+): RefreshToken {
     const decoded = verifyToken(oldToken, secret);
 
     if (typeof decoded === "string") {
@@ -35,6 +43,7 @@ export function rotateRefreshToken(
     delete payload.iat;
     delete payload.exp;
 
-    return signToken(payload, secret, "7d");
+    const newToken = signToken(payload, secret, "7d");
+    return newToken as RefreshToken;
 }
 

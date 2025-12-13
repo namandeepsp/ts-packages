@@ -9,3 +9,5 @@ dist/
 # Development standards (internal use only)
 STANDARDS.md
 q-dev-chat-*
+TODO.md
+TYPE_IMPROVEMENTS.md

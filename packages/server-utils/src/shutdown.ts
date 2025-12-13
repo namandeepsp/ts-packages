@@ -7,7 +7,7 @@ export function createGracefulShutdown(server: Server, config: GracefulShutdownC
 
   const shutdown = async (signal: string) => {
     console.log(`🛑 ${nameVersion} received ${signal}, shutting down gracefully...`);
-    
+
     const shutdownTimer = setTimeout(() => {
       console.log(`⏰ ${nameVersion} shutdown timeout reached, forcing exit`);
       process.exit(1);
@@ -44,9 +44,10 @@ export function withGracefulShutdown(config: GracefulShutdownConfig = {}): Serve
   };
 }
 
+
 export function startServerWithShutdown(
-  app: any, 
-  port: number, 
+  app: import('express').Application,
+  port: number,
   shutdownConfig: GracefulShutdownConfig = {},
   serverName?: string,
   serverVersion?: string
@@ -56,8 +57,9 @@ export function startServerWithShutdown(
     console.log(`🚀 ${nameVersion} running on http://localhost:${port}`);
   });
 
+
   // Apply graceful shutdown from stored config or provided config
-  const config = app.__gracefulShutdownConfig || shutdownConfig;
+  const config = (app as any).__gracefulShutdownConfig || shutdownConfig;
   const enhancedConfig = {
     ...config,
     serverName,

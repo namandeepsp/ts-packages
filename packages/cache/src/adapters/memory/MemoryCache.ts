@@ -73,7 +73,7 @@ export class MemoryCache<T = unknown> extends BaseCache<T> {
       const expiresAt = expiry > 0 ? Date.now() + expiry * 1000 : undefined;
 
       // Check max size
-      const maxSize = (this.memoryCacheConfig as any).maxSize;
+      const maxSize = this.memoryCacheConfig.maxSize;
       if (maxSize && this.store.size >= maxSize && !this.store.has(fullKey)) {
         // Remove oldest entry
         const firstKey = this.store.keys().next().value;

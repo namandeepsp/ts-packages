@@ -29,6 +29,8 @@ declare global {
     average(): number;
     compact(): T[];
     pluck<K extends keyof T>(key: K): T[K][];
+
+
     findLast(predicate: (item: T) => boolean): T | undefined;
     partition(predicate: (item: T) => boolean): [T[], T[]];
     flatten(depth?: number): any[];
@@ -73,4 +75,4 @@ declare global {
   }
 }
 
-export {};
+export { };

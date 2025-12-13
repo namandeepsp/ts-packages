@@ -1,6 +1,6 @@
 # @naman_deep_singh/server-utils
 
-**Version:** 1.2.0 (with integrated cache & session support)
+**Version:** 1.3.0 (with integrated cache & session support)
 
 Extensible server utilities for Express.js microservices with multi-protocol support, integrated caching, session management, and TypeScript.
 
@@ -19,13 +19,13 @@ npm install @naman_deep_singh/server-utils
 - ✅ **Graceful shutdown** handling with cache/session cleanup
 - ✅ **Health checks** with custom checks and cache health integration
 - ✅ **TypeScript support** with full type safety
-- ✅ **Hybrid exports** - use named imports or namespace imports
-- ✅ **Plugin architecture** for extensibility
+
 - ✅ **Built-in middleware** - logging, validation, rate limiting, auth, caching, sessions
+
 
 ## Quick Start
 
-### Named Imports
+### Basic Usage
 ```typescript
 import { createServer } from '@naman_deep_singh/server-utils';
 
@@ -42,13 +42,6 @@ server.app.get('/users', (req, res) => {
 
 // Start server
 await server.start();
-```
-
-### Namespace Import
-```typescript
-import ServerUtils from '@naman_deep_singh/server-utils';
-
-const server = ServerUtils.createServer('My API', '1.0.0');
 ```
 
 ## Multi-Protocol Support
@@ -131,17 +124,13 @@ server.addWebhook({
 
 ## Built-in Middleware
 
+
 ### Logging Middleware
 ```typescript
-import { createLoggingMiddleware, withLogging } from '@naman_deep_singh/server-utils';
+import { createLoggingMiddleware } from '@naman_deep_singh/server-utils';
 
 // Direct usage
 server.app.use(createLoggingMiddleware('detailed'));
-
-// Plugin usage
-const server = createServerWithPlugins('My API', '1.0.0', [
-  withLogging('detailed')
-]);
 ```
 
 ### Validation Middleware
@@ -184,52 +173,16 @@ server.app.use('/protected', requireAuth({
 
 ## Health Checks
 
+
 ### Basic Health Check
 ```typescript
-import { addHealthCheck, createHealthCheck, withHealthCheck } from '@naman_deep_singh/server-utils';
+import { createHealthCheck } from '@naman_deep_singh/server-utils';
 
-// Method 1: Direct addition
-addHealthCheck(server.app, '/health');
+// The health check is automatically enabled when healthCheck is not false
+// Health endpoint is available at /health by default
 
-// Method 2: As middleware
+// If you need to customize or disable it:
 server.app.get('/health', createHealthCheck());
-
-// Method 3: As plugin
-const server = createServerWithPlugins('My API', '1.0.0', [
-  withHealthCheck('/health')
-]);
-```
-
-### Advanced Health Checks
-```typescript
-addHealthCheck(server.app, '/health', {
-  customChecks: [
-    {
-      name: 'database',
-      check: async () => {
-        // Check database connection
-        return await db.ping();
-      }
-    },
-    {
-      name: 'redis',
-      check: async () => {
-        return await redis.ping() === 'PONG';
-      }
-    }
-  ]
-});
-
-// Response format:
-// {
-//   "status": "healthy",
-//   "checks": {
-//     "server": true,
-//     "timestamp": 1640995200000,
-//     "database": true,
-//     "redis": false
-//   }
-// }
 ```
 
 ## Server Management
@@ -332,6 +285,12 @@ import { Request, Response, NextFunction, Router, Application } from '@naman_dee
 import type { RequestHandler, ErrorRequestHandler } from '@naman_deep_singh/server-utils';
 
 // No need to install Express separately in your services
+
+## TypeScript Notes
+
+- This package includes TypeScript augmentations for Express `Request` and `Application` that expose runtime helpers used by the middleware (for example `req.cache`, `req.sessionStore`, `req.getSession`, and `req.createSession`). Installing and importing `@naman_deep_singh/server-utils` in your project will surface these types automatically.
+- Middleware that attaches runtime props uses `unknown` internally and runtime guards — prefer the provided helpers rather than casting `req` to `any`.
+
 ```
 
 ## API Reference

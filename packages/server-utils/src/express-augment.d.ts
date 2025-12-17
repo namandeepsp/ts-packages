@@ -8,6 +8,10 @@ declare global {
             sessionStore?: unknown;
             // session id extracted from cookie/header
             sessionId?: string | undefined;
+            // user
+            user?: unknown;
+            // request id
+            requestId?: string;
             // helper helpers
             getSession?: () => Promise<unknown>;
             createSession?: (id: string, data: Record<string, unknown>, ttl?: number) => Promise<unknown>;

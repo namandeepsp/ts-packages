@@ -1,4 +1,5 @@
-import { PeriodicHealthCheckConfig, HealthCheckService } from './types';
+
+import { PeriodicHealthCheckConfig, HealthCheckService } from '../types';
 
 export class PeriodicHealthMonitor {
   private intervals: NodeJS.Timeout[] = [];

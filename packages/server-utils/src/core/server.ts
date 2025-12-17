@@ -1,10 +1,12 @@
-import express from 'express';
+import express, { json, raw } from 'express';
 import { Server } from 'http';
-import { ServerConfig, SocketIOConfig, SocketInstance } from './types';
-import { createGracefulShutdown } from './shutdown';
-import { PeriodicHealthMonitor } from './periodic-health';
-import crypto from 'crypto';
+
 import { CacheFactory, SessionStore } from '@naman_deep_singh/cache';
+import crypto from 'crypto';
+import { Application, RequestHandler } from 'express';
+import { ServerConfig, SocketIOConfig, SocketInstance } from '../types';
+import { PeriodicHealthMonitor } from './periodic-health';
+import { createGracefulShutdown } from './shutdown';
 
 export interface GrpcService {
   service: Record<string, unknown>;
@@ -38,7 +40,7 @@ export interface ServerInstanceConfig extends Required<Omit<ServerConfig, 'socke
 }
 
 export interface ServerInstance {
-  app: express.Application;
+  app: Application;
   server?: Server;
   config: ServerInstanceConfig;
   start(): Promise<ServerInstance>;
@@ -62,7 +64,7 @@ export interface ServerInfo {
 }
 
 export class ExpressServer implements ServerInstance {
-  public app: express.Application;
+  public app: Application;
   public server?: Server;
   public config: ServerInstanceConfig;
   public cache?: import('@naman_deep_singh/cache').ICache<unknown>;
@@ -135,7 +137,7 @@ export class ExpressServer implements ServerInstance {
 
     // Apply JSON parser if enabled
     if (this.config.json) {
-      this.app.use(express.json());
+      this.app.use(json());
     }
 
     // Apply cookie parser if enabled
@@ -250,7 +252,8 @@ export class ExpressServer implements ServerInstance {
           // attach session middleware globally so req.sessionStore is available
           try {
             // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const { useSession } = require('./middleware') as typeof import('./middleware');
+
+            const { useSession } = require('../middleware/middleware') as typeof import('../middleware');
             this.app.use(useSession(cookieName));
             console.log(`✅ [${serverName}] Session middleware enabled (cookie: ${cookieName}, TTL: ${ttl}s)`);
           } catch (err) {
@@ -417,7 +420,7 @@ export class ExpressServer implements ServerInstance {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const jayson = require('jayson') as {
         server: (methods: RpcMethod) => {
-          middleware(): express.RequestHandler;
+          middleware(): RequestHandler;
         };
       };
       const rpcServer = jayson.server(this.rpcMethods);
@@ -429,7 +432,7 @@ export class ExpressServer implements ServerInstance {
   }
 
   addWebhook(config: WebhookConfig): void {
-    this.app.post(config.path, express.raw({ type: 'application/json' }), async (req, res) => {
+    this.app.post(config.path, raw({ type: 'application/json' }), async (req, res) => {
       try {
         // Verify signature if secret provided
         if (config.secret) {

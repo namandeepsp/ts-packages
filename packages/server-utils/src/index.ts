@@ -1,16 +1,19 @@
+
 // Core server utilities
-export { ExpressServer, createServer } from './server';
-export type { ServerInstance, ServerInfo, GrpcService, RpcMethod, WebhookConfig } from './server';
+export { ExpressServer, createServer } from './core/server';
+export type { ServerInstance, ServerInfo, GrpcService, RpcMethod, WebhookConfig } from './core/server';
 
 // Express re-exports (to avoid direct Express dependency in services)
 export { Request, Response, NextFunction, Router, Application } from 'express';
 export type { RequestHandler, ErrorRequestHandler } from 'express';
 
+
 // Health check utilities
-export { createHealthCheck, withHealthCheck, addHealthCheck } from './health';
+export { createHealthCheck, withHealthCheck, addHealthCheck } from './core/health';
 
 // Graceful shutdown utilities
-export { createGracefulShutdown, withGracefulShutdown, startServerWithShutdown } from './shutdown';
+export { createGracefulShutdown, withGracefulShutdown, startServerWithShutdown } from './core/shutdown';
+
 
 // Middleware utilities
 export {
@@ -41,10 +44,10 @@ export {
   getEnv,
   getEnvNumber,
   getEnvBoolean
-} from './utils';
+} from './utils/utils';
 
 // Periodic health monitoring
-export { PeriodicHealthMonitor } from './periodic-health';
+export { PeriodicHealthMonitor } from './core/periodic-health';
 
 // Types
 export type {
@@ -59,10 +62,11 @@ export type {
   HealthCheckService
 } from './types';
 
+
 // Import all exports for default export
-import { ExpressServer, createServer } from './server';
-import { createHealthCheck, withHealthCheck, addHealthCheck } from './health';
-import { createGracefulShutdown, withGracefulShutdown, startServerWithShutdown } from './shutdown';
+import { ExpressServer, createServer } from './core/server';
+import { createHealthCheck, withHealthCheck, addHealthCheck } from './core/health';
+import { createGracefulShutdown, withGracefulShutdown, startServerWithShutdown } from './core/shutdown';
 import {
   createLoggingMiddleware,
   createErrorHandler,
@@ -80,8 +84,8 @@ import {
   rateLimit,
   requireAuth
 } from './middleware';
-import { getEnv, getEnvNumber, getEnvBoolean } from './utils';
-import { PeriodicHealthMonitor } from './periodic-health';
+import { getEnv, getEnvNumber, getEnvBoolean } from './utils/utils';
+import { PeriodicHealthMonitor } from './core/periodic-health';
 
 // Default export for namespace usage
 const ServerUtils = {

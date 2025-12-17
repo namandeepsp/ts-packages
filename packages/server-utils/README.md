@@ -1,6 +1,6 @@
 # @naman_deep_singh/server-utils
 
-**Version:** 1.3.0 (with integrated cache & session support)
+**Version:** 1.4.0 (with integrated cache & session support)
 
 Extensible server utilities for Express.js microservices with multi-protocol support, integrated caching, session management, and TypeScript.
 
@@ -158,15 +158,29 @@ server.app.use('/api', rateLimit({
 }));
 ```
 
+
 ### Authentication Middleware
 ```typescript
 import { requireAuth } from '@naman_deep_singh/server-utils';
 
 server.app.use('/protected', requireAuth({
-  tokenExtractor: (req) => req.headers.authorization?.substring(7),
-  tokenValidator: async (token) => {
-    // Verify JWT token
-    return jwt.verify(token, process.env.JWT_SECRET);
+  secret: process.env.JWT_SECRET!,
+  unauthorizedMessage: 'Invalid or expired token'
+}));
+```
+
+**Advanced Configuration:**
+```typescript
+import { createAuthMiddleware } from '@naman_deep_singh/server-utils';
+
+server.app.use('/api', createAuthMiddleware({
+  secret: process.env.JWT_SECRET!,
+  unauthorizedMessage: 'Access denied',
+  tokenExtractor: (req) => {
+    // Custom token extraction logic
+    // By default, uses sophisticated extractToken from @naman_deep_singh/security
+    // that checks Authorization headers, cookies, query params, and body
+    return req.headers.authorization?.substring(7);
   }
 }));
 ```

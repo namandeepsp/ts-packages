@@ -1,5 +1,6 @@
 import { Server } from 'http';
-import { GracefulShutdownConfig, ServerPlugin } from './types';
+
+import { GracefulShutdownConfig, ServerPlugin } from '../types';
 
 export function createGracefulShutdown(server: Server, config: GracefulShutdownConfig = {}): void {
   const { timeout = 10000, onShutdown, serverName, serverVersion } = config;

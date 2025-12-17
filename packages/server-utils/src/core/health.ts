@@ -1,10 +1,11 @@
-import express from 'express';
-import { HealthCheckConfig, HealthCheck, ServerPlugin } from './types';
+import { Application, Request, RequestHandler, Response } from 'express';
 
-export function createHealthCheck(config: HealthCheckConfig = {}): express.RequestHandler {
+import { HealthCheckConfig, ServerPlugin } from '../types';
+
+export function createHealthCheck(config: HealthCheckConfig = {}): RequestHandler {
   const { customChecks = [] } = config;
 
-  return async (req: express.Request, res: express.Response) => {
+  return async (req: Request, res: Response) => {
     try {
       const checks: Record<string, boolean> = {
         server: true,
@@ -21,7 +22,7 @@ export function createHealthCheck(config: HealthCheckConfig = {}): express.Reque
       }
 
       const isHealthy = Object.values(checks).every(status => status === true || typeof status === 'number');
-      
+
       res.status(isHealthy ? 200 : 503).json({
         status: isHealthy ? 'healthy' : 'unhealthy',
         checks
@@ -36,12 +37,12 @@ export function createHealthCheck(config: HealthCheckConfig = {}): express.Reque
 }
 
 export function withHealthCheck(path: string = '/health', config: HealthCheckConfig = {}): ServerPlugin {
-  return (app: express.Application) => {
+  return (app: Application) => {
     app.get(path, createHealthCheck(config));
   };
 }
 
 // Convenience function for direct use
-export function addHealthCheck(app: express.Application, path: string = '/health', config: HealthCheckConfig = {}): void {
+export function addHealthCheck(app: Application, path: string = '/health', config: HealthCheckConfig = {}): void {
   app.get(path, createHealthCheck(config));
 }

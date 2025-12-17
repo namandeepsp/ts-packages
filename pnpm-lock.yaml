@@ -122,6 +122,12 @@ importers:
       '@naman_deep_singh/cache':
         specifier: ^1.2.0
         version: 1.2.0
+      '@naman_deep_singh/errors-utils':
+        specifier: ^1.0.1
+        version: 1.0.1(express@5.2.1)
+      '@naman_deep_singh/security':
+        specifier: ^1.2.0
+        version: 1.2.0(express@5.2.1)
       '@types/express':
         specifier: ^5.0.5
         version: 5.0.6
@@ -214,10 +220,16 @@ packages:
   '@naman_deep_singh/errors-utils@1.0.0':
     resolution: {integrity: sha512-djfAavOuU/ZS3qpAuKWeyOwb5K7TJwrK2j1s5Rap3lH1ZafSMCIbp5oKkjsaflM9rpAOGdiC042hoL+jl73JGA==}
 
+  '@naman_deep_singh/errors-utils@1.0.1':
+    resolution: {integrity: sha512-hnQ8JIGDK0WUu0mCfqrBKTjVHFElcYSphHVYoWF6NU0KuEZAp7QCxnX3LgctBiYI8lXa8cBLm2bq7NLQBk1XPw==}
+
   '@naman_deep_singh/response-utils@2.0.4':
     resolution: {integrity: sha512-Fzq725b5/YGW8JMFvO7cXW7L1mToKWtZfqWz6hd+/wzU8QIyu5bdlpRC4HQS6rc1woI1y66i86Uvc+rGlMDftg==}
     peerDependencies:
       express: ^5.1.0
+
+  '@naman_deep_singh/security@1.2.0':
+    resolution: {integrity: sha512-tfPKtQI5en79XZmVIiHoAvhMrwzi+24rJHJ0ecCJ66PEil2OgTIkEApBU3+eJFotSxt9UOKzDJW3aGcJC17aDg==}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -1099,9 +1111,23 @@ snapshots:
     transitivePeerDependencies:
       - express
 
+  '@naman_deep_singh/errors-utils@1.0.1(express@5.2.1)':
+    dependencies:
+      '@naman_deep_singh/response-utils': 2.0.4(express@5.2.1)
+    transitivePeerDependencies:
+      - express
+
   '@naman_deep_singh/response-utils@2.0.4(express@5.2.1)':
     dependencies:
       express: 5.2.1
+
+  '@naman_deep_singh/security@1.2.0(express@5.2.1)':
+    dependencies:
+      '@naman_deep_singh/errors-utils': 1.0.1(express@5.2.1)
+      bcryptjs: 3.0.3
+      jsonwebtoken: 9.0.3
+    transitivePeerDependencies:
+      - express
 
   '@pkgjs/parseargs@0.11.0':
     optional: true

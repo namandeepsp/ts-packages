@@ -13,7 +13,11 @@ export function extendArray() {
     return arr;
   };
 
+
   Array.prototype.chunk = function <T>(size: number): T[][] {
+    if (!Number.isInteger(size) || size <= 0) {
+      throw new TypeError(`chunk: size must be a positive integer, got ${size}`);
+    }
     const chunks: T[][] = [];
     for (let i = 0; i < this.length; i += size) {
       chunks.push(this.slice(i, i + size));
@@ -21,7 +25,12 @@ export function extendArray() {
     return chunks;
   };
 
+
   Array.prototype.groupBy = function <T>(keyFn: (item: T) => string | number): Record<string | number, T[]> {
+    if (typeof keyFn !== 'function') {
+      throw new TypeError(`groupBy: keyFn must be a function, got ${typeof keyFn}`);
+    }
+
     return this.reduce((groups, item) => {
       const key = keyFn(item);
       if (!groups[key]) groups[key] = [];
@@ -30,24 +39,41 @@ export function extendArray() {
     }, {} as Record<string | number, T[]>);
   };
 
+
   Array.prototype.sum = function (): number {
-    return this.reduce((sum, num) => sum + (typeof num === 'number' ? num : 0), 0);
+    const numbers = this.filter(item => typeof item === 'number');
+    if (numbers.length === 0) {
+      throw new TypeError('sum: array must contain at least one number');
+    }
+    return numbers.reduce((sum, num) => sum + num, 0);
   };
 
   Array.prototype.average = function (): number {
     const numbers = this.filter(item => typeof item === 'number');
-    return numbers.length > 0 ? numbers.reduce((sum, num) => sum + num, 0) / numbers.length : 0;
+    if (numbers.length === 0) {
+      throw new TypeError('average: array must contain at least one number');
+    }
+    return numbers.reduce((sum, num) => sum + num, 0) / numbers.length;
   };
 
   Array.prototype.compact = function <T>(): T[] {
     return this.filter(item => item != null && item !== '' && item !== false);
   };
 
+
   Array.prototype.pluck = function <T, K extends keyof T>(key: K): T[K][] {
+    if (typeof key !== 'string' && typeof key !== 'number' && typeof key !== 'symbol') {
+      throw new TypeError(`pluck: key must be a string, number, or symbol, got ${typeof key}`);
+    }
+
     return this.map(item => item && typeof item === 'object' ? item[key] : undefined).filter(val => val !== undefined);
   };
 
   Array.prototype.findLast = function <T>(predicate: (item: T) => boolean): T | undefined {
+    if (typeof predicate !== 'function') {
+      throw new TypeError(`findLast: predicate must be a function, got ${typeof predicate}`);
+    }
+
     for (let i = this.length - 1; i >= 0; i--) {
       if (predicate(this[i])) return this[i];
     }
@@ -55,6 +81,10 @@ export function extendArray() {
   };
 
   Array.prototype.partition = function <T>(predicate: (item: T) => boolean): [T[], T[]] {
+    if (typeof predicate !== 'function') {
+      throw new TypeError(`partition: predicate must be a function, got ${typeof predicate}`);
+    }
+
     const truthy: T[] = [];
     const falsy: T[] = [];
     this.forEach(item => predicate(item) ? truthy.push(item) : falsy.push(item));
@@ -73,15 +103,28 @@ export function extendArray() {
       acc.concat(Array.isArray(val) ? val.deepFlatten() : val), []);
   };
 
+
   Array.prototype.difference = function <T>(other: T[]): T[] {
+    if (!Array.isArray(other)) {
+      throw new TypeError(`difference: other must be an array, got ${typeof other}`);
+    }
+
     return this.filter(item => !other.includes(item));
   };
 
   Array.prototype.intersection = function <T>(other: T[]): T[] {
+    if (!Array.isArray(other)) {
+      throw new TypeError(`intersection: other must be an array, got ${typeof other}`);
+    }
+
     return this.filter(item => other.includes(item));
   };
 
   Array.prototype.union = function <T>(other: T[]): T[] {
+    if (!Array.isArray(other)) {
+      throw new TypeError(`union: other must be an array, got ${typeof other}`);
+    }
+
     return [...new Set([...this, ...other])];
   };
 

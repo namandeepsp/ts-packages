@@ -1,6 +1,7 @@
+
 # @naman_deep_singh/js-extensions
 
-**Version:** 1.2.0
+**Version:** 1.3.0
 
 Universal JavaScript prototype extensions for common development utilities. Works in both Node.js and browser environments with 50+ utility methods.
 
@@ -15,10 +16,11 @@ pnpm add @naman_deep_singh/js-extensions
 ## Quick Start
 
 ```typescript
-import { initExtensions } from '@naman_deep_singh/js-extensions';
+
+import { initializeExtensions } from '@naman_deep_singh/js-extensions';
 
 // Initialize all extensions
-initExtensions();
+initializeExtensions();
 
 // String utilities
 "hello world".toCapitalize(); // "Hello world"
@@ -41,15 +43,49 @@ initExtensions();
 ({user: {name: "John"}}).getPath('user.name'); // "John"
 ```
 
+
+## Error Handling & Validation
+
+All methods now include comprehensive input validation to ensure reliability and prevent runtime errors.
+
+### Input Validation
+```typescript
+// Invalid inputs now throw clear TypeError messages
+"hello".count(123); // TypeError: count: substring must be a string, got number
+"hello".count("");  // TypeError: count: substring cannot be empty
+[].sum();           // TypeError: sum: array must contain at least one number
+({a: 1}).pick(null); // TypeError: pick: keys must be an array, got object
+(3.14).round(-1);    // TypeError: round: decimals must be a non-negative integer, got -1
+```
+
+### Consistent Error Types
+- **`TypeError`** - Invalid parameter types or missing required values
+- **`RangeError`** - Out-of-range values (e.g., `toRoman` number limits)
+
+### Performance vs Validation Trade-off
+```typescript
+import { setPerformanceConfig } from '@naman_deep_singh/js-extensions';
+
+// Validation is enabled by default for reliability
+setPerformanceConfig({
+  enableCaching: true,    // Cache expensive operations
+  enableValidation: true  // Input validation enabled (default)
+});
+
+// Note: Currently validation cannot be disabled as it's built into the methods
+// Future versions may add an option to disable validation for maximum performance
+```
+
 ## Configuration
 
 ### Selective Extensions
 
 ```typescript
-import { initExtensions, extend } from '@naman_deep_singh/js-extensions';
+
+import { initializeExtensions, extend } from '@naman_deep_singh/js-extensions';
 
 // Only specific types
-initExtensions({ 
+initializeExtensions({
   string: true, 
   array: true, 
   object: false, 
@@ -64,10 +100,11 @@ extend.array();  // Only array methods
 ### Performance Configuration
 
 ```typescript
-import { initExtensions, setPerformanceConfig } from '@naman_deep_singh/js-extensions';
+
+import { initializeExtensions, setPerformanceConfig } from '@naman_deep_singh/js-extensions';
 
 // Configure performance options
-initExtensions({
+initializeExtensions({
   performance: {
     enableCaching: true,    // Cache expensive operations
     maxCacheSize: 200,      // LRU cache size
@@ -336,6 +373,7 @@ const config: PerformanceConfig = {
 };
 ```
 
+
 ## Package Stats
 
 - **60 utility methods** across 4 JavaScript types
@@ -343,13 +381,15 @@ const config: PerformanceConfig = {
 - **Universal compatibility** - Node.js and browser
 - **TypeScript native** - complete type definitions
 - **Performance optimized** - optional caching system
+- **Production-ready** - comprehensive input validation
 - **Tree-shakable** - selective imports supported
 
 ## Complete API Reference
 
 ### Core Functions
 ```typescript
-initExtensions(options?: ExtensionOptions): void
+
+initializeExtensions(options?: ExtensionOptions): void
 extendAll(): void
 setPerformanceConfig(config: Partial<PerformanceConfig>): void
 getPerformanceConfig(): PerformanceConfig

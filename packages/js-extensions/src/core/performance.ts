@@ -13,8 +13,15 @@ const defaultConfig: PerformanceConfig = {
 
 let config: PerformanceConfig = { ...defaultConfig };
 
+
 export function setPerformanceConfig(newConfig: Partial<PerformanceConfig>): void {
+  const oldMaxSize = config.maxCacheSize;
   config = { ...config, ...newConfig };
+
+  // Recreate cache if maxCacheSize changed
+  if (cache && oldMaxSize !== config.maxCacheSize) {
+    cache = new LRUCache(config.maxCacheSize);
+  }
 }
 
 export function getPerformanceConfig(): PerformanceConfig {
@@ -40,6 +47,7 @@ class LRUCache<K, V> {
     return value;
   }
 
+
   set(key: K, value: V): void {
     if (this.cache.has(key)) {
       this.cache.delete(key);
@@ -58,19 +66,28 @@ class LRUCache<K, V> {
   }
 }
 
-export const cache = new LRUCache(config.maxCacheSize);
+
+let cache: LRUCache<string, any> | null = null;
+
+function getOrCreateCache(): LRUCache<string, any> {
+  if (!cache) {
+    cache = new LRUCache(config.maxCacheSize);
+  }
+  return cache;
+}
 
 export function withCache<T>(key: string, fn: () => T): T {
   if (!config.enableCaching) {
     return fn();
   }
 
-  const cached = cache.get(key);
+  const currentCache = getOrCreateCache();
+  const cached = currentCache.get(key);
   if (cached !== undefined) {
     return cached as T;
   }
 
   const result = fn();
-  cache.set(key, result);
+  currentCache.set(key, result);
   return result;
 }

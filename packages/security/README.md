@@ -1,6 +1,6 @@
 # @naman_deep_singh/security
 
-**Version:** 1.3.1
+**Version:** 1.3.2
 
 A complete, lightweight security toolkit for Node.js & TypeScript providing:
 

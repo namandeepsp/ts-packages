@@ -1,6 +1,6 @@
 {
   "name": "@naman_deep_singh/security",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "Security utilities for password hashing and JWT token management with TypeScript",
   "type": "module",
   "main": "./dist/cjs/index.js",
@@ -35,7 +35,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.20.0",
   "dependencies": {
-    "@naman_deep_singh/errors-utils": "^1.0.0",
+    "@naman_deep_singh/errors-utils": "^1.1.1",
     "@naman_deep_singh/js-extensions": "^1.3.2",
     "bcryptjs": "^3.0.3",
     "jsonwebtoken": "^9.0.2"

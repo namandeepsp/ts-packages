@@ -1,7 +1,7 @@
 
 # @naman_deep_singh/js-extensions
 
-**Version:** 1.3.0
+**Version:** 1.3.1
 
 Universal JavaScript prototype extensions for common development utilities. Works in both Node.js and browser environments with 50+ utility methods.
 

@@ -95,8 +95,8 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0(express@5.2.1)
       '@naman_deep_singh/js-extensions':
-        specifier: ^1.3.1
-        version: 1.3.1
+        specifier: ^1.3.2
+        version: 1.3.2
       bcryptjs:
         specifier: ^3.0.3
         version: 3.0.3
@@ -222,8 +222,8 @@ packages:
   '@naman_deep_singh/errors-utils@1.0.1':
     resolution: {integrity: sha512-hnQ8JIGDK0WUu0mCfqrBKTjVHFElcYSphHVYoWF6NU0KuEZAp7QCxnX3LgctBiYI8lXa8cBLm2bq7NLQBk1XPw==}
 
-  '@naman_deep_singh/js-extensions@1.3.1':
-    resolution: {integrity: sha512-/iFU9b9teUJWzcTOaXNC8mVHZ2o5JAS3pNCa6ptKWjTISbrhL5s/4OeR/zwFgJqL++LQiwzH1APUVuhaAphwqw==}
+  '@naman_deep_singh/js-extensions@1.3.2':
+    resolution: {integrity: sha512-OxzFwxAc8o8IJYDz7YQSzCRAyoWuJEbdcX4vBgC25auC9hGMxdN9gOmKVtbWktftMICSSSG3C55KSsfb5f2CcA==}
 
   '@naman_deep_singh/response-utils@2.0.4':
     resolution: {integrity: sha512-Fzq725b5/YGW8JMFvO7cXW7L1mToKWtZfqWz6hd+/wzU8QIyu5bdlpRC4HQS6rc1woI1y66i86Uvc+rGlMDftg==}
@@ -863,7 +863,7 @@ snapshots:
     transitivePeerDependencies:
       - express
 
-  '@naman_deep_singh/js-extensions@1.3.1': {}
+  '@naman_deep_singh/js-extensions@1.3.2': {}
 
   '@naman_deep_singh/response-utils@2.0.4(express@5.2.1)':
     dependencies:

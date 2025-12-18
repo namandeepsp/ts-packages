@@ -1,9 +1,8 @@
-
 # @naman_deep_singh/js-extensions
 
-**Version:** 1.3.1
+**Version:** 1.3.2
 
-Universal JavaScript prototype extensions for common development utilities. Works in both Node.js and browser environments with 50+ utility methods.
+Universal JavaScript prototype extensions for common development utilities. Works in both Node.js and browser environments with 67+ utility methods.
 
 ## Installation
 
@@ -16,7 +15,6 @@ pnpm add @naman_deep_singh/js-extensions
 ## Quick Start
 
 ```typescript
-
 import { initializeExtensions } from '@naman_deep_singh/js-extensions';
 
 // Initialize all extensions
@@ -69,11 +67,10 @@ import { setPerformanceConfig } from '@naman_deep_singh/js-extensions';
 // Validation is enabled by default for reliability
 setPerformanceConfig({
   enableCaching: true,    // Cache expensive operations
-  enableValidation: true  // Input validation enabled (default)
+  enableValidation: true  // Input validation enabled (built-in, cannot be disabled)
 });
 
-// Note: Currently validation cannot be disabled as it's built into the methods
-// Future versions may add an option to disable validation for maximum performance
+// Note: Validation is built into all methods and cannot be disabled for maximum performance
 ```
 
 ## Configuration
@@ -81,7 +78,6 @@ setPerformanceConfig({
 ### Selective Extensions
 
 ```typescript
-
 import { initializeExtensions, extend } from '@naman_deep_singh/js-extensions';
 
 // Only specific types
@@ -100,15 +96,13 @@ extend.array();  // Only array methods
 ### Performance Configuration
 
 ```typescript
-
 import { initializeExtensions, setPerformanceConfig } from '@naman_deep_singh/js-extensions';
 
 // Configure performance options
 initializeExtensions({
   performance: {
     enableCaching: true,    // Cache expensive operations
-    maxCacheSize: 200,      // LRU cache size
-    enableValidation: false // Skip input validation for speed
+    maxCacheSize: 200       // LRU cache size
   }
 });
 
@@ -307,13 +301,12 @@ import { setPerformanceConfig, getPerformanceConfig } from '@naman_deep_singh/js
 // Enable caching for expensive operations
 setPerformanceConfig({
   enableCaching: true,
-  maxCacheSize: 200,
-  enableValidation: true
+  maxCacheSize: 200
 });
 
 // Check current config
 const config = getPerformanceConfig();
-console.log(config); // {enableCaching: true, maxCacheSize: 200, enableValidation: true}
+console.log(config); // {enableCaching: true, maxCacheSize: 200}
 ```
 
 ### Methods with Built-in Caching
@@ -321,7 +314,6 @@ The following methods automatically use LRU cache when enabled:
 - **`isPrime()`** - Prime number calculations cached for repeated calls
 - **`factorial()`** - Factorial results cached to avoid recalculation  
 - **`toRoman()`** - Roman numeral conversions cached for reuse
-- **`deepClone()`** - Deep clone operations cached for identical objects
 
 ### External Caching
 ```typescript
@@ -368,15 +360,14 @@ const picked: Pick<{a: number, b: string}, 'a'> = {a: 1, b: "test"}.pick(['a']);
 // Performance configuration is also typed
 const config: PerformanceConfig = {
   enableCaching: true,
-  maxCacheSize: 100,
-  enableValidation: false
+  maxCacheSize: 100
 };
 ```
 
 
 ## Package Stats
 
-- **60 utility methods** across 4 JavaScript types
+- **67 utility methods** across 4 JavaScript types
 - **Zero dependencies** - lightweight and fast
 - **Universal compatibility** - Node.js and browser
 - **TypeScript native** - complete type definitions
@@ -388,7 +379,6 @@ const config: PerformanceConfig = {
 
 ### Core Functions
 ```typescript
-
 initializeExtensions(options?: ExtensionOptions): void
 extendAll(): void
 setPerformanceConfig(config: Partial<PerformanceConfig>): void
@@ -401,7 +391,7 @@ extend.object(): void
 extend.number(): void
 ```
 
-### String Methods (17 methods)
+### String Methods (19 methods)
 ```typescript
 toCapitalize(): string
 toCamelCase(): string
@@ -422,7 +412,7 @@ words(): string[]
 lines(): string[]
 ```
 
-### Array Methods (18 methods)
+### Array Methods (21 methods)
 ```typescript
 unique<T>(): T[]
 shuffle<T>(): T[]
@@ -457,7 +447,7 @@ getPath(path: string, defaultValue?: any): any
 setPath(path: string, value: any): any
 ```
 
-### Number Methods (16 methods)
+### Number Methods (18 methods)
 ```typescript
 toPercent(decimals?: number): string
 toCurrency(currency?: string, locale?: string): string
@@ -476,3 +466,4 @@ abs(): number
 sign(): number
 times(callback: (index: number) => void): void
 ```
+

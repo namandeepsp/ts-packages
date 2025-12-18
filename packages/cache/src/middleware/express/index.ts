@@ -1,5 +1,5 @@
 export {
-  cacheSessionMiddleware,
-  cacheHealthCheckMiddleware,
-  cacheResponseMiddleware
-} from './cacheMiddleware';
+	cacheSessionMiddleware,
+	cacheHealthCheckMiddleware,
+	cacheResponseMiddleware,
+} from './cacheMiddleware'

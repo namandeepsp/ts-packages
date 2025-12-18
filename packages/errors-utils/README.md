@@ -1,6 +1,6 @@
 # @naman_deep_singh/errors-utils
 
-**Version:** 1.1.0
+**Version:** 1.1.1
 
 Standardized error classes and Express middleware for consistent error handling with TypeScript.
 

@@ -1,1 +1,1 @@
-export { extendNumber } from './number-extensions';
+export { extendNumber } from './number-extensions'

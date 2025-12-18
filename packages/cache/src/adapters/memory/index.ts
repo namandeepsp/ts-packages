@@ -1,1 +1,1 @@
-export { MemoryCache } from './MemoryCache';
+export { MemoryCache } from './MemoryCache'

@@ -1,30 +1,32 @@
 // Extension options validation
-import { ExtensionOptions } from '../types/extension-types';
+import type { ExtensionOptions } from '../types/extension-types'
 
-export function validateExtensionOptions(options: Partial<ExtensionOptions>): ExtensionOptions {
-    const validated: ExtensionOptions = {
-        string: options.string !== false,
-        array: options.array !== false,
-        object: options.object !== false,
-        number: options.number !== false,
-        performance: options.performance
-    };
+export function validateExtensionOptions(
+	options: Partial<ExtensionOptions>,
+): ExtensionOptions {
+	const validated: ExtensionOptions = {
+		string: options.string !== false,
+		array: options.array !== false,
+		object: options.object !== false,
+		number: options.number !== false,
+		performance: options.performance,
+	}
 
-    return validated;
+	return validated
 }
 
 export function createExtensionOptions(
-    enableString: boolean = true,
-    enableArray: boolean = true,
-    enableObject: boolean = true,
-    enableNumber: boolean = true,
-    performanceConfig?: any
+	enableString = true,
+	enableArray = true,
+	enableObject = true,
+	enableNumber = true,
+	performanceConfig?: any,
 ): ExtensionOptions {
-    return {
-        string: enableString,
-        array: enableArray,
-        object: enableObject,
-        number: enableNumber,
-        performance: performanceConfig
-    };
+	return {
+		string: enableString,
+		array: enableArray,
+		object: enableObject,
+		number: enableNumber,
+		performance: performanceConfig,
+	}
 }

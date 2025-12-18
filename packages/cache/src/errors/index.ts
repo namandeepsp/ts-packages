@@ -1,1 +1,1 @@
-export { CacheError } from './CacheError';
+export { CacheError } from './CacheError'

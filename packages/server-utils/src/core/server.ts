@@ -1,6 +1,6 @@
 import crypto from 'crypto'
 
-import { CacheFactory, SessionStore } from '@naman_deep_singh/cache'
+import { ICache, CacheFactory, SessionStore, CacheConfig, SessionData } from '@naman_deep_singh/cache'
 import express, { json, raw } from 'express'
 
 import { PeriodicHealthMonitor } from './periodic-health'
@@ -9,6 +9,7 @@ import { createGracefulShutdown } from './shutdown'
 import type { Server } from 'http'
 import type { Application, RequestHandler } from 'express'
 import type { ServerConfig, SocketIOConfig, SocketInstance } from '../types'
+import { useSession } from '../middleware'
 
 export interface GrpcService {
 	service: Record<string, unknown>
@@ -78,9 +79,9 @@ export class ExpressServer implements ServerInstance {
 	public app: Application
 	public server?: Server
 	public config: ServerInstanceConfig
-	public cache?: import('@naman_deep_singh/cache').ICache<unknown>
+	public cache?: ICache<unknown>
 	public sessionStore?:
-		| import('@naman_deep_singh/cache').SessionStore
+		| SessionStore
 		| undefined
 	private status: 'starting' | 'running' | 'stopping' | 'stopped' = 'stopped'
 	private grpcServices: GrpcService[] = []
@@ -241,13 +242,11 @@ export class ExpressServer implements ServerInstance {
 						ttl:
 							(cacheConfig as Record<string, any>)?.ttl ??
 							config.cache?.defaultTTL,
-					} as unknown as import('@naman_deep_singh/cache').CacheConfig
+					} as unknown as CacheConfig
 					const cache = await CacheFactory.createWithFallback<unknown>(cfg)
 
 					this.app.locals.cache = cache as unknown
-					this.cache = cache as import(
-						'@naman_deep_singh/cache',
-					).ICache<unknown>
+					this.cache = cache as ICache<unknown>
 					this.app.locals.cacheDefaultTTL = config.cache?.defaultTTL
 
 					// attach per-request helper middleware
@@ -275,7 +274,7 @@ export class ExpressServer implements ServerInstance {
 					`${serverName.replace(/\s+/g, '_').toLowerCase()}.sid`
 				const ttl = config.session.ttl ?? 3600
 				let cache = this.app.locals.cache as
-					| import('@naman_deep_singh/cache').ICache<unknown>
+					| ICache<unknown>
 					| undefined
 
 				if (!cache) {
@@ -283,9 +282,7 @@ export class ExpressServer implements ServerInstance {
 					try {
 						cache = CacheFactory.create({ adapter: 'memory' })
 						this.app.locals.cache = cache
-						this.cache = cache as import(
-							'@naman_deep_singh/cache',
-						).ICache<unknown>
+						this.cache = cache as ICache<unknown>
 						console.log(
 							`📝 [${serverName}] Session store using in-memory cache`,
 						)
@@ -307,8 +304,8 @@ export class ExpressServer implements ServerInstance {
 					)
 				} else {
 					const store = new SessionStore(
-						cache as import('@naman_deep_singh/cache').ICache<
-							import('@naman_deep_singh/cache').SessionData
+						cache as ICache<
+							SessionData
 						>,
 						{ ttl },
 					)
@@ -318,10 +315,6 @@ export class ExpressServer implements ServerInstance {
 
 					// attach session middleware globally so req.sessionStore is available
 					try {
-						const { useSession } =
-							require('../middleware/middleware') as typeof import(
-								'../middleware',
-							)
 						this.app.use(useSession(cookieName))
 						console.log(
 							`✅ [${serverName}] Session middleware enabled (cookie: ${cookieName}, TTL: ${ttl}s)`,
@@ -376,7 +369,7 @@ export class ExpressServer implements ServerInstance {
 								// Close cache and session store if present
 								try {
 									const cache = this.app.locals.cache as
-										| import('@naman_deep_singh/cache').ICache<unknown>
+										| ICache<unknown>
 										| undefined
 									if (cache && typeof cache.close === 'function') {
 										await cache.close()
@@ -387,7 +380,7 @@ export class ExpressServer implements ServerInstance {
 
 								try {
 									const store = this.app.locals.sessionStore as
-										| import('@naman_deep_singh/cache').SessionStore
+										| SessionStore
 										| undefined
 									if (store && typeof (store as any).close === 'function') {
 										await (store as any).close()

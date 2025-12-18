@@ -1,37 +1,47 @@
-import bcrypt from "bcryptjs";
-import { UnauthorizedError } from "@naman_deep_singh/errors-utils";
+import { UnauthorizedError } from '@naman_deep_singh/errors-utils'
+import bcrypt from 'bcryptjs'
 
 /**
  * Compare a password with a stored hash asynchronously.
  */
-export const verifyPassword = async (password: string, hash: string): Promise<boolean> => {
-    try {
-        const result = await bcrypt.compare(password, hash);
-        if (!result) throw new UnauthorizedError('Password verification failed');
-        return result;
-    } catch {
-        throw new UnauthorizedError('Password verification failed');
-    }
-};
+export const verifyPassword = async (
+	password: string,
+	hash: string,
+): Promise<boolean> => {
+	try {
+		const result = await bcrypt.compare(password, hash)
+		if (!result) throw new UnauthorizedError('Password verification failed')
+		return result
+	} catch {
+		throw new UnauthorizedError('Password verification failed')
+	}
+}
 
-
-export async function verifyPasswordWithPepper(password: string, pepper: string, hash: string) {
-    return verifyPassword(password + pepper, hash);
+export async function verifyPasswordWithPepper(
+	password: string,
+	pepper: string,
+	hash: string,
+) {
+	return verifyPassword(password + pepper, hash)
 }
 
 /**
  * Compare a password with a stored hash synchronously.
  */
 export const verifyPasswordSync = (password: string, hash: string): boolean => {
-    try {
-        const result = bcrypt.compareSync(password, hash);
-        if (!result) throw new UnauthorizedError('Password verification failed');
-        return result;
-    } catch (error) {
-        throw new UnauthorizedError('Password verification failed');
-    }
-};
+	try {
+		const result = bcrypt.compareSync(password, hash)
+		if (!result) throw new UnauthorizedError('Password verification failed')
+		return result
+	} catch (error) {
+		throw new UnauthorizedError('Password verification failed')
+	}
+}
 
-export async function verifyPasswordWithPepperSync(password: string, pepper: string, hash: string) {
-    return verifyPasswordSync(password + pepper, hash);
+export async function verifyPasswordWithPepperSync(
+	password: string,
+	pepper: string,
+	hash: string,
+) {
+	return verifyPasswordSync(password + pepper, hash)
 }

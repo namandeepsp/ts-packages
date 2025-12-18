@@ -1,30 +1,29 @@
-import { JwtPayload } from "jsonwebtoken";
+import type { JwtPayload } from 'jsonwebtoken'
 
 // Branded types to prevent token mixing
 export interface AccessTokenBrand {
-    readonly access: unique symbol;
+	readonly access: unique symbol
 }
 export interface RefreshTokenBrand {
-    readonly refresh: unique symbol;
+	readonly refresh: unique symbol
 }
 
-export type AccessToken = string & AccessTokenBrand;
-export type RefreshToken = string & RefreshTokenBrand;
+export type AccessToken = string & AccessTokenBrand
+export type RefreshToken = string & RefreshTokenBrand
 
 export interface TokenPair {
-    accessToken: AccessToken;
-    refreshToken: RefreshToken;
+	accessToken: AccessToken
+	refreshToken: RefreshToken
 }
-
 
 // Enhanced verification result types
 export interface VerificationResult<T = JwtPayload> {
-    valid: boolean;
-    payload?: T | string;
-    error?: Error;
+	valid: boolean
+	payload?: T | string
+	error?: Error
 }
 
 export interface TokenValidationOptions {
-    ignoreExpiration?: boolean;
-    ignoreIssuedAt?: boolean;
+	ignoreExpiration?: boolean
+	ignoreIssuedAt?: boolean
 }

@@ -29,7 +29,7 @@ export function getPerformanceConfig(): PerformanceConfig {
 }
 
 // Simple LRU cache for expensive operations
-class LRUCache<K, V> {
+export class LRUCache<K, V> {
   private cache = new Map<K, V>();
   private maxSize: number;
 

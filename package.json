@@ -3,23 +3,34 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "publishServerPkg": "pnpm --filter ./packages/server-utils build && pnpm --filter ./packages/server-utils publish",
-    "publishResponsePkg": "pnpm --filter ./packages/response-utils build && pnpm --filter ./packages/response-utils publish",
-    "publishErrorPkg": "pnpm --filter ./packages/error-utils build && pnpm --filter ./packages/error-utils publish",
-    "publishJSExtensionsPkg": "pnpm --filter ./packages/js-extensions build && pnpm --filter ./packages/js-extensions publish",
-    "publishSecurityPkg": "pnpm --filter ./packages/security build && pnpm --filter ./packages/security publish",
-    "publishCachePkg": "pnpm --filter ./packages/cache build && pnpm --filter ./packages/cache publish",
-    "publishAllPkg": "pnpm publishServerPkg && pnpm publishResponsePkg && pnpm publishErrorPkg && pnpm publishJSExtensionsPkg && pnpm publishSecurityPkg && pnpm publishCachePkg"
+    "publish-server-pkg": "pnpm --filter ./packages/server-utils build && pnpm --filter ./packages/server-utils publish",
+    "publish-response-pkg": "pnpm --filter ./packages/response-utils build && pnpm --filter ./packages/response-utils publish",
+    "publish-error-pkg": "pnpm --filter ./packages/errors-utils build && pnpm --filter ./packages/errors-utils publish",
+    "publish-js-extensions-pkg": "pnpm --filter ./packages/js-extensions build && pnpm --filter ./packages/js-extensions publish",
+    "publish-security-pkg": "pnpm --filter ./packages/security build && pnpm --filter ./packages/security publish",
+    "publish-cache-pkg": "pnpm --filter ./packages/cache build && pnpm --filter ./packages/cache publish",
+    "build": "pnpm --filter ./packages/server-utils build && pnpm --filter ./packages/response-utils build && pnpm --filter ./packages/errors-utils build && pnpm --filter ./packages/js-extensions build && pnpm --filter ./packages/security build && pnpm --filter ./packages/cache build",
+    "publish-all-pkg": "pnpm publish-server-pkg && pnpm publish-response-pkg && pnpm publish-error-pkg && pnpm publish-js-extensions-pkg && pnpm publish-security-pkg && pnpm publish-cache-pkg",
+    "clear-cache": "pnpm store prune",
+    "organize": "biome check packages/*/src --write",
+    "organize-imports": "biome check packages/*/src --write",
+    "format-all": "biome format packages/*/src --write",
+    "lint-all": "biome check packages/*/src",
+    "organize-all": "biome check packages/*/src --write",
+    "organize-package": "biome check packages/*/src --write --files-filter $npm_config_package",
+    "format-package": "biome format packages/*/src --write --files-filter $npm_config_package",
+    "lint-package": "biome check packages/*/src --files-filter $npm_config_package",
+    "clean": "biome check packages/*/src --write"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.20.0",
   "devDependencies": {
-    "eslint": "^9.39.1",
-    "prettier": "^3.6.2",
+    "@biomejs/biome": "^1.8.3",
     "typescript": "^5.9.3"
   }
 }

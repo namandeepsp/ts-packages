@@ -1,13 +1,14 @@
-import type { RequestHandler } from 'express';
-import { createResponderFactory } from '../../core/factory';
-import { ResponderConfig } from '../../core/config';
+import type { RequestHandler } from 'express'
+import type { ResponderConfig } from '../../core/config'
+import { createResponderFactory } from '../../core/factory'
 
+export const responderMiddleware = (
+	cfg?: Partial<ResponderConfig>,
+): RequestHandler => {
+	const factory = createResponderFactory(cfg)
 
-export const responderMiddleware = (cfg?: Partial<ResponderConfig>): RequestHandler => {
-    const factory = createResponderFactory(cfg);
-
-    return (req, res, next) => {
-        (res as any).responder = <P>() => factory<P>(res);
-        next();
-    };
-};
+	return (req, res, next) => {
+		;(res as any).responder = <P>() => factory<P>(res)
+		next()
+	}
+}

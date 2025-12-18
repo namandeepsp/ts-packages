@@ -1,1 +1,1 @@
-export { RedisCache } from './RedisCache';
+export { RedisCache } from './RedisCache'

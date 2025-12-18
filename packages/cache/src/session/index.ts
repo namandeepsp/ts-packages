@@ -1,2 +1,2 @@
-export { SessionStore } from './SessionStore';
-export type { SessionOptions } from '../types';
+export { SessionStore } from './SessionStore'
+export type { SessionOptions } from '../types'

@@ -1,25 +1,25 @@
-import type { Request, Response, NextFunction } from "express";
-import { AppError } from "../../error/AppError";
-import { ExpressResponder } from "@naman_deep_singh/response-utils";
-import { mapAppErrorToResponder } from "../../utils/mapAppErrorToResponder";
+import { ExpressResponder } from '@naman_deep_singh/response-utils'
+import type { NextFunction, Request, Response } from 'express'
+import { AppError } from '../../error/AppError'
+import { mapAppErrorToResponder } from '../../utils/mapAppErrorToResponder'
 
 export function expressErrorHandler(
-    err: unknown,
-    req: Request,
-    res: Response,
-    next: NextFunction
+	err: unknown,
+	req: Request,
+	res: Response,
+	next: NextFunction,
 ) {
-    const responder = new ExpressResponder({}, res);
+	const responder = new ExpressResponder({}, res)
 
-    // AppError → known operational error
-    if (err instanceof AppError) {
-        return mapAppErrorToResponder(responder, err);
-    }
+	// AppError → known operational error
+	if (err instanceof AppError) {
+		return mapAppErrorToResponder(responder, err)
+	}
 
-    // Unexpected / programming / unknown error
-    console.error("UNEXPECTED ERROR:", err);
+	// Unexpected / programming / unknown error
+	console.error('UNEXPECTED ERROR:', err)
 
-    return responder.serverError("Internal server error", {
-        details: process.env.NODE_ENV === "production" ? undefined : err,
-    });
+	return responder.serverError('Internal server error', {
+		details: process.env.NODE_ENV === 'production' ? undefined : err,
+	})
 }

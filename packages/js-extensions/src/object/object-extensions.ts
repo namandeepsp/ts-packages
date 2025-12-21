@@ -51,9 +51,6 @@ export function extendObject() {
 	}
 
 	Object.prototype.deepClone = function <T>(): T {
-		// Create a more robust cache key using WeakMap for cycle detection
-		const cloneId = Symbol('clone')
-
 		// Simple cycle detection without caching key generation
 		if (this === null || typeof this !== 'object') return this
 

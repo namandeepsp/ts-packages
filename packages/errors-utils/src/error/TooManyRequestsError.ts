@@ -2,13 +2,12 @@ import { HTTP_STATUS } from '@naman_deep_singh/response-utils'
 import { ERROR_CODES, type ErrorCode } from 'src/constants'
 import { HTTPError } from './HTTPError'
 
-export class UnauthorizedError extends HTTPError {
+export class TooManyRequestsError extends HTTPError {
 	constructor(
-		errorCodes: ErrorCode = ERROR_CODES.UNAUTHORIZED,
-		status: number = HTTP_STATUS.CLIENT_ERROR.UNAUTHORIZED,
+		errorCode: ErrorCode = ERROR_CODES.TOO_MANY_REQUESTS,
 		details?: unknown,
 		cause?: Error,
 	) {
-		super(errorCodes, status, details, cause)
+		super(errorCode, HTTP_STATUS.CLIENT_ERROR.TOO_MANY_REQUESTS, details, cause)
 	}
 }

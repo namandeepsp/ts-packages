@@ -1,6 +1,6 @@
 # @naman_deep_singh/cache
 
-**Version:** 1.3.1 (with Redis Clustering support)
+**Version:** 1.3.2 (with Redis Clustering support)
 
 A flexible, extensible caching layer with support for Redis, Memcache, and in-memory caches. Includes session management, health checks, and Express middleware.
 

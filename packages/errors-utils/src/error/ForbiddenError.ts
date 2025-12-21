@@ -1,7 +1,14 @@
+import { HTTP_STATUS } from '@naman_deep_singh/response-utils'
+import { ERROR_CODES } from 'src/constants'
 import { HTTPError } from './HTTPError'
 
 export class ForbiddenError extends HTTPError {
-	constructor(message = 'Forbidden', details?: unknown) {
-		super(message, 403, details)
+	constructor(details?: unknown, cause?: Error) {
+		super(
+			ERROR_CODES.FORBIDDEN,
+			HTTP_STATUS.CLIENT_ERROR.FORBIDDEN,
+			details,
+			cause,
+		)
 	}
 }

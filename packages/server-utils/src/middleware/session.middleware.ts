@@ -7,7 +7,7 @@ import type {
 
 // Session middleware helper (attaches sessionStore and helpers to req)
 export function useSession(cookieName?: string): RequestHandler {
-	return async (req: Request, res: Response, next: NextFunction) => {
+	return async (req: Request, _res: Response, next: NextFunction) => {
 		try {
 			const store = req.app.locals.sessionStore as
 				| { get?: Function; create?: Function }

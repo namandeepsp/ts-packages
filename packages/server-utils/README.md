@@ -1,6 +1,6 @@
 # @naman_deep_singh/server-utils
 
-**Version:** 1.4.2 (with integrated cache & session support)
+**Version:** 1.4.3 (with integrated cache & session support)
 
 Extensible server utilities for Express.js microservices with multi-protocol support, integrated caching, session management, and TypeScript.
 

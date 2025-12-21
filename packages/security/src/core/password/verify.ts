@@ -33,7 +33,7 @@ export const verifyPasswordSync = (password: string, hash: string): boolean => {
 		const result = bcrypt.compareSync(password, hash)
 		if (!result) throw new UnauthorizedError('Password verification failed')
 		return result
-	} catch (error) {
+	} catch (_error) {
 		throw new UnauthorizedError('Password verification failed')
 	}
 }

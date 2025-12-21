@@ -190,7 +190,11 @@ export class JWTManager implements ITokenManager {
 			const decoded = verifyToken(token, this.refreshSecret)
 
 			if (this.cache) {
-				this.cache.set(cacheKey, { valid: true, payload: decoded, timestamp: Date.now() })
+				this.cache.set(cacheKey, {
+					valid: true,
+					payload: decoded,
+					timestamp: Date.now(),
+				})
 			}
 
 			return decoded
@@ -258,7 +262,7 @@ export class JWTManager implements ITokenManager {
 	validateToken(
 		token: string,
 		secret: Secret,
-		options: TokenValidationOptions = {},
+		_options: TokenValidationOptions = {},
 	): boolean {
 		try {
 			if (!token || typeof token !== 'string') {

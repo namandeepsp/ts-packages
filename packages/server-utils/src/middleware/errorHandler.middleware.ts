@@ -7,7 +7,7 @@ import type {
 
 // Error handling middleware
 export function createErrorHandler(): ErrorRequestHandler {
-	return (err: unknown, req: Request, res: Response, next: NextFunction) => {
+	return (err: unknown, _req: Request, res: Response, next: NextFunction) => {
 		console.error('Error:', err)
 
 		if (res.headersSent) {

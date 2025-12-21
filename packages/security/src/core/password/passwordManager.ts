@@ -84,7 +84,7 @@ export class PasswordManager implements IPasswordManager {
 			}
 
 			return isValid
-		} catch (error) {
+		} catch (_error) {
 			return false
 		}
 	}
@@ -200,25 +200,41 @@ export class PasswordManager implements IPasswordManager {
 	 */
 	checkStrength(password: string): PasswordStrength {
 		const entropy = estimatePasswordEntropy(password)
+
 		let score = 0
 		const feedback: string[] = []
 		const suggestions: string[] = []
 
-		// Length scoring
-		if (password.length >= 8) score++
+		/* ---------------- Entropy baseline ---------------- */
+
+		if (entropy < 28) {
+			feedback.push('Password is easy to guess')
+			suggestions.push('Use more unique characters and length')
+		} else if (entropy < 36) {
+			score += 1
+		} else if (entropy < 60) {
+			score += 2
+		} else {
+			score += 3
+		}
+
+		/* ---------------- Length scoring ---------------- */
+
 		if (password.length >= 12) score++
 		if (password.length >= 16) score++
 
-		// Character variety scoring
+		/* ---------------- Character variety ---------------- */
+
 		if (/[a-z]/.test(password)) score++
 		if (/[A-Z]/.test(password)) score++
 		if (/[0-9]/.test(password)) score++
 		if (/[^A-Za-z0-9]/.test(password)) score++
 
-		// Common patterns deduction
+		/* ---------------- Pattern deductions ---------------- */
+
 		if (/^[A-Za-z]+$/.test(password)) {
 			score--
-			feedback.push('Consider adding numbers and symbols')
+			feedback.push('Consider adding numbers or symbols')
 		}
 
 		if (/^[0-9]+$/.test(password)) {
@@ -236,7 +252,8 @@ export class PasswordManager implements IPasswordManager {
 			feedback.push('Avoid sequential patterns')
 		}
 
-		// Common passwords check
+		/* ---------------- Common passwords ---------------- */
+
 		const commonPasswords = ['password', '123456', 'qwerty', 'admin', 'letmein']
 		if (
 			commonPasswords.some((common) => password.toLowerCase().includes(common))
@@ -245,8 +262,12 @@ export class PasswordManager implements IPasswordManager {
 			feedback.push('Avoid common passwords')
 		}
 
-		// Clamp score and determine label
+		/* ---------------- Clamp score ---------------- */
+
 		score = Math.max(0, Math.min(4, score))
+
+		/* ---------------- Strength label ---------------- */
+
 		let label: PasswordStrength['label']
 
 		switch (score) {
@@ -260,7 +281,7 @@ export class PasswordManager implements IPasswordManager {
 				break
 			case 2:
 				label = 'fair'
-				suggestions.push('Consider adding more length or character types')
+				suggestions.push('Consider increasing length or randomness')
 				break
 			case 3:
 				label = 'good'
@@ -285,7 +306,7 @@ export class PasswordManager implements IPasswordManager {
 	/**
 	 * Check if password hash needs upgrade (different salt rounds)
 	 */
-	needsUpgrade(hash: string, currentConfig: PasswordConfig): boolean {
+	needsUpgrade(_hash: string, _currentConfig: PasswordConfig): boolean {
 		// Simple heuristic: if the hash doesn't match current salt rounds pattern
 		// In practice, you'd need to store the salt rounds with the hash
 		return false

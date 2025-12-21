@@ -1,6 +1,12 @@
 import crypto from 'crypto'
 
-import { ICache, CacheFactory, SessionStore, CacheConfig, SessionData } from '@naman_deep_singh/cache'
+import {
+	type CacheConfig,
+	CacheFactory,
+	type ICache,
+	type SessionData,
+	SessionStore,
+} from '@naman_deep_singh/cache'
 import express, { json, raw } from 'express'
 
 import { PeriodicHealthMonitor } from './periodic-health'
@@ -8,8 +14,8 @@ import { createGracefulShutdown } from './shutdown'
 
 import type { Server } from 'http'
 import type { Application, RequestHandler } from 'express'
-import type { ServerConfig, SocketIOConfig, SocketInstance } from '../types'
 import { useSession } from '../middleware'
+import type { ServerConfig, SocketIOConfig, SocketInstance } from '../types'
 
 export interface GrpcService {
 	service: Record<string, unknown>
@@ -80,9 +86,7 @@ export class ExpressServer implements ServerInstance {
 	public server?: Server
 	public config: ServerInstanceConfig
 	public cache?: ICache<unknown>
-	public sessionStore?:
-		| SessionStore
-		| undefined
+	public sessionStore?: SessionStore | undefined
 	private status: 'starting' | 'running' | 'stopping' | 'stopped' = 'stopped'
 	private grpcServices: GrpcService[] = []
 	private grpcServer?: GrpcServerInstance
@@ -134,7 +138,7 @@ export class ExpressServer implements ServerInstance {
 				const corsOptions =
 					typeof this.config.cors === 'object' ? this.config.cors : undefined
 				this.app.use(cors(corsOptions))
-			} catch (error) {
+			} catch (_error) {
 				console.warn(
 					`${this.config.name}: CORS middleware not available. Install cors package.`,
 				)
@@ -146,7 +150,7 @@ export class ExpressServer implements ServerInstance {
 			try {
 				const helmet = require('helmet')
 				this.app.use(helmet())
-			} catch (error) {
+			} catch (_error) {
 				console.warn(
 					`${this.config.name}: Helmet middleware not available. Install helmet package.`,
 				)
@@ -163,7 +167,7 @@ export class ExpressServer implements ServerInstance {
 			try {
 				const cookieParser = require('cookie-parser')
 				this.app.use(cookieParser())
-			} catch (error) {
+			} catch (_error) {
 				console.warn(
 					`${this.config.name}: Cookie parser middleware not available. Install cookie-parser package.`,
 				)
@@ -273,9 +277,7 @@ export class ExpressServer implements ServerInstance {
 					config.session.cookieName ||
 					`${serverName.replace(/\s+/g, '_').toLowerCase()}.sid`
 				const ttl = config.session.ttl ?? 3600
-				let cache = this.app.locals.cache as
-					| ICache<unknown>
-					| undefined
+				let cache = this.app.locals.cache as ICache<unknown> | undefined
 
 				if (!cache) {
 					// fallback to in-memory cache for session store
@@ -303,12 +305,7 @@ export class ExpressServer implements ServerInstance {
 						`❌ [${serverName}] CRITICAL: Session enabled but no cache available to store sessions. Session functionality will be unavailable.`,
 					)
 				} else {
-					const store = new SessionStore(
-						cache as ICache<
-							SessionData
-						>,
-						{ ttl },
-					)
+					const store = new SessionStore(cache as ICache<SessionData>, { ttl })
 					this.app.locals.sessionStore = store
 					this.app.locals.sessionCookieName = cookieName
 					this.sessionStore = store
@@ -385,7 +382,7 @@ export class ExpressServer implements ServerInstance {
 									if (store && typeof (store as any).close === 'function') {
 										await (store as any).close()
 									}
-								} catch (e) {
+								} catch (_e) {
 									// SessionStore may not have close; ignore
 								}
 							},
@@ -491,7 +488,7 @@ export class ExpressServer implements ServerInstance {
 						)
 					},
 				)
-			} catch (error: unknown) {
+			} catch (_error: unknown) {
 				console.warn(
 					`${this.config.name}: gRPC not available. Install @grpc/grpc-js to use gRPC features.`,
 				)
@@ -511,7 +508,7 @@ export class ExpressServer implements ServerInstance {
 			const rpcServer = jayson.server(this.rpcMethods)
 			this.app.use(path, rpcServer.middleware())
 			console.log(`📡 ${this.config.name} JSON-RPC server mounted on ${path}`)
-		} catch (error: unknown) {
+		} catch (_error: unknown) {
 			console.warn(
 				`${this.config.name}: JSON-RPC not available. Install jayson to use RPC features.`,
 			)
@@ -635,7 +632,7 @@ export class ExpressServer implements ServerInstance {
 				`🔌 ${this.config.name} Socket.IO server attached${config.path ? ` at ${config.path}` : ''}${config.cors ? ' (CORS enabled)' : ''}`,
 			)
 			return io
-		} catch (error: unknown) {
+		} catch (_error: unknown) {
 			console.warn(
 				`${this.config.name}: Socket.IO not available. Install socket.io to use WebSocket features.`,
 			)

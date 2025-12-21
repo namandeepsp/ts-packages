@@ -7,7 +7,7 @@ export const responderMiddleware = (
 ): RequestHandler => {
 	const factory = createResponderFactory(cfg)
 
-	return (req, res, next) => {
+	return (_req, res, next) => {
 		;(res as any).responder = <P>() => factory<P>(res)
 		next()
 	}

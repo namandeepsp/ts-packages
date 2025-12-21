@@ -13,7 +13,7 @@ export const hashPassword = async (
 		ensureValidPassword(password)
 		const salt = await bcrypt.genSalt(saltRounds)
 		return bcrypt.hash(password, salt)
-	} catch (err) {
+	} catch (_err) {
 		throw new InternalServerError('Password hashing failed')
 	}
 }
@@ -30,7 +30,7 @@ export const hashPasswordSync = (password: string, saltRounds = 10): string => {
 		ensureValidPassword(password)
 		const salt = bcrypt.genSaltSync(saltRounds)
 		return bcrypt.hashSync(password, salt)
-	} catch (error) {
+	} catch (_error) {
 		throw new InternalServerError('Password hashing failed')
 	}
 }

@@ -21,7 +21,7 @@ export interface ValidationRule {
 export function createValidationMiddleware(
 	rules: ValidationRule[],
 ): RequestHandler {
-	return (req: Request, res: Response, next: NextFunction) => {
+	return (req: Request, _res: Response, next: NextFunction) => {
 		const errors: string[] = []
 
 		for (const rule of rules) {

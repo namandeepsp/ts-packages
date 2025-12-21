@@ -6,7 +6,7 @@ export function createHealthCheck(
 ): RequestHandler {
 	const { customChecks = [] } = config
 
-	return async (req: Request, res: Response) => {
+	return async (_req: Request, res: Response) => {
 		try {
 			const checks: Record<string, boolean> = {
 				server: true,
@@ -17,7 +17,7 @@ export function createHealthCheck(
 			for (const check of customChecks) {
 				try {
 					checks[check.name] = await check.check()
-				} catch (error) {
+				} catch (_error) {
 					checks[check.name] = false
 				}
 			}
@@ -30,7 +30,7 @@ export function createHealthCheck(
 				status: isHealthy ? 'healthy' : 'unhealthy',
 				checks,
 			})
-		} catch (error) {
+		} catch (_error) {
 			res.status(503).json({
 				status: 'unhealthy',
 				error: 'Health check failed',

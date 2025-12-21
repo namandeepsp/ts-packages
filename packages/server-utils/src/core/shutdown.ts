@@ -45,7 +45,7 @@ export function createGracefulShutdown(
 export function withGracefulShutdown(
 	config: GracefulShutdownConfig = {},
 ): ServerPlugin {
-	return (app, serverConfig) => {
+	return (app, _serverConfig) => {
 		// This plugin needs to be applied after server.listen()
 		// Store config for later use
 		;(app as any).__gracefulShutdownConfig = config

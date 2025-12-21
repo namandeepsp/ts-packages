@@ -15,7 +15,7 @@ export function cacheSessionMiddleware(
 	const sessionIdHeader = options?.sessionIdHeader ?? 'x-session-id'
 	const sessionDataKey = options?.sessionDataKey ?? 'session'
 
-	return async (req: Request, res: Response, next: NextFunction) => {
+	return async (req: Request, _res: Response, next: NextFunction) => {
 		try {
 			// Get session ID from header or cookie
 			const sessionId =
@@ -119,7 +119,7 @@ export function cacheResponseMiddleware(
 						} else {
 							try {
 								responseData = JSON.stringify(data)
-							} catch (e) {
+							} catch (_e) {
 								responseData = null
 							}
 						}

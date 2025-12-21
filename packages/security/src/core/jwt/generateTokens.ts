@@ -1,12 +1,12 @@
-import { type JwtPayload, type Secret, verify } from 'jsonwebtoken'
+import type { JwtPayload, Secret } from 'jsonwebtoken'
 import { signToken } from './signToken'
 import type { AccessToken, RefreshToken, TokenPair } from './types'
 import { verifyToken } from './verify'
 
 // Helper function to create branded tokens
-const createBrandedToken = <T extends string>(token: string, _brand: T): T => {
+/* const createBrandedToken = <T extends string>(token: string, _brand: T): T => {
 	return token as T
-}
+} */
 
 export const generateTokens = (
 	payload: Record<string, unknown>,

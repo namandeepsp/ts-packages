@@ -1,4 +1,4 @@
-import jwt, { type Secret, sign, type SignOptions } from 'jsonwebtoken'
+import { type Secret, type SignOptions, sign } from 'jsonwebtoken'
 import { parseDuration } from './parseDuration'
 
 function getExpiryTimestamp(seconds: number) {

@@ -55,7 +55,7 @@ export class CryptoManager {
 	public encrypt(
 		plaintext: string,
 		key: string,
-		options?: {
+		_options?: {
 			algorithm?: string
 			encoding?: BufferEncoding
 			iv?: string
@@ -72,7 +72,7 @@ export class CryptoManager {
 	public decrypt(
 		encryptedData: string,
 		key: string,
-		options?: {
+		_options?: {
 			algorithm?: string
 			encoding?: BufferEncoding
 			iv?: string
@@ -89,7 +89,7 @@ export class CryptoManager {
 	public generateHmac(
 		data: string,
 		secret: string,
-		options?: {
+		_options?: {
 			algorithm?: string
 			encoding?: BufferEncoding
 		},
@@ -104,7 +104,7 @@ export class CryptoManager {
 	 */
 	public generateSecureRandom(
 		length: number,
-		encoding: BufferEncoding = 'hex',
+		_encoding: BufferEncoding = 'hex',
 	): string {
 		// Use the basic random token function
 		return functionalRandomToken(length)
@@ -117,7 +117,7 @@ export class CryptoManager {
 		data: string,
 		secret: string,
 		signature: string,
-		options?: {
+		_options?: {
 			algorithm?: string
 			encoding?: BufferEncoding
 		},
@@ -179,7 +179,7 @@ export class CryptoManager {
 		publicKeyEncoding?: { type: string; format: string }
 		privateKeyEncoding?: { type: string; format: string }
 	}): Promise<{ publicKey: string; privateKey: string }> {
-		return new Promise((resolve, reject) => {
+		return new Promise((resolve, _reject) => {
 			const crypto = require('crypto')
 
 			const keyPair = crypto.generateKeyPairSync('rsa', {
@@ -202,7 +202,7 @@ export class CryptoManager {
 	 * Encrypt data using RSA public key
 	 */
 	public rsaEncrypt(data: string, publicKey: string): Promise<string> {
-		return new Promise((resolve, reject) => {
+		return new Promise((resolve, _reject) => {
 			const crypto = require('crypto')
 
 			const buffer = Buffer.from(data, 'utf8')
@@ -218,7 +218,7 @@ export class CryptoManager {
 		encryptedData: string,
 		privateKey: string,
 	): Promise<string> {
-		return new Promise((resolve, reject) => {
+		return new Promise((resolve, _reject) => {
 			const crypto = require('crypto')
 
 			const buffer = Buffer.from(encryptedData, 'base64')

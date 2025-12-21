@@ -1,5 +1,5 @@
 // src/jwt/decodeToken.ts
-import jwt, { decode, type JwtPayload } from 'jsonwebtoken'
+import { type JwtPayload, decode } from 'jsonwebtoken'
 
 /**
  * Flexible decode

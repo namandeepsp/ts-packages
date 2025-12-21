@@ -7,6 +7,10 @@
         "enabled": true,
         "rules": {
             "recommended": false,
+            "correctness": {
+                "noUnusedImports": "error",
+                "noUnusedVariables": "warn"
+            },
             "suspicious": {
                 "noExplicitAny": "off"
             },

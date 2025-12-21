@@ -1,7 +1,14 @@
+import { HTTP_STATUS } from '@naman_deep_singh/response-utils'
+import { ERROR_CODES } from 'src/constants'
 import { HTTPError } from './HTTPError'
 
 export class ValidationError extends HTTPError {
-	constructor(message = 'Validation Error', details?: unknown) {
-		super(message, 422, details)
+	constructor(details?: unknown, cause?: Error) {
+		super(
+			ERROR_CODES.VALIDATION_FAILED,
+			HTTP_STATUS.CLIENT_ERROR.UNPROCESSABLE_ENTITY,
+			details,
+			cause,
+		)
 	}
 }

@@ -1,125 +1,200 @@
-# @naman_deep_singh/errors-utils
+@naman_deep_singh/errors-utils
 
-**Version:** 1.1.1
+Version: 1.3.1
 
-Standardized error classes and Express middleware for consistent error handling with TypeScript.
+A standardized, code-driven error handling system for TypeScript and Express applications, providing consistent error identity, responses, and middleware integration.
 
-## 🚀 Features
+🚀 Features
 
-- ✅ **Structured Error Classes** - AppError, HTTPError, ValidationError, etc.
-- ✅ **Express Middleware** - Error converter and handler
-- ✅ **Response Integration** - Works with @naman_deep_singh/response-utils
-- ✅ **TypeScript Support** - Full type safety
-- ✅ **Consistent Responses** - Standardized error format across your API
+✅ Structured Error Classes — AppError, HTTPError, ValidationError, etc.
 
-## 📦 Installation
+✅ Strongly-Typed Error Codes — Centralized error identity via constants
 
-```bash
+✅ Centralized Error Messages — One source of truth for user-facing messages
+
+✅ Express Middleware — Error converter & global handler
+
+✅ Response Integration — Works seamlessly with @naman_deep_singh/response-utils
+
+✅ TypeScript First — Full type safety & IntelliSense
+
+✅ Consistent API Responses — Unified error shape across services
+
+📦 Installation
 npm install @naman_deep_singh/errors-utils
-```
 
-## 🔧 Usage
+🧠 Design Philosophy
 
-### Error Classes
+This package is code-driven, not message-driven.
 
-```typescript
-import { 
-  AppError, 
-  BadRequestError, 
-  UnauthorizedError, 
+Errors are identified by stable error codes
+
+Messages are resolved internally via centralized mappings
+
+API contracts remain stable even if messages change
+
+This ensures:
+
+Consistency across microservices
+
+Safe refactoring
+
+Better logging, tracing, and observability
+
+🔧 Usage
+Creating Errors (Recommended)
+import {
+  BadRequestError,
+  UnauthorizedError,
   NotFoundError,
   ValidationError,
-  InternalServerError 
-} from '@naman_deep_singh/errors-utils';
+  InternalServerError,
+  ERROR_CODES,
+} from '@naman_deep_singh/errors-utils'
 
-// Basic usage
-throw new BadRequestError('Invalid input data');
-throw new UnauthorizedError('Authentication required');
-throw new NotFoundError('User not found');
-throw new ValidationError('Email is required');
+throw new BadRequestError(ERROR_CODES.BAD_REQUEST)
 
-// With details
-throw new BadRequestError('Validation failed', {
-  fields: ['email', 'password']
-});
-```
+throw new UnauthorizedError(ERROR_CODES.UNAUTHORIZED)
 
-### Express Middleware
+throw new NotFoundError(ERROR_CODES.NOT_FOUND)
 
-```typescript
-import express from 'express';
-import { expressErrorHandler, errorConverter } from '@naman_deep_singh/errors-utils';
+throw new ValidationError(ERROR_CODES.VALIDATION_FAILED, {
+  fields: ['email', 'password'],
+})
 
-const app = express();
+throw new InternalServerError(ERROR_CODES.INTERNAL_SERVER_ERROR)
 
-// Convert unknown errors to AppError
-app.use(errorConverter);
+🧾 Error Codes & Messages
+
+The package exposes a strongly-typed error code system.
+
+import {
+  ERROR_CODES,
+  ERROR_MESSAGES,
+  ErrorCode,
+} from '@naman_deep_singh/errors-utils'
+
+Exports
+
+ERROR_CODES — Canonical list of all supported error codes
+
+ERROR_MESSAGES — Mapping of error codes → user-facing messages
+
+ErrorCode — Union type of all valid error codes
+
+Why Error Codes?
+
+✅ Consistent error identity across services
+
+✅ Centralized message management
+
+✅ Safer API contracts
+
+✅ Improved logging & observability
+
+🌐 Express Middleware
+
+This package provides Express-specific middleware under the hood
+and exposes a clean public API.
+
+import express from 'express'
+import {
+  errorConverter,
+  expressErrorHandler,
+  ValidationError,
+  ERROR_CODES,
+} from '@naman_deep_singh/errors-utils'
+
+const app = express()
+
+// Convert unknown / third-party errors → AppError
+app.use(errorConverter)
 
 // Handle all errors consistently
-app.use(expressErrorHandler);
+app.use(expressErrorHandler)
 
-// In your routes
 app.post('/users', (req, res) => {
   if (!req.body.email) {
-    throw new BadRequestError('Email is required');
+    throw new ValidationError(ERROR_CODES.VALIDATION_FAILED)
   }
-  // Error will be caught and formatted automatically
-});
-```
+})
 
-## 🔗 Integration
+Middleware Responsibilities
 
-### With @naman_deep_singh/server-utils
+errorConverter
 
-```typescript
-import { createServer } from '@naman_deep_singh/server-utils';
-import { expressErrorHandler } from '@naman_deep_singh/errors-utils';
+Converts unknown errors into AppError
 
-const server = createServer('My API', '1.0.0');
+Preserves known operational errors
 
-// Replace basic error handler with advanced one
-server.app.use(expressErrorHandler);
-```
+expressErrorHandler
 
-### With @naman_deep_singh/response-utils
+Sends standardized API responses
 
-```typescript
-import { responderMiddleware } from '@naman_deep_singh/response-utils';
+Integrates with @naman_deep_singh/response-utils
 
-server.app.use(responderMiddleware());
-server.app.use(expressErrorHandler); // Uses response-utils for consistent format
-```
+Hides internal errors in production
 
-## 📚 Error Classes
+🔗 Integration
+With @naman_deep_singh/response-utils
+import { responderMiddleware } from '@naman_deep_singh/response-utils'
+import { expressErrorHandler } from '@naman_deep_singh/errors-utils'
 
-| Class | Status Code | Use Case |
-|-------|-------------|----------|
-| `AppError` | Custom | Base error class |
-| `BadRequestError` | 400 | Invalid input data |
-| `UnauthorizedError` | 401 | Authentication failures |
-| `ForbiddenError` | 403 | Authorization failures |
-| `NotFoundError` | 404 | Resource not found |
-| `ConflictError` | 409 | Resource conflicts |
-| `ValidationError` | 422 | Input validation errors |
-| `InternalServerError` | 500 | Server errors |
+app.use(responderMiddleware())
+app.use(expressErrorHandler)
 
-## 🎯 Response Format
+With @naman_deep_singh/server-utils
+import { createServer } from '@naman_deep_singh/server-utils'
+import { expressErrorHandler } from '@naman_deep_singh/errors-utils'
 
-All errors produce consistent responses:
+const server = createServer('My API', '1.0.0')
 
-```json
+server.app.use(expressErrorHandler)
+
+🧠 Custom Errors
+
+You can safely extend existing errors:
+
+import {
+  InternalServerError,
+  ERROR_CODES,
+} from '@naman_deep_singh/errors-utils'
+
+export class CryptoIntegrityError extends InternalServerError {
+  constructor(details?: unknown, cause?: Error) {
+    super(ERROR_CODES.CRYPTO_INTEGRITY_ERROR, details, cause)
+  }
+}
+
+📚 Available Error Classes
+Class	Status Code	Use Case
+AppError	Custom	Base error class
+HTTPError	4xx / 5xx	Base HTTP error
+BadRequestError	400	Invalid input
+UnauthorizedError	401	Authentication failures
+TokenExpiredError	401	Expired tokens
+TokenMalformedError	401	Invalid token format
+ForbiddenError	403	Authorization failures
+NotFoundError	404	Resource not found
+ConflictError	409	Resource conflicts
+ValidationError	422	Validation errors
+RateLimitError	429	Rate limiting
+TooManyRequestsError	429	Alias of RateLimitError
+CryptoIntegrityError	500	Crypto validation failure
+InternalServerError	500	Server-side failures
+🎯 Standard Error Response
+
+All errors resolve to a consistent response shape:
+
 {
   "success": false,
-  "message": "Error message",
-  "data": undefined,
-  "error": {
-    "message": "Detailed error message",
-    "details": {...}
-  },
-  "meta": null
+  "code": "VALIDATION_FAILED",
+  "message": "Validation failed",
+  "details": {
+    "fields": ["email"]
+  }
 }
-```
 
-## 📄 License
+📄 License
 
 ISC © Naman Deep Singh

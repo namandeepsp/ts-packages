@@ -1,25 +1,32 @@
 import { ExpressResponder } from '@naman_deep_singh/response-utils'
 import type { NextFunction, Request, Response } from 'express'
+import { ERROR_CODES } from '../../constants'
 import { AppError } from '../../error/AppError'
 import { mapAppErrorToResponder } from '../../utils/mapAppErrorToResponder'
 
 export function expressErrorHandler(
 	err: unknown,
-	req: Request,
+	_req: Request,
 	res: Response,
-	next: NextFunction,
+	_next: NextFunction,
 ) {
 	const responder = new ExpressResponder({}, res)
 
-	// AppError → known operational error
+	// 1. Known operational error
 	if (err instanceof AppError) {
 		return mapAppErrorToResponder(responder, err)
 	}
 
-	// Unexpected / programming / unknown error
+	// 2. Log unexpected errors (never expose internals in prod)
 	console.error('UNEXPECTED ERROR:', err)
 
-	return responder.serverError('Internal server error', {
-		details: process.env.NODE_ENV === 'production' ? undefined : err,
-	})
+	// 3. Normalize unknown error → AppError
+	const internalError = new AppError(
+		ERROR_CODES.INTERNAL_SERVER_ERROR,
+		500,
+		process.env.NODE_ENV === 'production' ? undefined : err,
+		err instanceof Error ? err : undefined,
+	)
+
+	return mapAppErrorToResponder(responder, internalError)
 }

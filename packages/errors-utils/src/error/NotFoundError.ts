@@ -1,7 +1,14 @@
+import { HTTP_STATUS } from '@naman_deep_singh/response-utils'
+import { ERROR_CODES } from 'src/constants'
 import { HTTPError } from './HTTPError'
 
 export class NotFoundError extends HTTPError {
-	constructor(message = 'Not Found', details?: unknown) {
-		super(message, 404, details)
+	constructor(details?: unknown, cause?: Error) {
+		super(
+			ERROR_CODES.NOT_FOUND,
+			HTTP_STATUS.CLIENT_ERROR.NOT_FOUND,
+			details,
+			cause,
+		)
 	}
 }

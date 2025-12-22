@@ -1,24 +1,25 @@
 # @naman_deep_singh/response-utils
 
-**Version:** 2.1.2
+**Version:** 2.1.3
 
-A flexible, framework-agnostic **TypeScript** response utility library for building consistent and configurable API responses.  
-Supports **Express.js**, pagination, typed payloads, and expandable response adapters.
+A flexible, framework-agnostic **TypeScript response utility library** for building consistent, typed, and configurable API responses.
+
+Designed with a clean **core + adapter** architecture.  
+First-class support for **Express.js**, pagination, and standardized HTTP status handling.
 
 ---
 
 ## 🚀 Features
 
-| Feature                                        | Status |
-| ---------------------------------------------- | :----: |
-| Fully Typesafe Response Envelopes              |   ✅   |
-| Framework-Agnostic Core                        |   ✅   |
-| Express.js Adapter + Middleware                |   ✅   |
-| Automatic HTTP Status Handling                 |   ✅   |
-| Pagination Responses                           |   ✅   |
-| Centralized Response Config                    |   ✅   |
-| Status Code Constants                          |   ✅   |
-| Legacy API (`success`, `error`, etc.)          |   ⚠️ Deprecated   |
+| Feature                                      | Status |
+|---------------------------------------------|:------:|
+| Fully typesafe response envelopes            |   ✅   |
+| Framework-agnostic core                      |   ✅   |
+| Express.js responder adapter                 |   ✅   |
+| Express middleware injection                 |   ✅   |
+| Pagination helpers                           |   ✅   |
+| Centralized responder configuration          |   ✅   |
+| HTTP status constants                        |   ✅   |
 
 ---
 
@@ -26,221 +27,178 @@ Supports **Express.js**, pagination, typed payloads, and expandable response ada
 
 ```sh
 npm install @naman_deep_singh/response-utils
-```
-
-## 🧠 Architecture Overview
-
-```
+🧠 Architecture Overview
 response-utils
-├─ core/          → BaseResponder + config + factory (framework-independent)
+├─ core/               → Framework-agnostic responders
+│  ├─ BaseResponder
+│  ├─ config
+│  ├─ factory
+│  └─ types
+│
 ├─ adapters/
-│   └─ express/   → ExpressResponder + middleware
-├─ constants/     → HTTP status constants
-└─ legacy/        → success(), error(), etc. (optional migration layer)
-```
+│  └─ express/         → ExpressResponder
+│
+├─ middleware/
+│  └─ express/         → responderMiddleware
+│
+├─ constants/          → HTTP status constants
 
-## 📄 Response Format (Default Envelope)
-
-```typescript
+📄 Response Envelope (Default Shape)
 interface ResponseEnvelope<P = unknown, M = Record<string, unknown>> {
-  success: boolean;
-  message?: string;
-  data?: P;
-  error: { message: string; code?: string; details?: unknown } | null;
-  meta: M | null;
+  success: boolean
+  message?: string
+  data?: P
+  error: {
+    message: string
+    code?: string
+    details?: unknown
+  } | null
+  meta: M | null
 }
-```
+🛠️ Usage
+✔ Framework-Agnostic (No Express)
+import { BaseResponder } from '@naman_deep_singh/response-utils'
 
-## 🛠️ Usage Examples
+const responder = new BaseResponder()
 
-### ✔ Framework-Agnostic (no Express)
-```typescript
-import { BaseResponder } from '@naman_deep_singh/response-utils';
+const result = responder.ok({ user: 'John' }, 'Loaded')
 
-const r = new BaseResponder();
-const result = r.ok({ user: "John" }, "Loaded");
-console.log(result);
-```
+// When no sender is attached, returns:
+// { status: 200, body: ResponseEnvelope }
+console.log(result)
+🌐 Express Integration
+1️⃣ Register Middleware
+import express from 'express'
+import { responderMiddleware } from '@naman_deep_singh/response-utils'
 
-### 🌐 Express Integration
+const app = express()
 
-#### 1️⃣ Add Middleware
+app.use(responderMiddleware())
+This injects a res.responder() factory into every request.
 
-```typescript
-import express from 'express';
-import { responderMiddleware } from '@naman_deep_singh/response-utils';
-
-const app = express();
-app.use(responderMiddleware());
-```
-
-#### 2️⃣ Controller Usage
-
-```typescript
+2️⃣ Controller Usage
 app.get('/user', (req, res) => {
-  const responder = (res as any).responder();
-  return responder.okAndSend({ id: 1, name: "John Doe" }, "User found");
-});
-```
+  const responder = res.responder<{ id: number; name: string }>()
 
-`okAndSend()` automatically applies HTTP status + JSON response.
+  responder.okAndSend(
+    { id: 1, name: 'John Doe' },
+    'User found'
+  )
+})
+✅ okAndSend() automatically:
 
-#### ⚙️ Config Options
+sets HTTP status
 
-```typescript
-app.use(responderMiddleware({
-  timestamp: true,
-  extra: { service: "user-service" }
-}));
-```
+sends JSON response
 
-Example output:
+returns void for clean controller ergonomics
 
-```json
+⚙️ Middleware Configuration
+app.use(
+  responderMiddleware({
+    timestamp: true,
+    extra: { service: 'user-service' },
+  })
+)
+Example response:
+
 {
   "success": true,
   "data": { ... },
   "error": null,
   "meta": {
-    "timestamp": "2025-11-22T12:00:00Z",
-    "service": "user-service"
-  }
+    "timestamp": "2025-11-22T12:00:00Z"
+  },
+  "service": "user-service"
 }
-```
-
-### 🔢 Pagination Support
-
-```typescript
+🔢 Pagination Support
 responder.paginateAndSend(
   [{ id: 1 }],
-  1, // page
-  10, // limit
-  42, // total
-  "Loaded"
-);
-```
+  1,    // page
+  10,   // limit
+  42,   // total
+  'Loaded'
+)
+Pagination metadata is automatically calculated.
 
-## 📚 Supported Methods
+📚 Available Methods
+✅ Success Responses
+Method	HTTP
+ok()	200
+created()	201
+noContent()	204
+paginate()	200
+Each method has an Express variant:
 
-### Success Methods
-| Method | Status |
-|--------|--------|
-| `ok()` | 200 |
-| `created()` | 201 |
-| `noContent()` | 204 |
-| `paginated()` | 200 |
+okAndSend()
 
-### Error Methods
-| Method | Status |
-|--------|--------|
-| `badRequest()` | 400 |
-| `unauthorized()` | 401 |
-| `forbidden()` | 403 |
-| `notFound()` | 404 |
-| `conflict()` | 409 |
-| `unprocessableEntity()` | 422 |
-| `tooManyRequests()` | 429 |
-| `serverError()` | 500 |
+createdAndSend()
 
-**Each has an Express `*AndSend()` variant**  
-Example → `notFoundAndSend()`, `createdAndSend()`
+paginateAndSend()
 
-### 🧩 Status Constants
+❌ Error Responses
+Method	HTTP
+badRequest()	400
+unauthorized()	401
+forbidden()	403
+notFound()	404
+conflict()	409
+unprocessableEntity()	422
+tooManyRequests()	429
+serverError()	500
+Each also has a *AndSend() variant.
 
-```typescript
-import { HTTP_STATUS } from '@naman_deep_singh/response-utils';
+🧩 HTTP Status Constants
+import { HTTP_STATUS } from '@naman_deep_singh/response-utils'
 
-console.log(HTTP_STATUS.CLIENT_ERROR.NOT_FOUND); // 404
-console.log(HTTP_STATUS.SUCCESS.CREATED); // 201
-```
+HTTP_STATUS.SUCCESS.OK              // 200
+HTTP_STATUS.CLIENT_ERROR.NOT_FOUND  // 404
+HTTP_STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR // 500
+Categories
+SUCCESS
 
-**Categories:**
-- `SUCCESS`
-- `REDIRECTION`
-- `CLIENT_ERROR`
-- `SERVER_ERROR`
+REDIRECTION
 
-**All fully readonly + literal typed** ✔
+CLIENT_ERROR
 
+SERVER_ERROR
 
-### 🧩 Status Constants
+✔ Object.freeze() protected
+✔ Fully literal-typed (as const)
+✔ IDE autocomplete friendly
 
-```typescript
-import { HTTP_STATUS } from '@naman_deep_singh/response-utils';
+🧩 TypeScript: Express Response Augmentation (Recommended)
+For full type safety, add this once in your project:
 
-console.log(HTTP_STATUS.CLIENT_ERROR.NOT_FOUND); // 404
-console.log(HTTP_STATUS.SUCCESS.CREATED); // 201
-```
+import type { ExpressResponder } from '@naman_deep_singh/response-utils'
 
-**Categories available:**
+declare global {
+  namespace Express {
+    interface Response {
+      responder: <P = unknown>() => ExpressResponder<P>
+    }
+  }
+}
 
-- `SUCCESS`
-- `REDIRECTION`
-- `CLIENT_ERROR`
-- `SERVER_ERROR`
+⚠️ Do not use for new projects.
 
-All values are:
+🔗 Integration with Other Packages
+With @naman_deep_singh/server-utils
+import { responderMiddleware } from '@naman_deep_singh/response-utils'
 
-✔ Object.freeze() protected  
-✔ Strongly typed using as const  
-✔ Auto-complete supported in IDEs  
-✔ Works with any HTTP framework
+server.app.use(responderMiddleware())
+With @naman_deep_singh/errors-utils
+import { expressErrorHandler } from '@naman_deep_singh/errors-utils'
 
-### 🕘 Legacy API (Migration-friendly)
+server.app.use(expressErrorHandler)
+Provides consistent error responses across services.
 
-```typescript
-import { success, error } from '@naman_deep_singh/response-utils/legacy';
+🔜 Roadmap
+Fastify adapter
 
-// Success response
-const result = success({ id: 1, name: 'John' }, 'User found', 200);
-// Returns: { success: true, message: 'User found', data: {...}, statusCode: 200 }
+Hono adapter
 
-// Error response  
-const errorResult = error('User not found', 404, 'NOT_FOUND');
-// Returns: { success: false, message: 'User not found', error: 'NOT_FOUND', statusCode: 404 }
+Configurable envelope key mapping
 
-// With Express response object
-success({ users: [] }, 'Success', 200, res); // Automatically sends response
-error('Server error', 500, undefined, res); // Automatically sends error
-```
-
-**Legacy Functions:**
-- `success(data, message?, status?, res?)` - Create success response
-- `error(message, status?, error?, res?)` - Create error response
-
-⚠ **Recommended only for old codebases.** Use BaseResponder/ExpressResponder for new projects.
-
-## 🔜 Roadmap
-
-| Feature | Status |
-|---------|--------|
-| Fastify Adapter | Planned |
-| Hono Adapter | Planned |
-| Custom Error Classes | Planned |
-
-## Integration with Other Packages
-
-### With @naman_deep_singh/server-utils
-
-```typescript
-import { createServer } from '@naman_deep_singh/server-utils';
-import { responderMiddleware } from '@naman_deep_singh/response-utils';
-
-const server = createServer('My API', '1.0.0');
-server.app.use(responderMiddleware());
-
-// All server-utils middleware now uses consistent response format
-```
-
-### With @naman_deep_singh/errors-utils
-
-```typescript
-import { expressErrorHandler } from '@naman_deep_singh/errors-utils';
-
-// Advanced error handling with consistent responses
-server.app.use(expressErrorHandler);
-```
-
-## 📄 License
-
+📄 License
 MIT © Naman Deep Singh

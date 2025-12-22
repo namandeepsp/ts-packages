@@ -11,6 +11,3 @@ export { responderMiddleware } from './middleware/express/expressMiddleware'
 // HTTP Status Constants
 export { HTTP_STATUS } from './constants/httpStatus'
 export type { HttpStatusCode } from './constants/httpStatus'
-
-// Legacy API (Deprecated but supported)
-export * as legacy from './legacy'

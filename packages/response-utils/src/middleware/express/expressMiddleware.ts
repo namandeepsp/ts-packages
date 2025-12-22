@@ -8,7 +8,7 @@ export const responderMiddleware = (
 	const factory = createResponderFactory(cfg)
 
 	return (_req, res, next) => {
-		;(res as any).responder = <P>() => factory<P>(res)
+		;(res as any).responder = <P = unknown>() => factory<P>(res)
 		next()
 	}
 }

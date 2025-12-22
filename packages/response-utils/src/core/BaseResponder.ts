@@ -22,10 +22,31 @@ export class BaseResponder<P = unknown, M = PaginationMeta> {
 		code?: string
 		details?: unknown
 	} {
-		if (err instanceof Error)
-			return { message: err.message, code: (err as any).code }
-		if (typeof err === 'string') return { message: err }
-		return { message: 'Unknown error', details: err }
+		// errors-utils AppError compatibility
+		if (typeof err === 'object' && err !== null) {
+			const e = err as Record<string, unknown>
+
+			if (typeof e.message === 'string') {
+				return {
+					message: e.message,
+					code: typeof e.code === 'string' ? e.code : undefined,
+					details: e.details,
+				}
+			}
+		}
+
+		if (err instanceof Error) {
+			return { message: err.message }
+		}
+
+		if (typeof err === 'string') {
+			return { message: err }
+		}
+
+		return {
+			message: 'Internal server error',
+			details: err,
+		}
 	}
 
 	protected buildEnvelope(

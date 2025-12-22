@@ -1,6 +1,6 @@
 # @naman_deep_singh/response-utils
 
-**Version:** 2.1.3
+**Version:** 2.1.4
 
 A flexible, framework-agnostic **TypeScript response utility library** for building consistent, typed, and configurable API responses.
 

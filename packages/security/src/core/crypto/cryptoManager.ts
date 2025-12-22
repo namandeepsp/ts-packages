@@ -1,3 +1,4 @@
+import { ERROR_CODES, InternalServerError } from '@naman_deep_singh/errors-utils'
 import {
 	decrypt as functionalDecrypt,
 	encrypt as functionalEncrypt,
@@ -56,15 +57,24 @@ export class CryptoManager {
 		plaintext: string,
 		key: string,
 		_options?: {
-			algorithm?: string
-			encoding?: BufferEncoding
+			algorithm?: string;
+			encoding?: BufferEncoding;
 			iv?: string
-		},
+		}
 	): string {
-		// For now, use the basic encrypt function
-		// TODO: Enhance to support different algorithms and options
-		return functionalEncrypt(plaintext, key)
+		try {
+			return functionalEncrypt(plaintext, key)
+		} catch (err) {
+			throw new InternalServerError(
+				undefined,
+				{
+					message: 'Encryption failed',
+				},
+				err instanceof Error ? err : undefined
+			)
+		}
 	}
+
 
 	/**
 	 * Decrypt data using the default or specified algorithm
@@ -73,14 +83,22 @@ export class CryptoManager {
 		encryptedData: string,
 		key: string,
 		_options?: {
-			algorithm?: string
-			encoding?: BufferEncoding
+			algorithm?: string;
+			encoding?: BufferEncoding;
 			iv?: string
-		},
+		}
 	): string {
-		// For now, use the basic decrypt function
-		// TODO: Enhance to support different algorithms and options
-		return functionalDecrypt(encryptedData, key)
+		try {
+			return functionalDecrypt(encryptedData, key)
+		} catch (err) {
+			throw new InternalServerError(
+				undefined,
+				{
+					message: 'Decryption failed',
+				},
+				err instanceof Error ? err : undefined
+			)
+		}
 	}
 
 	/**
@@ -133,7 +151,7 @@ export class CryptoManager {
 		password: string,
 		salt: string,
 		iterations = 100000,
-		keyLength = 32,
+		keyLength = 32
 	): Promise<string> {
 		return new Promise((resolve, reject) => {
 			const crypto = require('crypto')
@@ -144,13 +162,19 @@ export class CryptoManager {
 				iterations,
 				keyLength,
 				'sha256',
-				(err: Error, derivedKey: Buffer) => {
+				(err: Error | null, derivedKey: Buffer) => {
 					if (err) {
-						reject(err)
+						reject(new InternalServerError(
+							undefined,
+							{
+								message: 'Key derivation failed',
+							},
+							err instanceof Error ? err : undefined
+						))
 					} else {
 						resolve(derivedKey.toString('hex'))
 					}
-				},
+				}
 			)
 		})
 	}
@@ -233,20 +257,24 @@ export class CryptoManager {
 	public rsaSign(
 		data: string,
 		privateKey: string,
-		algorithm = 'sha256',
+		algorithm = 'sha256'
 	): Promise<string> {
 		return new Promise((resolve, reject) => {
 			const crypto = require('crypto')
-
-			const sign = crypto.createSign(algorithm)
-			sign.update(data)
-			sign.end()
-
 			try {
+				const sign = crypto.createSign(algorithm)
+				sign.update(data)
+				sign.end()
 				const signature = sign.sign(privateKey, 'base64')
 				resolve(signature)
-			} catch (error) {
-				reject(error)
+			} catch (err) {
+				reject(new InternalServerError(
+					undefined,
+					{
+						message: 'RSA signing failed',
+					},
+					err instanceof Error ? err : undefined
+				))
 			}
 		})
 	}
@@ -258,20 +286,24 @@ export class CryptoManager {
 		data: string,
 		signature: string,
 		publicKey: string,
-		algorithm = 'sha256',
+		algorithm = 'sha256'
 	): Promise<boolean> {
 		return new Promise((resolve, reject) => {
 			const crypto = require('crypto')
-
-			const verify = crypto.createVerify(algorithm)
-			verify.update(data)
-			verify.end()
-
 			try {
+				const verify = crypto.createVerify(algorithm)
+				verify.update(data)
+				verify.end()
 				const isValid = verify.verify(publicKey, signature, 'base64')
 				resolve(isValid)
-			} catch (error) {
-				reject(error)
+			} catch (err) {
+				reject(new InternalServerError(
+					undefined,
+					{
+						message: 'RSA verification failed',
+					},
+					err instanceof Error ? err : undefined
+				))
 			}
 		})
 	}

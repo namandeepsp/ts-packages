@@ -1,6 +1,6 @@
 @naman_deep_singh/errors-utils
 
-Version: 1.3.2
+Version: 1.3.3
 
 A standardized, code-driven error handling system for TypeScript and Express applications, providing consistent error identity, responses, and middleware integration.
 

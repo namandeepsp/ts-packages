@@ -1,5 +1,4 @@
 import { ValidationError } from '@naman_deep_singh/errors-utils'
-
 import type {
 	NextFunction,
 	Request,
@@ -90,8 +89,8 @@ export function createValidationMiddleware(
 
 		if (errors.length > 0) {
 			// Use ValidationError from errors-utils and let error middleware handle response
-			const validationError = new ValidationError('Validation failed', {
-				validationErrors: errors,
+			const validationError = new ValidationError({
+				fieldErrors: errors,
 			})
 			return next(validationError)
 		}

@@ -3,41 +3,54 @@ import type {
 	NextFunction,
 	Request,
 	Response,
-} from 'node_modules/@types/express'
+} from 'express'
 
-// Error handling middleware
+import { AppError } from '@naman_deep_singh/errors-utils'
+
 export function createErrorHandler(): ErrorRequestHandler {
 	return (err: unknown, _req: Request, res: Response, next: NextFunction) => {
-		console.error('Error:', err)
-
 		if (res.headersSent) {
 			return next(err)
 		}
 
-		// Type guard for error objects
-		const errorObj = err as {
-			status?: number
-			statusCode?: number
-			message?: string
-			stack?: string
+		// Use responder if available
+		const responder = (res as any).responder?.() ?? null
+
+		// Known application error
+		if (err instanceof AppError) {
+			if (responder) {
+				return responder.status(err.statusCode).error(err.code, err.details)
+			}
+
+			// Fallback (if responder middleware is not mounted)
+			return res.status(err.statusCode).json({
+				success: false,
+				message: err.code,
+				error: {
+					message: err.code,
+					details: err.details,
+				},
+				data: undefined,
+				meta: null,
+			})
 		}
 
-		const status = errorObj.status || errorObj.statusCode || 500
-		const message =
-			process.env.NODE_ENV === 'production'
-				? 'Internal Server Error'
-				: errorObj.message || 'Unknown error'
+		// Unknown / unhandled error
+		console.error('Unhandled error:', err)
 
-		res.status(status).json({
+		const status = 500
+		const message = 'Internal Server Error'
+
+		if (responder) {
+			return responder.status(status).error(message)
+		}
+
+		// Final fallback
+		return res.status(status).json({
 			success: false,
 			message,
+			error: { message },
 			data: undefined,
-			error: {
-				message,
-				...(process.env.NODE_ENV !== 'production' && {
-					details: { stack: errorObj.stack },
-				}),
-			},
 			meta: null,
 		})
 	}

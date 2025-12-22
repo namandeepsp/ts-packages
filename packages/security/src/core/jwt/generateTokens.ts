@@ -2,6 +2,7 @@ import type { JwtPayload, Secret } from 'jsonwebtoken'
 import { signToken } from './signToken'
 import type { AccessToken, RefreshToken, TokenPair } from './types'
 import { verifyToken } from './verify'
+import { TokenMalformedError } from '@naman_deep_singh/errors-utils'
 
 // Helper function to create branded tokens
 /* const createBrandedToken = <T extends string>(token: string, _brand: T): T => {
@@ -35,7 +36,9 @@ export function rotateRefreshToken(
 	const decoded = verifyToken(oldToken, secret)
 
 	if (typeof decoded === 'string') {
-		throw new Error('Invalid token payload — expected JWT payload object')
+		throw new TokenMalformedError({
+			message: 'Invalid token payload — expected JWT payload object',
+		})
 	}
 
 	const payload: JwtPayload = { ...decoded }

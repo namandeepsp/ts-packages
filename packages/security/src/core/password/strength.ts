@@ -8,7 +8,7 @@ export const isPasswordStrong = (
 	password: string,
 	options: PasswordStrengthOptions = {},
 ): boolean => {
-	if (!password) throw new BadRequestError('Invalid password provided')
+	if (!password) throw new BadRequestError({ message: 'Invalid password provided' })
 
 	const {
 		minLength = 8,
@@ -23,13 +23,13 @@ export const isPasswordStrong = (
 			`Password must be at least ${minLength} characters`,
 		)
 	if (requireUppercase && !/[A-Z]/.test(password))
-		throw new ValidationError('Password must include uppercase letters')
+		throw new ValidationError({ message: 'Password must include uppercase letters' })
 	if (requireLowercase && !/[a-z]/.test(password))
-		throw new ValidationError('Password must include lowercase letters')
+		throw new ValidationError({ message: 'Password must include lowercase letters' })
 	if (requireNumbers && !/[0-9]/.test(password))
-		throw new ValidationError('Password must include numbers')
+		throw new ValidationError({ message: 'Password must include numbers' })
 	if (requireSymbols && !/[^A-Za-z0-9]/.test(password))
-		throw new ValidationError('Password must include symbols')
+		throw new ValidationError({ message: 'Password must include symbols' })
 
 	return true
 }

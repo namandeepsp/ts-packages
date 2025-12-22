@@ -1,4 +1,5 @@
 import {
+	ERROR_CODES,
 	TokenExpiredError,
 	TokenMalformedError,
 	UnauthorizedError,
@@ -70,8 +71,6 @@ export function createAuthMiddleware(config: AuthConfig): RequestHandler {
 			// Unexpected error → always pass cause
 			return next(
 				new UnauthorizedError(
-					undefined,
-					undefined,
 					{ reason: 'Authentication failed' },
 					error instanceof Error ? error : undefined,
 				),

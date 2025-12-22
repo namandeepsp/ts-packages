@@ -1,6 +1,5 @@
 import { HTTP_STATUS } from '@naman_deep_singh/response-utils'
 import { ERROR_CODES } from 'src/constants'
-import { UnauthorizedError } from './UnauthorizedError'
 import { HTTPError } from './HTTPError'
 
 export class TokenExpiredError extends HTTPError {

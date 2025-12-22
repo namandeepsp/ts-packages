@@ -1,6 +1,6 @@
-import { ERROR_CODES } from "src/constants";
-import { HTTPError } from "./HTTPError";
-import { HTTP_STATUS } from "@naman_deep_singh/response-utils";
+import { HTTP_STATUS } from '@naman_deep_singh/response-utils'
+import { ERROR_CODES } from 'src/constants'
+import { HTTPError } from './HTTPError'
 
 export class UnauthorizedError extends HTTPError {
 	constructor(details?: unknown, cause?: Error) {

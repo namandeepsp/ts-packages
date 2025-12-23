@@ -1,7 +1,7 @@
 ```bash
 @naman_deep_singh/errors-utils
 
-Version: 1.4.0
+Version: 1.4.1
 
 A standardized, code-driven error handling system for TypeScript and Express applications, providing consistent error identity, responses, and middleware integration.
 

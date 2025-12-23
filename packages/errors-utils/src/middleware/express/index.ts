@@ -1,2 +1,2 @@
-export * from './errorHandler'
-export * from './errorConverter'
+export * from './errorHandler.middleware'
+export * from './errorConverter.middleware'

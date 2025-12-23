@@ -1,5 +1,4 @@
-// =========================
-// Base Errors
+export * from './errorRegistry'
 // =========================
 export * from './error/AppError'
 export * from './error/HTTPError'
@@ -13,7 +12,6 @@ export * from './error/ForbiddenError'
 export * from './error/NotFoundError'
 export * from './error/ConflictError'
 export * from './error/ValidationError'
-export * from './error/RateLimitError'
 export * from './error/TooManyRequestsError'
 
 // =========================

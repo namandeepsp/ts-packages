@@ -1,37 +1,94 @@
-import type { ErrorCode } from './errorCodes'
+import { ERROR_CODES, type ErrorCode } from './errorCodes'
+
+/**
+ * Canonical error messages mapped to ERROR_CODES
+ * - Human-readable
+ * - Safe for API responses
+ * - Useful for logs
+ * - Can be overridden by services if needed
+ */
 
 export const ERROR_MESSAGES: Record<ErrorCode, string> = {
-	BAD_REQUEST: 'Bad request',
-	UNAUTHORIZED: 'Unauthorized',
-	FORBIDDEN: 'Forbidden',
-	NOT_FOUND: 'Resource not found',
-	CONFLICT: 'Conflict occurred',
-	VALIDATION_FAILED: 'Validation failed',
-	RATE_LIMIT_EXCEEDED: 'Too many requests',
+	/* ------------------------------------------------------------------ */
+	/* 🧱 Common / Generic                                                  */
+	/* ------------------------------------------------------------------ */
+	[ERROR_CODES.BAD_REQUEST]: 'The request is invalid or malformed.',
+	[ERROR_CODES.VALIDATION_FAILED]: 'Request validation failed.',
+	[ERROR_CODES.UNAUTHORIZED]: 'Authentication is required.',
+	[ERROR_CODES.FORBIDDEN]: 'You do not have permission to perform this action.',
+	[ERROR_CODES.NOT_FOUND]: 'The requested resource was not found.',
+	[ERROR_CODES.CONFLICT]:
+		'The request could not be completed due to a conflict.',
+	[ERROR_CODES.TOO_MANY_REQUESTS]: 'Too many requests. Please try again later.',
 
-	INTERNAL_SERVER_ERROR: 'Internal server error',
+	[ERROR_CODES.INTERNAL_SERVER_ERROR]: 'An unexpected internal error occurred.',
+	[ERROR_CODES.SERVICE_UNAVAILABLE]: 'The service is currently unavailable.',
+	[ERROR_CODES.DEPENDENCY_FAILURE]: 'A dependent service failed to respond.',
 
-	CRYPTO_INTEGRITY_ERROR: 'Crypto integrity error',
+	/* ------------------------------------------------------------------ */
+	/* 🌐 HTTP / Network                                                    */
+	/* ------------------------------------------------------------------ */
+	[ERROR_CODES.HTTP_ERROR]:
+		'An HTTP error occurred while processing the request.',
+	[ERROR_CODES.HTTP_TIMEOUT]: 'The request timed out.',
+	[ERROR_CODES.UPSTREAM_SERVICE_ERROR]:
+		'An upstream service returned an error.',
 
-	TOO_MANY_REQUESTS: 'Too many requests',
+	/* ------------------------------------------------------------------ */
+	/* 🔐 Authentication / Authorization                                   */
+	/* ------------------------------------------------------------------ */
+	[ERROR_CODES.AUTH_FAILED]: 'Authentication failed.',
+	[ERROR_CODES.TOKEN_MISSING]: 'Authentication token is missing.',
+	[ERROR_CODES.TOKEN_INVALID]: 'Authentication token is invalid.',
+	[ERROR_CODES.TOKEN_EXPIRED]: 'Authentication token has expired.',
 
-	TOKEN_EXPIRED: 'Token expired',
-	TOKEN_INVALID: 'Invalid token',
-	TOKEN_NOT_PROVIDED: 'Token not provided',
-	TOKEN_NOT_FOUND: 'Token not found',
-	TOKEN_NOT_CREATED: 'Token not created',
-	TOKEN_NOT_UPDATED: 'Token not updated',
-	TOKEN_NOT_DELETED: 'Token not deleted',
-	TOKEN_NOT_VALIDATED: 'Token not validated',
-	TOKEN_NOT_REFRESHED: 'Token not refreshed',
-	TOKEN_NOT_REVOKED: 'Token not revoked',
-	TOKEN_NOT_BLACKLISTED: 'Token not blacklisted',
-	TOKEN_NOT_WHITELISTED: 'Token not whitelisted',
-	TOKEN_NOT_DECODED: 'Token not decoded',
-	TOKEN_NOT_ENCODED: 'Token not encoded',
-	TOKEN_NOT_SIGNED: 'Token not signed',
-	TOKEN_NOT_VERIFIED: 'Token not verified',
-	TOKEN_NOT_DECRYPTED: 'Token not decrypted',
-	TOKEN_NOT_ENCRYPTED: 'Token not encrypted',
-	TOKEN_NOT_GENERATED: 'Token not generated',
+	/* ------------------------------------------------------------------ */
+	/* 🔑 Cryptography / Security                                          */
+	/* ------------------------------------------------------------------ */
+	[ERROR_CODES.CRYPTO_ERROR]: 'A cryptographic operation failed.',
+	[ERROR_CODES.CRYPTO_INTEGRITY_ERROR]: 'Data integrity verification failed.',
+
+	/* ------------------------------------------------------------------ */
+	/* 💾 Cache                                                             */
+	/* ------------------------------------------------------------------ */
+	[ERROR_CODES.CACHE_ERROR]: 'A cache operation failed.',
+	[ERROR_CODES.CACHE_CONNECTION_FAILED]:
+		'Failed to connect to the cache store.',
+
+	/* ------------------------------------------------------------------ */
+	/* 🗄️ Database                                                          */
+	/* ------------------------------------------------------------------ */
+	[ERROR_CODES.DATABASE_ERROR]: 'A database error occurred.',
+	[ERROR_CODES.DATABASE_CONNECTION_FAILED]:
+		'Failed to connect to the database.',
+	[ERROR_CODES.DATABASE_CONSTRAINT_VIOLATION]:
+		'The operation violates a database constraint.',
+
+	/* ------------------------------------------------------------------ */
+	/* 📩 Messaging / Queues                                                */
+	/* ------------------------------------------------------------------ */
+	[ERROR_CODES.MESSAGE_BROKER_ERROR]: 'A message broker error occurred.',
+	[ERROR_CODES.MESSAGE_PUBLISH_FAILED]:
+		'Failed to publish message to the message broker.',
+
+	/* ------------------------------------------------------------------ */
+	/* 📁 File / Storage                                                    */
+	/* ------------------------------------------------------------------ */
+	[ERROR_CODES.FILE_ERROR]: 'A file operation failed.',
+	[ERROR_CODES.FILE_NOT_FOUND]: 'The requested file was not found.',
+	[ERROR_CODES.FILE_UPLOAD_FAILED]: 'File upload failed.',
+	[ERROR_CODES.FILE_TOO_LARGE]: 'The uploaded file exceeds the allowed size.',
+
+	/* ------------------------------------------------------------------ */
+	/* ⚙️ Configuration / Environment                                      */
+	/* ------------------------------------------------------------------ */
+	[ERROR_CODES.CONFIG_ERROR]: 'Configuration error detected.',
+	[ERROR_CODES.CONFIG_MISSING]: 'Required configuration is missing.',
+
+	/* ------------------------------------------------------------------ */
+	/* ⏱️ Timeouts / Resources                                              */
+	/* ------------------------------------------------------------------ */
+	[ERROR_CODES.TIMEOUT_ERROR]: 'The operation timed out.',
+	[ERROR_CODES.RESOURCE_EXHAUSTED]:
+		'The system has exhausted required resources.',
 }

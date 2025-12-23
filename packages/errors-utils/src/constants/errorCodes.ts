@@ -1,37 +1,78 @@
 export const ERROR_CODES = {
+	/* ------------------------------------------------------------------ */
+	/* 🧱 Common / Generic                                                  */
+	/* ------------------------------------------------------------------ */
 	BAD_REQUEST: 'BAD_REQUEST',
+	VALIDATION_FAILED: 'VALIDATION_FAILED',
 	UNAUTHORIZED: 'UNAUTHORIZED',
 	FORBIDDEN: 'FORBIDDEN',
 	NOT_FOUND: 'NOT_FOUND',
 	CONFLICT: 'CONFLICT',
-	VALIDATION_FAILED: 'VALIDATION_FAILED',
-	RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
-
-	INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
-
-	CRYPTO_INTEGRITY_ERROR: 'CRYPTO_INTEGRITY_ERROR',
-
 	TOO_MANY_REQUESTS: 'TOO_MANY_REQUESTS',
 
-	TOKEN_EXPIRED: 'TOKEN_EXPIRED',
+	INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
+	SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE',
+	DEPENDENCY_FAILURE: 'DEPENDENCY_FAILURE',
+
+	/* ------------------------------------------------------------------ */
+	/* 🌐 HTTP / Network                                                    */
+	/* ------------------------------------------------------------------ */
+	HTTP_ERROR: 'HTTP_ERROR',
+	HTTP_TIMEOUT: 'HTTP_TIMEOUT',
+	UPSTREAM_SERVICE_ERROR: 'UPSTREAM_SERVICE_ERROR',
+
+	/* ------------------------------------------------------------------ */
+	/* 🔐 Authentication / Authorization                                   */
+	/* ------------------------------------------------------------------ */
+	AUTH_FAILED: 'AUTH_FAILED',
+	TOKEN_MISSING: 'TOKEN_MISSING',
 	TOKEN_INVALID: 'TOKEN_INVALID',
-	TOKEN_NOT_PROVIDED: 'TOKEN_NOT_PROVIDED',
-	TOKEN_NOT_FOUND: 'TOKEN_NOT_FOUND',
-	TOKEN_NOT_CREATED: 'TOKEN_NOT_CREATED',
-	TOKEN_NOT_UPDATED: 'TOKEN_NOT_UPDATED',
-	TOKEN_NOT_DELETED: 'TOKEN_NOT_DELETED',
-	TOKEN_NOT_VALIDATED: 'TOKEN_NOT_VALIDATED',
-	TOKEN_NOT_REFRESHED: 'TOKEN_NOT_REFRESHED',
-	TOKEN_NOT_REVOKED: 'TOKEN_NOT_REVOKED',
-	TOKEN_NOT_BLACKLISTED: 'TOKEN_NOT_BLACKLISTED',
-	TOKEN_NOT_WHITELISTED: 'TOKEN_NOT_WHITELISTED',
-	TOKEN_NOT_DECODED: 'TOKEN_NOT_DECODED',
-	TOKEN_NOT_ENCODED: 'TOKEN_NOT_ENCODED',
-	TOKEN_NOT_SIGNED: 'TOKEN_NOT_SIGNED',
-	TOKEN_NOT_VERIFIED: 'TOKEN_NOT_VERIFIED',
-	TOKEN_NOT_DECRYPTED: 'TOKEN_NOT_DECRYPTED',
-	TOKEN_NOT_ENCRYPTED: 'TOKEN_NOT_ENCRYPTED',
-	TOKEN_NOT_GENERATED: 'TOKEN_NOT_GENERATED',
+	TOKEN_EXPIRED: 'TOKEN_EXPIRED',
+
+	/* ------------------------------------------------------------------ */
+	/* 🔑 Cryptography / Security                                          */
+	/* ------------------------------------------------------------------ */
+	CRYPTO_ERROR: 'CRYPTO_ERROR',
+	CRYPTO_INTEGRITY_ERROR: 'CRYPTO_INTEGRITY_ERROR',
+
+	/* ------------------------------------------------------------------ */
+	/* 💾 Cache                                                             */
+	/* ------------------------------------------------------------------ */
+	CACHE_ERROR: 'CACHE_ERROR',
+	CACHE_CONNECTION_FAILED: 'CACHE_CONNECTION_FAILED',
+
+	/* ------------------------------------------------------------------ */
+	/* 🗄️ Database                                                          */
+	/* ------------------------------------------------------------------ */
+	DATABASE_ERROR: 'DATABASE_ERROR',
+	DATABASE_CONNECTION_FAILED: 'DATABASE_CONNECTION_FAILED',
+	DATABASE_CONSTRAINT_VIOLATION: 'DATABASE_CONSTRAINT_VIOLATION',
+
+	/* ------------------------------------------------------------------ */
+	/* 📩 Messaging / Queues                                                */
+	/* ------------------------------------------------------------------ */
+	MESSAGE_BROKER_ERROR: 'MESSAGE_BROKER_ERROR',
+	MESSAGE_PUBLISH_FAILED: 'MESSAGE_PUBLISH_FAILED',
+
+	/* ------------------------------------------------------------------ */
+	/* 📁 File / Storage                                                    */
+	/* ------------------------------------------------------------------ */
+	FILE_ERROR: 'FILE_ERROR',
+	FILE_NOT_FOUND: 'FILE_NOT_FOUND',
+	FILE_UPLOAD_FAILED: 'FILE_UPLOAD_FAILED',
+	FILE_TOO_LARGE: 'FILE_TOO_LARGE',
+
+	/* ------------------------------------------------------------------ */
+	/* ⚙️ Configuration / Environment                                      */
+	/* ------------------------------------------------------------------ */
+	CONFIG_ERROR: 'CONFIG_ERROR',
+	CONFIG_MISSING: 'CONFIG_MISSING',
+
+	/* ------------------------------------------------------------------ */
+	/* ⏱️ Timeouts / Resources                                              */
+	/* ------------------------------------------------------------------ */
+	TIMEOUT_ERROR: 'TIMEOUT_ERROR',
+	RESOURCE_EXHAUSTED: 'RESOURCE_EXHAUSTED',
 } as const
 
-export type ErrorCode = keyof typeof ERROR_CODES
+export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES]

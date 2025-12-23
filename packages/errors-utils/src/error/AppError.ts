@@ -1,5 +1,6 @@
 import { HTTP_STATUS } from '@naman_deep_singh/response-utils'
-import { ERROR_MESSAGES, type ErrorCode } from '../constants'
+import { errorMessageRegistry } from 'src'
+import type { ErrorCode } from '../constants'
 
 export class AppError extends Error {
 	public statusCode: number
@@ -14,7 +15,7 @@ export class AppError extends Error {
 		details?: unknown,
 		cause?: Error,
 	) {
-		super(ERROR_MESSAGES[code]) // message comes from mapping
+		super(errorMessageRegistry.resolve(code)) // message comes from mapping
 		this.code = code
 		this.statusCode = statusCode
 		this.isOperational = true

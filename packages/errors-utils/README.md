@@ -1,7 +1,7 @@
 ```bash
 @naman_deep_singh/errors-utils
 
-Version: 1.4.1
+Version: 1.4.2
 
 A standardized, code-driven error handling system for TypeScript and Express applications, providing consistent error identity, responses, and middleware integration.
 
@@ -43,22 +43,21 @@ import {
   NotFoundError,
   ValidationError,
   InternalServerError,
-  ERROR_CODES,
 } from '@naman_deep_singh/errors-utils'
 
 // Basic usage
-throw new BadRequestError(ERROR_CODES.BAD_REQUEST)
+throw new BadRequestError()
 
-throw new UnauthorizedError(ERROR_CODES.UNAUTHORIZED)
+throw new UnauthorizedError()
 
-throw new NotFoundError(ERROR_CODES.NOT_FOUND)
+throw new NotFoundError()
 
 // With additional details
-throw new ValidationError(ERROR_CODES.VALIDATION_FAILED, {
+throw new ValidationError({
   fields: ['email', 'password'],
 })
 
-throw new InternalServerError(ERROR_CODES.INTERNAL_SERVER_ERROR)
+throw new InternalServerError()
 
 🧾 Error Codes & Messages
 import {
@@ -87,7 +86,6 @@ import {
   errorConverter,
   expressErrorHandler,
   ValidationError,
-  ERROR_CODES,
 } from '@naman_deep_singh/errors-utils'
 
 const app = express()
@@ -100,7 +98,9 @@ app.use(expressErrorHandler)
 
 app.post('/users', (req, res) => {
   if (!req.body.email) {
-    throw new ValidationError(ERROR_CODES.VALIDATION_FAILED)
+    throw new ValidationError({
+      fields: ['email'],
+    })
   }
 })
 
@@ -151,9 +151,15 @@ errorMessageRegistry.register({
 
 After this, AppError or any derived class will use the updated messages automatically.
 
-import { AppError } from '@naman_deep_singh/errors-utils'
+import { AppError, ErrorCode } from '@naman_deep_singh/errors-utils'
 
-throw new AppError('CUSTOM_ERROR') // message: "Something went wrong with custom logic"
+throw new AppError(
+  'CUSTOM_ERROR' as ErrorCode,
+  500,
+  {
+    reason: "Something went wrong with custom logic"
+  }
+)
 
 📚 Available Error Classes
 Class	Status Code	Use Case
@@ -170,6 +176,8 @@ ValidationError	422	Validation errors
 RateLimitError	429	Rate limiting
 CryptoIntegrityError	500	Crypto validation failure
 InternalServerError	500	Server-side failures
+ServiceUnavailableError 500 Service not available
+
 🎯 Standard Error Response
 
 All errors resolve to a consistent response shape:
@@ -180,7 +188,7 @@ All errors resolve to a consistent response shape:
   "message": "Validation failed",
   "details": {
     "fields": ["email"]
-  }
+  },
 }
 
 📄 License

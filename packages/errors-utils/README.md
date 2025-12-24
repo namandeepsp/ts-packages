@@ -86,7 +86,6 @@ import {
   errorConverter,
   expressErrorHandler,
   ValidationError,
-  ERROR_CODES,
 } from '@naman_deep_singh/errors-utils'
 
 const app = express()
@@ -152,7 +151,7 @@ errorMessageRegistry.register({
 
 After this, AppError or any derived class will use the updated messages automatically.
 
-import { AppError } from '@naman_deep_singh/errors-utils'
+import { AppError, ErrorCode } from '@naman_deep_singh/errors-utils'
 
 throw new AppError(
   'CUSTOM_ERROR' as ErrorCode,

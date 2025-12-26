@@ -1,6 +1,6 @@
 {
   "name": "@naman_deep_singh/security",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "Security utilities for password hashing and JWT token management with TypeScript",
   "type": "module",
   "main": "./dist/cjs/index.js",

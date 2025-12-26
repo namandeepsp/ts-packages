@@ -5,7 +5,7 @@ import type {
 	ITokenManager,
 	JWTConfig,
 	RefreshToken,
-	TokenPair
+	TokenPair,
 } from '../../interfaces/jwt.interface'
 import { signToken } from './signToken'
 import { safeVerifyToken } from './verify'
@@ -22,7 +22,10 @@ export class JWTManager implements ITokenManager {
 	private refreshSecret: Secret
 	private accessExpiry: string | number
 	private refreshExpiry: string | number
-	private cache?: LRUCache<string, { valid: boolean; payload: JwtPayload; timestamp: number }>
+	private cache?: LRUCache<
+		string,
+		{ valid: boolean; payload: JwtPayload; timestamp: number }
+	>
 	private cacheTTL: number
 
 	constructor(config: JWTConfig) {
@@ -47,40 +50,51 @@ export class JWTManager implements ITokenManager {
 
 			return { accessToken, refreshToken }
 		} catch (error) {
-			if (error instanceof BadRequestError || error instanceof ValidationError) throw error
+			if (error instanceof BadRequestError || error instanceof ValidationError)
+				throw error
 			throw new BadRequestError(
-				{ message: 'Failed to generate tokens' },
-				error instanceof Error ? error : undefined
+				{ reason: 'Failed to generate tokens' },
+				error instanceof Error ? error : undefined,
 			)
 		}
 	}
 
 	/** Generate access token */
-	async generateAccessToken(payload: Record<string, unknown>): Promise<AccessToken> {
+	async generateAccessToken(
+		payload: Record<string, unknown>,
+	): Promise<AccessToken> {
 		try {
 			this.validatePayload(payload)
-			const token = signToken(payload, this.accessSecret, this.accessExpiry, { algorithm: 'HS256' })
+			const token = signToken(payload, this.accessSecret, this.accessExpiry, {
+				algorithm: 'HS256',
+			})
 			return token as unknown as AccessToken
 		} catch (error) {
-			if (error instanceof BadRequestError || error instanceof ValidationError) throw error
+			if (error instanceof BadRequestError || error instanceof ValidationError)
+				throw error
 			throw new BadRequestError(
-				{ message: 'Failed to generate access token' },
-				error instanceof Error ? error : undefined
+				{ reason: 'Failed to generate access token' },
+				error instanceof Error ? error : undefined,
 			)
 		}
 	}
 
 	/** Generate refresh token */
-	async generateRefreshToken(payload: Record<string, unknown>): Promise<RefreshToken> {
+	async generateRefreshToken(
+		payload: Record<string, unknown>,
+	): Promise<RefreshToken> {
 		try {
 			this.validatePayload(payload)
-			const token = signToken(payload, this.refreshSecret, this.refreshExpiry, { algorithm: 'HS256' })
+			const token = signToken(payload, this.refreshSecret, this.refreshExpiry, {
+				algorithm: 'HS256',
+			})
 			return token as unknown as RefreshToken
 		} catch (error) {
-			if (error instanceof BadRequestError || error instanceof ValidationError) throw error
+			if (error instanceof BadRequestError || error instanceof ValidationError)
+				throw error
 			throw new BadRequestError(
-				{ message: 'Failed to generate refresh token' },
-				error instanceof Error ? error : undefined
+				{ reason: 'Failed to generate refresh token' },
+				error instanceof Error ? error : undefined,
 			)
 		}
 	}
@@ -118,7 +132,9 @@ export class JWTManager implements ITokenManager {
 	/** Rotate refresh token */
 	async rotateRefreshToken(oldToken: string): Promise<RefreshToken> {
 		if (!oldToken || typeof oldToken !== 'string') {
-			throw new ValidationError({ message: 'Old refresh token must be a non-empty string' })
+			throw new ValidationError({
+				reason: 'Old refresh token must be a non-empty string',
+			})
 		}
 
 		const decoded = await this.verifyRefreshToken(oldToken)
@@ -166,35 +182,49 @@ export class JWTManager implements ITokenManager {
 	/** Private helper methods */
 	private validatePayload(payload: Record<string, unknown>): void {
 		if (!payload || typeof payload !== 'object') {
-			throw new ValidationError({ message: 'Payload must be a non-null object' })
+			throw new ValidationError({
+				reason: 'Payload must be a non-null object',
+			})
 		}
 		if (Object.keys(payload).length === 0) {
-			throw new ValidationError({ message: 'Payload cannot be empty' })
+			throw new ValidationError({ reason: 'Payload cannot be empty' })
 		}
 	}
 
 	private async verifyTokenWithCache(
 		token: string,
 		secret: Secret,
-		type: 'access' | 'refresh'
+		type: 'access' | 'refresh',
 	): Promise<JwtPayload> {
 		if (!token || typeof token !== 'string') {
-			throw new ValidationError({ message: `${type} token must be a non-empty string` })
+			throw new ValidationError({
+				reason: `${type} token must be a non-empty string`,
+			})
 		}
 
 		const cacheKey = `${type}_${token}`
 		if (this.cache) {
 			const cached = this.cache.get(cacheKey)
 			if (cached && Date.now() - cached.timestamp <= this.cacheTTL) {
-				if (!cached.valid) throw new UnauthorizedError({ message: `${type} token is invalid or expired` })
+				if (!cached.valid)
+					throw new UnauthorizedError({
+						reason: `${type} token is invalid or expired`,
+					})
 				return cached.payload
 			}
 		}
 
 		const { valid, payload, error } = safeVerifyToken(token, secret)
 		if (!valid || !payload || typeof payload === 'string') {
-			this.cache?.set(cacheKey, { valid: false, payload: {} as JwtPayload, timestamp: Date.now() })
-			throw new UnauthorizedError({ message: `${type} token is invalid or expired`, cause: error })
+			this.cache?.set(cacheKey, {
+				valid: false,
+				payload: {} as JwtPayload,
+				timestamp: Date.now(),
+			})
+			throw new UnauthorizedError({
+				reason: `${type} token is invalid or expired`,
+				cause: error,
+			})
 		}
 
 		this.cache?.set(cacheKey, { valid: true, payload, timestamp: Date.now() })

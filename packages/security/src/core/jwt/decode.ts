@@ -1,6 +1,6 @@
+import { BadRequestError } from '@naman_deep_singh/errors-utils'
 // src/jwt/decodeToken.ts
 import { type JwtPayload, decode } from 'jsonwebtoken'
-import { BadRequestError } from '@naman_deep_singh/errors-utils'
 
 /**
  * Flexible decode
@@ -20,7 +20,7 @@ export function decodeTokenStrict(token: string): JwtPayload {
 
 	if (!decoded || typeof decoded === 'string') {
 		throw new BadRequestError({
-			message: 'Invalid JWT payload structure',
+			reason: 'Invalid JWT payload structure',
 		})
 	}
 

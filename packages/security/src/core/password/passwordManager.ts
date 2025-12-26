@@ -50,12 +50,15 @@ export class PasswordManager implements IPasswordManager {
 
 			return { hash, salt: finalSalt }
 		} catch (error) {
-			if (error instanceof BadRequestError || error instanceof ValidationError) {
+			if (
+				error instanceof BadRequestError ||
+				error instanceof ValidationError
+			) {
 				throw error
 			}
 			throw new BadRequestError(
-				{ message: 'Failed to hash password' },
-				error instanceof Error ? error : undefined
+				{ reason: 'Failed to hash password' },
+				error instanceof Error ? error : undefined,
 			)
 		}
 	}
@@ -81,9 +84,9 @@ export class PasswordManager implements IPasswordManager {
 		const config = { ...this.defaultConfig, ...options }
 
 		if (length < config.minLength! || length > config.maxLength!) {
-			throw new ValidationError(
-				{ message: `Password length must be between ${config.minLength} and ${config.maxLength}` }
-			)
+			throw new ValidationError({
+				reason: `Password length must be between ${config.minLength} and ${config.maxLength}`,
+			})
 		}
 
 		let charset = 'abcdefghijklmnopqrstuvwxyz'
@@ -98,10 +101,14 @@ export class PasswordManager implements IPasswordManager {
 		}
 
 		// Ensure requirements
-		if (config.requireUppercase && !/[A-Z]/.test(password)) password = password.replace(/[a-z]/, 'A')
-		if (config.requireLowercase && !/[a-z]/.test(password)) password = password.replace(/[A-Z]/, 'a')
-		if (config.requireNumbers && !/[0-9]/.test(password)) password = password.replace(/[A-Za-z]/, '0')
-		if (config.requireSpecialChars && !/[^A-Za-z0-9]/.test(password)) password = password.replace(/[A-Za-z0-9]/, '!')
+		if (config.requireUppercase && !/[A-Z]/.test(password))
+			password = password.replace(/[a-z]/, 'A')
+		if (config.requireLowercase && !/[a-z]/.test(password))
+			password = password.replace(/[A-Z]/, 'a')
+		if (config.requireNumbers && !/[0-9]/.test(password))
+			password = password.replace(/[A-Za-z]/, '0')
+		if (config.requireSpecialChars && !/[^A-Za-z0-9]/.test(password))
+			password = password.replace(/[A-Za-z0-9]/, '!')
 
 		return password
 	}
@@ -109,17 +116,31 @@ export class PasswordManager implements IPasswordManager {
 	/**
 	 * Validate password against configuration
 	 */
-	validate(password: string, config: PasswordConfig = {}): PasswordValidationResult {
+	validate(
+		password: string,
+		config: PasswordConfig = {},
+	): PasswordValidationResult {
 		const finalConfig = { ...this.defaultConfig, ...config }
 		const errors: string[] = []
 
-		if (!password || typeof password !== 'string') errors.push('Password must be a non-empty string')
-		if (password.length < finalConfig.minLength!) errors.push(`Password must be at least ${finalConfig.minLength} characters`)
-		if (password.length > finalConfig.maxLength!) errors.push(`Password must not exceed ${finalConfig.maxLength} characters`)
-		if (finalConfig.requireUppercase && !/[A-Z]/.test(password)) errors.push('Password must contain at least one uppercase letter')
-		if (finalConfig.requireLowercase && !/[a-z]/.test(password)) errors.push('Password must contain at least one lowercase letter')
-		if (finalConfig.requireNumbers && !/[0-9]/.test(password)) errors.push('Password must contain at least one number')
-		if (finalConfig.requireSpecialChars && !/[^A-Za-z0-9]/.test(password)) errors.push('Password must contain at least one special character')
+		if (!password || typeof password !== 'string')
+			errors.push('Password must be a non-empty string')
+		if (password.length < finalConfig.minLength!)
+			errors.push(
+				`Password must be at least ${finalConfig.minLength} characters`,
+			)
+		if (password.length > finalConfig.maxLength!)
+			errors.push(
+				`Password must not exceed ${finalConfig.maxLength} characters`,
+			)
+		if (finalConfig.requireUppercase && !/[A-Z]/.test(password))
+			errors.push('Password must contain at least one uppercase letter')
+		if (finalConfig.requireLowercase && !/[a-z]/.test(password))
+			errors.push('Password must contain at least one lowercase letter')
+		if (finalConfig.requireNumbers && !/[0-9]/.test(password))
+			errors.push('Password must contain at least one number')
+		if (finalConfig.requireSpecialChars && !/[^A-Za-z0-9]/.test(password))
+			errors.push('Password must contain at least one special character')
 
 		if (finalConfig.customRules) {
 			finalConfig.customRules.forEach((rule) => {
@@ -127,7 +148,11 @@ export class PasswordManager implements IPasswordManager {
 			})
 		}
 
-		return { isValid: errors.length === 0, errors, strength: this.checkStrength(password) }
+		return {
+			isValid: errors.length === 0,
+			errors,
+			strength: this.checkStrength(password),
+		}
 	}
 
 	/**
@@ -139,8 +164,10 @@ export class PasswordManager implements IPasswordManager {
 		const feedback: string[] = []
 		const suggestions: string[] = []
 
-		if (entropy < 28) { feedback.push('Password is easy to guess'); suggestions.push('Use more unique characters and length') }
-		else if (entropy < 36) score++
+		if (entropy < 28) {
+			feedback.push('Password is easy to guess')
+			suggestions.push('Use more unique characters and length')
+		} else if (entropy < 36) score++
 		else if (entropy < 60) score += 2
 		else score += 3
 
@@ -152,24 +179,57 @@ export class PasswordManager implements IPasswordManager {
 		if (/[0-9]/.test(password)) score++
 		if (/[^A-Za-z0-9]/.test(password)) score++
 
-		if (/^[A-Za-z]+$/.test(password)) { score--; feedback.push('Consider adding numbers or symbols') }
-		if (/^[0-9]+$/.test(password)) { score -= 2; feedback.push('Avoid using only numbers') }
-		if (/([a-zA-Z0-9])\1{2,}/.test(password)) { score--; feedback.push('Avoid repeated characters') }
-		if (/(?:012|123|234|345|456|567|678|789)/.test(password)) { score--; feedback.push('Avoid sequential patterns') }
+		if (/^[A-Za-z]+$/.test(password)) {
+			score--
+			feedback.push('Consider adding numbers or symbols')
+		}
+		if (/^[0-9]+$/.test(password)) {
+			score -= 2
+			feedback.push('Avoid using only numbers')
+		}
+		if (/([a-zA-Z0-9])\1{2,}/.test(password)) {
+			score--
+			feedback.push('Avoid repeated characters')
+		}
+		if (/(?:012|123|234|345|456|567|678|789)/.test(password)) {
+			score--
+			feedback.push('Avoid sequential patterns')
+		}
 
 		const commonPasswords = ['password', '123456', 'qwerty', 'admin', 'letmein']
-		if (commonPasswords.some((common) => password.toLowerCase().includes(common))) { score = 0; feedback.push('Avoid common passwords') }
+		if (
+			commonPasswords.some((common) => password.toLowerCase().includes(common))
+		) {
+			score = 0
+			feedback.push('Avoid common passwords')
+		}
 
 		score = Math.max(0, Math.min(4, score))
 
 		let label: PasswordStrength['label']
 		switch (score) {
-			case 0: label = 'very-weak'; suggestions.push('Use a longer password with mixed characters'); break
-			case 1: label = 'weak'; suggestions.push('Add more character variety'); break
-			case 2: label = 'fair'; suggestions.push('Consider increasing length or randomness'); break
-			case 3: label = 'good'; suggestions.push('Your password is reasonably secure'); break
-			case 4: label = 'strong'; suggestions.push('Your password is very secure'); break
-			default: label = 'very-weak'
+			case 0:
+				label = 'very-weak'
+				suggestions.push('Use a longer password with mixed characters')
+				break
+			case 1:
+				label = 'weak'
+				suggestions.push('Add more character variety')
+				break
+			case 2:
+				label = 'fair'
+				suggestions.push('Consider increasing length or randomness')
+				break
+			case 3:
+				label = 'good'
+				suggestions.push('Your password is reasonably secure')
+				break
+			case 4:
+				label = 'strong'
+				suggestions.push('Your password is very secure')
+				break
+			default:
+				label = 'very-weak'
 		}
 
 		return { score, label, feedback, suggestions }

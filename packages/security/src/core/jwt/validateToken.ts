@@ -1,5 +1,5 @@
-import type { JwtPayload } from 'jsonwebtoken'
 import { ValidationError } from '@naman_deep_singh/errors-utils'
+import type { JwtPayload } from 'jsonwebtoken'
 
 export interface TokenRequirements {
 	requiredFields?: string[]
@@ -15,19 +15,27 @@ export function validateTokenPayload(
 	payload: Record<string, unknown>,
 	rules: TokenRequirements = { requiredFields: ['exp', 'iat'] },
 ): void {
-	const { requiredFields = [], forbiddenFields = [], validateTypes = {} } = rules
+	const {
+		requiredFields = [],
+		forbiddenFields = [],
+		validateTypes = {},
+	} = rules
 
 	// 1. Required fields
 	for (const field of requiredFields) {
 		if (!(field in payload)) {
-			throw new ValidationError(`Missing required field: ${field}`)
+			throw new ValidationError({
+				reason: `Missing required field: ${field}`,
+			})
 		}
 	}
 
 	// 2. Forbidden fields
 	for (const field of forbiddenFields) {
 		if (field in payload) {
-			throw new ValidationError(`Forbidden field in token: ${field}`)
+			throw new ValidationError({
+				reason: `Forbidden field in token: ${field}`,
+			})
 		}
 	}
 
@@ -35,9 +43,9 @@ export function validateTokenPayload(
 	for (const key in validateTypes) {
 		const expectedType = validateTypes[key]
 		if (key in payload && typeof payload[key] !== expectedType) {
-			throw new ValidationError(
-				`Invalid type for ${key}. Expected ${expectedType}, got ${typeof payload[key]}`
-			)
+			throw new ValidationError({
+				reason: `Invalid type for ${key}. Expected ${expectedType}, got ${typeof payload[key]}`,
+			})
 		}
 	}
 }

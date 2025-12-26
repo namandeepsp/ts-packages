@@ -1,4 +1,4 @@
-import { ValidationError } from "@naman_deep_singh/errors-utils"
+import { ValidationError } from '@naman_deep_singh/errors-utils'
 
 const TIME_UNITS: Record<string, number> = {
 	s: 1,
@@ -20,14 +20,14 @@ export function parseDuration(input: string | number): number {
 		const unit = match[2].toLowerCase()
 
 		if (!TIME_UNITS[unit]) {
-			throw new ValidationError({ message: `Invalid time unit: ${unit}` })
+			throw new ValidationError({ reason: `Invalid time unit: ${unit}` })
 		}
 
 		totalSeconds += value * TIME_UNITS[unit]
 	}
 
 	if (totalSeconds === 0) {
-		throw new ValidationError({ message: `Invalid expiry format: "${input}"` })
+		throw new ValidationError({ reason: `Invalid expiry format: "${input}"` })
 	}
 
 	return totalSeconds

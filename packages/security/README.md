@@ -1,7 +1,7 @@
 ```bash
 @naman_deep_singh/security
 
-Version: 1.4.0
+Version: 1.5.0
 
 A complete, lightweight security toolkit for Node.js & TypeScript providing:
 

@@ -1,4 +1,4 @@
-import { ERROR_CODES, InternalServerError } from '@naman_deep_singh/errors-utils'
+import { CryptoIntegrityError } from '@naman_deep_singh/errors-utils'
 import {
 	decrypt as functionalDecrypt,
 	encrypt as functionalEncrypt,
@@ -57,24 +57,22 @@ export class CryptoManager {
 		plaintext: string,
 		key: string,
 		_options?: {
-			algorithm?: string;
-			encoding?: BufferEncoding;
+			algorithm?: string
+			encoding?: BufferEncoding
 			iv?: string
-		}
+		},
 	): string {
 		try {
 			return functionalEncrypt(plaintext, key)
-		} catch (err) {
-			throw new InternalServerError(
-				undefined,
+		} catch (error) {
+			throw new CryptoIntegrityError(
 				{
-					message: 'Encryption failed',
+					reason: 'Encryption failed',
 				},
-				err instanceof Error ? err : undefined
+				error instanceof Error ? error : undefined,
 			)
 		}
 	}
-
 
 	/**
 	 * Decrypt data using the default or specified algorithm
@@ -83,20 +81,19 @@ export class CryptoManager {
 		encryptedData: string,
 		key: string,
 		_options?: {
-			algorithm?: string;
-			encoding?: BufferEncoding;
+			algorithm?: string
+			encoding?: BufferEncoding
 			iv?: string
-		}
+		},
 	): string {
 		try {
 			return functionalDecrypt(encryptedData, key)
-		} catch (err) {
-			throw new InternalServerError(
-				undefined,
+		} catch (error) {
+			throw new CryptoIntegrityError(
 				{
-					message: 'Decryption failed',
+					reason: 'Decryption failed',
 				},
-				err instanceof Error ? err : undefined
+				error instanceof Error ? error : undefined,
 			)
 		}
 	}
@@ -151,7 +148,7 @@ export class CryptoManager {
 		password: string,
 		salt: string,
 		iterations = 100000,
-		keyLength = 32
+		keyLength = 32,
 	): Promise<string> {
 		return new Promise((resolve, reject) => {
 			const crypto = require('crypto')
@@ -162,19 +159,20 @@ export class CryptoManager {
 				iterations,
 				keyLength,
 				'sha256',
-				(err: Error | null, derivedKey: Buffer) => {
-					if (err) {
-						reject(new InternalServerError(
-							undefined,
-							{
-								message: 'Key derivation failed',
-							},
-							err instanceof Error ? err : undefined
-						))
+				(error: Error | null, derivedKey: Buffer) => {
+					if (error) {
+						reject(
+							new CryptoIntegrityError(
+								{
+									reason: 'Key derivation failed',
+								},
+								error instanceof Error ? error : undefined,
+							),
+						)
 					} else {
 						resolve(derivedKey.toString('hex'))
 					}
-				}
+				},
 			)
 		})
 	}
@@ -257,7 +255,7 @@ export class CryptoManager {
 	public rsaSign(
 		data: string,
 		privateKey: string,
-		algorithm = 'sha256'
+		algorithm = 'sha256',
 	): Promise<string> {
 		return new Promise((resolve, reject) => {
 			const crypto = require('crypto')
@@ -267,14 +265,15 @@ export class CryptoManager {
 				sign.end()
 				const signature = sign.sign(privateKey, 'base64')
 				resolve(signature)
-			} catch (err) {
-				reject(new InternalServerError(
-					undefined,
-					{
-						message: 'RSA signing failed',
-					},
-					err instanceof Error ? err : undefined
-				))
+			} catch (error) {
+				reject(
+					new CryptoIntegrityError(
+						{
+							reason: 'RSA signing failed',
+						},
+						error instanceof Error ? error : undefined,
+					),
+				)
 			}
 		})
 	}
@@ -286,7 +285,7 @@ export class CryptoManager {
 		data: string,
 		signature: string,
 		publicKey: string,
-		algorithm = 'sha256'
+		algorithm = 'sha256',
 	): Promise<boolean> {
 		return new Promise((resolve, reject) => {
 			const crypto = require('crypto')
@@ -296,14 +295,15 @@ export class CryptoManager {
 				verify.end()
 				const isValid = verify.verify(publicKey, signature, 'base64')
 				resolve(isValid)
-			} catch (err) {
-				reject(new InternalServerError(
-					undefined,
-					{
-						message: 'RSA verification failed',
-					},
-					err instanceof Error ? err : undefined
-				))
+			} catch (error) {
+				reject(
+					new CryptoIntegrityError(
+						{
+							reason: 'RSA verification failed',
+						},
+						error instanceof Error ? error : undefined,
+					),
+				)
 			}
 		})
 	}

@@ -6,7 +6,7 @@ import { BadRequestError } from '@naman_deep_singh/errors-utils'
  */
 export function ensureValidPassword(password: string): void {
 	if (!password || typeof password !== 'string') {
-		throw new BadRequestError({ message: 'Invalid password provided' })
+		throw new BadRequestError({ reason: 'Invalid password provided' })
 	}
 }
 

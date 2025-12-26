@@ -1,6 +1,6 @@
+import { ValidationError } from '@naman_deep_singh/errors-utils'
 import { type Secret, type SignOptions, sign } from 'jsonwebtoken'
 import { parseDuration } from './parseDuration'
-import { ValidationError } from '@naman_deep_singh/errors-utils'
 
 function getExpiryTimestamp(seconds: number) {
 	return Math.floor(Date.now() / 1000) + seconds
@@ -15,7 +15,7 @@ export const signToken = (
 	const seconds = parseDuration(expiresIn)
 
 	if (!seconds || seconds < 10) {
-		throw new ValidationError({ message: 'Token expiry too small' })
+		throw new ValidationError({ reason: 'Token expiry too small' })
 	}
 
 	const tokenPayload = {

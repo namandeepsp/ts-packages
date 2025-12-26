@@ -31,8 +31,8 @@ export function cacheSessionMiddleware(
 			}
 
 			next()
-		} catch (err) {
-			console.error('Session middleware error:', err)
+		} catch (error) {
+			console.error('Session middleware error:', error)
 			next()
 		}
 	}
@@ -52,12 +52,12 @@ export function cacheHealthCheckMiddleware(
 				.then((health) => {
 					res.status(health.isAlive ? 200 : 503).json(health)
 				})
-				.catch((err) => {
+				.catch((error) => {
 					res.status(503).json({
 						isAlive: false,
 						adapter: 'unknown',
 						timestamp: new Date(),
-						error: (err as Error).message,
+						error: (error as Error).message,
 					})
 				})
 			return
@@ -125,8 +125,8 @@ export function cacheResponseMiddleware(
 						}
 
 						if (responseData !== null) {
-							cache.set(cacheKey, responseData, ttl).catch((err) => {
-								console.error('Failed to cache response:', err)
+							cache.set(cacheKey, responseData, ttl).catch((error) => {
+								console.error('Failed to cache response:', error)
 							})
 						}
 					}
@@ -137,8 +137,8 @@ export function cacheResponseMiddleware(
 
 				next()
 			})
-			.catch((err) => {
-				console.error('Cache middleware error:', err)
+			.catch((error) => {
+				console.error('Cache middleware error:', error)
 				next()
 			})
 	}

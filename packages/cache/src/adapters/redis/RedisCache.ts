@@ -1,5 +1,6 @@
 import { createClient, createCluster } from 'redis'
 import type { RedisClientOptions } from 'redis'
+import { CACHE_ERROR_CODES } from 'src/errors/cacheErrorCodes'
 import { BaseCache } from '../../core/BaseCache'
 import { CacheError } from '../../errors'
 import type { HealthCheckResponse, RedisCacheConfig } from '../../types'
@@ -81,13 +82,12 @@ export class RedisCache<T = unknown> extends BaseCache<T> {
 				await this.client.connect()
 				this.isConnected = true
 			}
-		} catch (err) {
-			throw new CacheError(
-				'Failed to connect to Redis',
-				'REDIS_CONNECTION_ERROR',
-				'redis',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.CACHE_CONNECTION_FAILED, {
+				adapter: 'redis',
+				operation: 'connect',
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -116,13 +116,13 @@ export class RedisCache<T = unknown> extends BaseCache<T> {
 
 			this.recordHit()
 			return this.deserialize(value)
-		} catch (err) {
-			throw new CacheError(
-				`Failed to get key "${key}" from Redis`,
-				'REDIS_GET_ERROR',
-				'redis',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.CACHE_ERROR, {
+				adapter: 'redis',
+				operation: 'get',
+				details: { key },
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -143,13 +143,13 @@ export class RedisCache<T = unknown> extends BaseCache<T> {
 			}
 
 			this.recordSet()
-		} catch (err) {
-			throw new CacheError(
-				`Failed to set key "${key}" in Redis`,
-				'REDIS_SET_ERROR',
-				'redis',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.CACHE_ERROR, {
+				adapter: 'redis',
+				operation: 'set',
+				details: { key },
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -163,13 +163,13 @@ export class RedisCache<T = unknown> extends BaseCache<T> {
 			const result = await this.client!.del(fullKey)
 			this.recordDelete()
 			return result > 0
-		} catch (err) {
-			throw new CacheError(
-				`Failed to delete key "${key}" from Redis`,
-				'REDIS_DELETE_ERROR',
-				'redis',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.CACHE_ERROR, {
+				adapter: 'redis',
+				operation: 'delete',
+				details: { key },
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -182,13 +182,13 @@ export class RedisCache<T = unknown> extends BaseCache<T> {
 			const fullKey = this.buildKey(key)
 			const result = await this.client!.exists(fullKey)
 			return result > 0
-		} catch (err) {
-			throw new CacheError(
-				`Failed to check existence of key "${key}" in Redis`,
-				'REDIS_EXISTS_ERROR',
-				'redis',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.CACHE_ERROR, {
+				adapter: 'redis',
+				operation: 'exists',
+				details: { key },
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -214,13 +214,12 @@ export class RedisCache<T = unknown> extends BaseCache<T> {
 					console.warn('Clear operation not supported in cluster mode')
 				}
 			}
-		} catch (err) {
-			throw new CacheError(
-				'Failed to clear Redis cache',
-				'REDIS_CLEAR_ERROR',
-				'redis',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.CACHE_OPERATION_TIMEOUT, {
+				adapter: 'redis',
+				operation: 'clear',
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -246,13 +245,13 @@ export class RedisCache<T = unknown> extends BaseCache<T> {
 			})
 
 			return result
-		} catch (err) {
-			throw new CacheError(
-				'Failed to get multiple keys from Redis',
-				'REDIS_GET_MULTIPLE_ERROR',
-				'redis',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.CACHE_ERROR, {
+				adapter: 'redis',
+				operation: 'getMultiple',
+				details: { keys },
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -284,13 +283,13 @@ export class RedisCache<T = unknown> extends BaseCache<T> {
 			}
 
 			this.stats.sets += Object.keys(data).length
-		} catch (err) {
-			throw new CacheError(
-				'Failed to set multiple keys in Redis',
-				'REDIS_SET_MULTIPLE_ERROR',
-				'redis',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.CACHE_ERROR, {
+				adapter: 'redis',
+				operation: 'setMultiple',
+				details: { keys: Object.keys(data) },
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -304,13 +303,13 @@ export class RedisCache<T = unknown> extends BaseCache<T> {
 			const result = await this.client!.del(fullKeys)
 			this.stats.deletes += result
 			return result
-		} catch (err) {
-			throw new CacheError(
-				'Failed to delete multiple keys from Redis',
-				'REDIS_DELETE_MULTIPLE_ERROR',
-				'redis',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.CACHE_ERROR, {
+				adapter: 'redis',
+				operation: 'deleteMultiple',
+				details: { keys },
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -322,13 +321,13 @@ export class RedisCache<T = unknown> extends BaseCache<T> {
 			await this.ensureConnected()
 			const fullKey = this.buildKey(key)
 			return await this.client!.incrBy(fullKey, amount)
-		} catch (err) {
-			throw new CacheError(
-				`Failed to increment key "${key}" in Redis`,
-				'REDIS_INCREMENT_ERROR',
-				'redis',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.CACHE_ERROR, {
+				adapter: 'redis',
+				operation: 'increment',
+				details: { key },
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -340,13 +339,13 @@ export class RedisCache<T = unknown> extends BaseCache<T> {
 			await this.ensureConnected()
 			const fullKey = this.buildKey(key)
 			return await this.client!.decrBy(fullKey, amount)
-		} catch (err) {
-			throw new CacheError(
-				`Failed to decrement key "${key}" in Redis`,
-				'REDIS_DECREMENT_ERROR',
-				'redis',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.CACHE_ERROR, {
+				adapter: 'redis',
+				operation: 'decrement',
+				details: { key },
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -374,12 +373,12 @@ export class RedisCache<T = unknown> extends BaseCache<T> {
 				adapter: 'redis',
 				timestamp: new Date(),
 			}
-		} catch (err) {
+		} catch (error) {
 			return {
 				isAlive: false,
 				adapter: 'redis',
 				timestamp: new Date(),
-				error: (err as Error).message,
+				error: (error as Error).message,
 			}
 		}
 	}
@@ -394,13 +393,12 @@ export class RedisCache<T = unknown> extends BaseCache<T> {
 				this.isConnected = false
 				this.client = null
 			}
-		} catch (err) {
-			throw new CacheError(
-				'Failed to close Redis connection',
-				'REDIS_CLOSE_ERROR',
-				'redis',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.CACHE_ERROR, {
+				adapter: 'redis',
+				operation: 'close',
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 }

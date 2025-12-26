@@ -1,6 +1,6 @@
 # @naman_deep_singh/cache
 
-**Version:** 1.3.2 (with Redis Clustering support)
+**Version:** 1.4.0 (with Redis Clustering support)
 
 A flexible, extensible caching layer with support for Redis, Memcache, and in-memory caches. Includes session management, health checks, and Express middleware.
 
@@ -27,13 +27,109 @@ npm install @naman_deep_singh/cache redis memcached
 - `redis` (for Redis adapter)
 - `memcached` (for Memcache adapter)
 
-Both are optional if you're only using the memory adapter.
-
 ## Quick Start
 
 ### Using the Factory
 
 ```typescript
+
+Both are optional if you're only using the memory adapter.
+
+All cache-related failures throw a CacheError, which:
+
+Extends AppError
+
+Uses cache-specific error codes
+
+Supports adapter & operation metadata
+
+Integrates with centralized error message resolution via errorMessageRegistry
+
+Integrates with centralized error message resolution via errorMessageRegistry
+
+import { CacheError } from '@naman_deep_singh/cache'
+import { CACHE_ERROR_CODES } from '@naman_deep_singh/cache/errors'
+
+Cache Error Codes
+
+Cache-specific error codes are scoped to this package and are not mixed with global application error codes.
+
+Examples:
+
+CACHE_ERROR
+
+CACHE_CONNECTION_FAILED
+
+CACHE_UNSUPPORTED_ADAPTER
+
+CACHE_INVALID_CONFIG
+
+CACHE_KEY_NOT_FOUND
+
+CACHE_OPERATION_TIMEOUT
+
+CACHE_SERIALIZE_ERROR
+
+CACHE_DESERIALIZE_ERROR
+
+SESSION_CREATE_ERROR
+
+SESSION_GET_ERROR
+
+SESSION_UPDATE_ERROR
+
+SESSION_DELETE_ERROR
+
+SESSION_EXISTS_ERROR
+
+SESSION_CLEAR_ERROR
+
+SESSION_GET_MULTIPLE_ERROR
+
+SESSION_DELETE_MULTIPLE_ERROR
+
+SESSION_EXTEND_ERROR
+
+SESSION_GET_EXTEND_ERROR
+
+SESSION_NOT_FOUND
+
+These codes are registered internally using errorMessageRegistry, ensuring consistent messaging across services.
+
+Example: Handling Cache Errors
+try {
+  await cache.get('user:123')
+} catch (error) {
+  if (error instanceof CacheError) {
+    console.error('Cache error occurred', {
+      code: error.code,
+      adapter: error.adapter,
+      operation: error.operation,
+      details: error.details,
+    })
+  }
+}
+
+Example: Adapter-Level Error Throwing
+
+throw new CacheError(CACHE_ERROR_CODES.CACHE_CONNECTION_FAILED, {
+  adapter: 'memcache',
+  operation: 'connect',
+  cause: error,
+})
+
+Design Notes
+
+❌ Cache errors do not extend HTTP error classes
+
+❌ Cache errors do not pollute global ErrorCode
+
+✅ Cache errors are package-scoped
+
+✅ Error messages remain centralized and overridable
+
+✅ Metadata (adapter, operation) is preserved for observability
+
 import { CacheFactory, SessionStore } from '@naman_deep_singh/cache';
 
 // Create a Redis cache
@@ -432,12 +528,12 @@ import { CacheError } from '@naman_deep_singh/cache';
 
 try {
   await cache.get('key');
-} catch (err) {
-  if (err instanceof CacheError) {
-    console.log(`Error: ${err.message}`);
-    console.log(`Code: ${err.code}`);
-    console.log(`Adapter: ${err.adapter}`);
-    console.log(`Original error:`, err.originalError);
+} catch (error) {
+  if (error instanceof CacheError) {
+    console.log(`Error: ${error.message}`);
+    console.log(`Code: ${error.code}`);
+    console.log(`Adapter: ${error.adapter}`);
+    console.log(`Original error:`, error.originalError);
   }
 }
 

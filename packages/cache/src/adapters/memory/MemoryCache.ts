@@ -1,3 +1,4 @@
+import { CACHE_ERROR_CODES } from 'src/errors/cacheErrorCodes'
 import { BaseCache } from '../../core/BaseCache'
 import { CacheError } from '../../errors'
 import type { HealthCheckResponse, MemoryCacheConfig } from '../../types'
@@ -52,13 +53,13 @@ export class MemoryCache<T = unknown> extends BaseCache<T> {
 
 			this.recordHit()
 			return entry.value
-		} catch (err) {
-			throw new CacheError(
-				`Failed to get key "${key}" from memory cache`,
-				'MEMORY_GET_ERROR',
-				'memory',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.CACHE_KEY_NOT_FOUND, {
+				adapter: 'memory',
+				operation: 'get',
+				details: { key },
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -84,13 +85,13 @@ export class MemoryCache<T = unknown> extends BaseCache<T> {
 
 			this.store.set(fullKey, { value, expiresAt })
 			this.recordSet()
-		} catch (err) {
-			throw new CacheError(
-				`Failed to set key "${key}" in memory cache`,
-				'MEMORY_SET_ERROR',
-				'memory',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.CACHE_ERROR, {
+				adapter: 'memory',
+				operation: 'set',
+				details: { key },
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -105,13 +106,13 @@ export class MemoryCache<T = unknown> extends BaseCache<T> {
 				this.recordDelete()
 			}
 			return deleted
-		} catch (err) {
-			throw new CacheError(
-				`Failed to delete key "${key}" from memory cache`,
-				'MEMORY_DELETE_ERROR',
-				'memory',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.CACHE_ERROR, {
+				adapter: 'memory',
+				operation: 'delete',
+				details: { key },
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -134,13 +135,13 @@ export class MemoryCache<T = unknown> extends BaseCache<T> {
 			}
 
 			return true
-		} catch (err) {
-			throw new CacheError(
-				`Failed to check existence of key "${key}" in memory cache`,
-				'MEMORY_EXISTS_ERROR',
-				'memory',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.CACHE_ERROR, {
+				adapter: 'memory',
+				operation: 'exists',
+				details: { key },
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -160,13 +161,12 @@ export class MemoryCache<T = unknown> extends BaseCache<T> {
 				// Clear all
 				this.store.clear()
 			}
-		} catch (err) {
-			throw new CacheError(
-				'Failed to clear memory cache',
-				'MEMORY_CLEAR_ERROR',
-				'memory',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.CACHE_OPERATION_TIMEOUT, {
+				adapter: 'memory',
+				operation: 'clear',
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -200,13 +200,13 @@ export class MemoryCache<T = unknown> extends BaseCache<T> {
 			}
 
 			return result
-		} catch (err) {
-			throw new CacheError(
-				'Failed to get multiple keys from memory cache',
-				'MEMORY_GET_MULTIPLE_ERROR',
-				'memory',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.CACHE_ERROR, {
+				adapter: 'memory',
+				operation: 'getMultiple',
+				details: { keys },
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -224,13 +224,13 @@ export class MemoryCache<T = unknown> extends BaseCache<T> {
 			}
 
 			this.stats.sets += Object.keys(data).length
-		} catch (err) {
-			throw new CacheError(
-				'Failed to set multiple keys in memory cache',
-				'MEMORY_SET_MULTIPLE_ERROR',
-				'memory',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.CACHE_ERROR, {
+				adapter: 'memory',
+				operation: 'setMultiple',
+				details: { keys: Object.keys(data) },
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -248,13 +248,13 @@ export class MemoryCache<T = unknown> extends BaseCache<T> {
 			}
 			this.stats.deletes += count
 			return count
-		} catch (err) {
-			throw new CacheError(
-				'Failed to delete multiple keys from memory cache',
-				'MEMORY_DELETE_MULTIPLE_ERROR',
-				'memory',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.CACHE_ERROR, {
+				adapter: 'memory',
+				operation: 'deleteMultiple',
+				details: { keys },
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -280,13 +280,13 @@ export class MemoryCache<T = unknown> extends BaseCache<T> {
 
 			this.store.set(fullKey, { value: value as T, expiresAt })
 			return value
-		} catch (err) {
-			throw new CacheError(
-				`Failed to increment key "${key}" in memory cache`,
-				'MEMORY_INCREMENT_ERROR',
-				'memory',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.CACHE_ERROR, {
+				adapter: 'memory',
+				operation: 'increment',
+				details: { key },
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -312,13 +312,13 @@ export class MemoryCache<T = unknown> extends BaseCache<T> {
 
 			this.store.set(fullKey, { value: value as T, expiresAt })
 			return value
-		} catch (err) {
-			throw new CacheError(
-				`Failed to decrement key "${key}" in memory cache`,
-				'MEMORY_DECREMENT_ERROR',
-				'memory',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.CACHE_ERROR, {
+				adapter: 'memory',
+				operation: 'decrement',
+				details: { key },
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -343,13 +343,12 @@ export class MemoryCache<T = unknown> extends BaseCache<T> {
 				this.cleanupInterval = null
 			}
 			this.store.clear()
-		} catch (err) {
-			throw new CacheError(
-				'Failed to close memory cache',
-				'MEMORY_CLOSE_ERROR',
-				'memory',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.CACHE_ERROR, {
+				adapter: 'memory',
+				operation: 'close',
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 }

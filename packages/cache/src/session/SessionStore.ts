@@ -1,5 +1,6 @@
 import { CacheError } from '../errors'
 
+import { CACHE_ERROR_CODES } from 'src/errors/cacheErrorCodes'
 import type { ICache } from '../core/interfaces'
 import type { SessionData, SessionOptions } from '../types'
 
@@ -31,13 +32,13 @@ export class SessionStore {
 		try {
 			const ttlValue = ttl ?? this.options.ttl
 			await this.cache.set(sessionId, data, ttlValue)
-		} catch (err) {
-			throw new CacheError(
-				`Failed to create session "${sessionId}"`,
-				'SESSION_CREATE_ERROR',
-				'session',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.SESSION_CREATE_ERROR, {
+				adapter: 'session',
+				operation: 'create',
+				details: { sessionId },
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -47,13 +48,13 @@ export class SessionStore {
 	async get(sessionId: string): Promise<SessionData | null> {
 		try {
 			return await this.cache.get(sessionId)
-		} catch (err) {
-			throw new CacheError(
-				`Failed to get session "${sessionId}"`,
-				'SESSION_GET_ERROR',
-				'session',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.SESSION_GET_ERROR, {
+				adapter: 'session',
+				operation: 'get',
+				details: { sessionId },
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -65,24 +66,25 @@ export class SessionStore {
 			const current = await this.cache.get(sessionId)
 
 			if (!current) {
-				throw new CacheError(
-					`Session "${sessionId}" not found`,
-					'SESSION_NOT_FOUND',
-				)
+				throw new CacheError(CACHE_ERROR_CODES.SESSION_NOT_FOUND, {
+					adapter: 'session',
+					operation: 'update',
+					details: { sessionId },
+				})
 			}
 
 			const merged = { ...current, ...data }
 			await this.cache.set(sessionId, merged, this.options.ttl)
-		} catch (err) {
-			if (err instanceof CacheError) {
-				throw err
+		} catch (error) {
+			if (error instanceof CacheError) {
+				throw error
 			}
-			throw new CacheError(
-				`Failed to update session "${sessionId}"`,
-				'SESSION_UPDATE_ERROR',
-				'session',
-				err as Error,
-			)
+			throw new CacheError(CACHE_ERROR_CODES.SESSION_UPDATE_ERROR, {
+				adapter: 'session',
+				operation: 'update',
+				details: { sessionId },
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -92,13 +94,13 @@ export class SessionStore {
 	async delete(sessionId: string): Promise<boolean> {
 		try {
 			return await this.cache.delete(sessionId)
-		} catch (err) {
-			throw new CacheError(
-				`Failed to delete session "${sessionId}"`,
-				'SESSION_DELETE_ERROR',
-				'session',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.SESSION_DELETE_ERROR, {
+				adapter: 'session',
+				operation: 'delete',
+				details: { sessionId },
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -108,13 +110,13 @@ export class SessionStore {
 	async exists(sessionId: string): Promise<boolean> {
 		try {
 			return await this.cache.exists(sessionId)
-		} catch (err) {
-			throw new CacheError(
-				`Failed to check session "${sessionId}" existence`,
-				'SESSION_EXISTS_ERROR',
-				'session',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.SESSION_EXISTS_ERROR, {
+				adapter: 'session',
+				operation: 'exists',
+				details: { sessionId },
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -124,13 +126,12 @@ export class SessionStore {
 	async clear(): Promise<void> {
 		try {
 			await this.cache.clear()
-		} catch (err) {
-			throw new CacheError(
-				'Failed to clear sessions',
-				'SESSION_CLEAR_ERROR',
-				'session',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.SESSION_CLEAR_ERROR, {
+				adapter: 'session',
+				operation: 'clear',
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -142,13 +143,12 @@ export class SessionStore {
 	): Promise<Record<string, SessionData | null>> {
 		try {
 			return await this.cache.getMultiple(sessionIds)
-		} catch (err) {
-			throw new CacheError(
-				'Failed to get multiple sessions',
-				'SESSION_GET_MULTIPLE_ERROR',
-				'session',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.SESSION_GET_MULTIPLE_ERROR, {
+				adapter: 'session',
+				operation: 'getMultiple',
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -158,13 +158,12 @@ export class SessionStore {
 	async deleteMultiple(sessionIds: string[]): Promise<number> {
 		try {
 			return await this.cache.deleteMultiple(sessionIds)
-		} catch (err) {
-			throw new CacheError(
-				'Failed to delete multiple sessions',
-				'SESSION_DELETE_MULTIPLE_ERROR',
-				'session',
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.SESSION_DELETE_MULTIPLE_ERROR, {
+				adapter: 'session',
+				operation: 'deleteMultiple',
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -176,24 +175,25 @@ export class SessionStore {
 			const current = await this.cache.get(sessionId)
 
 			if (!current) {
-				throw new CacheError(
-					`Session "${sessionId}" not found`,
-					'SESSION_NOT_FOUND',
-				)
+				throw new CacheError(CACHE_ERROR_CODES.SESSION_NOT_FOUND, {
+					adapter: 'session',
+					operation: 'extend',
+					details: { sessionId },
+				})
 			}
 
 			const ttlValue = ttl ?? this.options.ttl
 			await this.cache.set(sessionId, current, ttlValue)
-		} catch (err) {
-			if (err instanceof CacheError) {
-				throw err
+		} catch (error) {
+			if (error instanceof CacheError) {
+				throw error
 			}
-			throw new CacheError(
-				`Failed to extend session "${sessionId}"`,
-				'SESSION_EXTEND_ERROR',
-				'session',
-				err as Error,
-			)
+			throw new CacheError(CACHE_ERROR_CODES.SESSION_EXTEND_ERROR, {
+				adapter: 'session',
+				operation: 'extend',
+				details: { sessionId },
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -212,16 +212,16 @@ export class SessionStore {
 			}
 
 			return data
-		} catch (err) {
-			if (err instanceof CacheError) {
-				throw err
+		} catch (error) {
+			if (error instanceof CacheError) {
+				throw error
 			}
-			throw new CacheError(
-				`Failed to get and extend session "${sessionId}"`,
-				'SESSION_GET_EXTEND_ERROR',
-				'session',
-				err as Error,
-			)
+			throw new CacheError(CACHE_ERROR_CODES.SESSION_GET_EXTEND_ERROR, {
+				adapter: 'session',
+				operation: 'getAndExtend',
+				details: { sessionId },
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 

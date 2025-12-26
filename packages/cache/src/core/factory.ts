@@ -1,3 +1,4 @@
+import { CACHE_ERROR_CODES } from 'src/errors/cacheErrorCodes'
 import { MemcacheCache } from '../adapters/memcache'
 import { MemoryCache } from '../adapters/memory'
 import { RedisCache } from '../adapters/redis'
@@ -25,18 +26,25 @@ export class CacheFactory {
 
 				// Validate: can't use both single + cluster
 				if (redisConfig.host && redisConfig.cluster) {
-					throw new CacheError(
-						'Cannot specify both host and cluster config',
-						'INVALID_CONFIG',
-					)
+					throw new CacheError(CACHE_ERROR_CODES.CACHE_INVALID_CONFIG, {
+						adapter: 'redis',
+						operation: 'create',
+						details: {
+							reason:
+								'Redis config cannot have both "host" and "cluster" defined',
+						},
+					})
 				}
 
 				// Require either single or cluster
 				if (!redisConfig.host && !redisConfig.cluster) {
-					throw new CacheError(
-						'Redis requires either host or cluster config',
-						'INVALID_CONFIG',
-					)
+					throw new CacheError(CACHE_ERROR_CODES.CACHE_INVALID_CONFIG, {
+						adapter: 'redis',
+						operation: 'create',
+						details: {
+							reason: 'Redis requires either host or cluster config',
+						},
+					})
 				}
 				return new RedisCache<T>(redisConfig)
 
@@ -47,10 +55,10 @@ export class CacheFactory {
 				return new MemoryCache<T>(config as MemoryCacheConfig)
 
 			default:
-				throw new CacheError(
-					`Unknown cache adapter: ${config.adapter}`,
-					'UNKNOWN_ADAPTER',
-				)
+				throw new CacheError(CACHE_ERROR_CODES.CACHE_UNSUPPORTED_ADAPTER, {
+					adapter: config.adapter,
+					operation: 'create',
+				})
 		}
 	}
 
@@ -84,9 +92,12 @@ export class CacheFactory {
 		}
 
 		// No fallback, throw error
-		throw new CacheError(
-			`Failed to initialize ${config.adapter} cache and fallback is disabled`,
-			'CACHE_INIT_ERROR',
-		)
+		throw new CacheError(CACHE_ERROR_CODES.CACHE_CONNECTION_FAILED, {
+			adapter: config.adapter,
+			operation: 'createWithFallback',
+			details: {
+				reason: `${config.adapter} cache is not alive and fallback is disabled`,
+			},
+		})
 	}
 }

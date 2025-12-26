@@ -1,22 +1,21 @@
-/**
- * Custom error class for cache operations
- */
-export class CacheError extends Error {
-	public readonly code: string
-	public readonly adapter?: string
-	public readonly originalError?: Error
+import { AppError, type ErrorCode } from '@naman_deep_singh/errors-utils'
+import type { CacheErrorCode } from './cacheErrorCodes'
+
+export class CacheError extends AppError {
+	readonly adapter?: string
+	readonly operation?: string
 
 	constructor(
-		message: string,
-		code = 'CACHE_ERROR',
-		adapter?: string,
-		originalError?: Error,
+		code: CacheErrorCode,
+		options?: {
+			adapter?: string
+			operation?: string
+			details?: unknown
+			cause?: Error
+		},
 	) {
-		super(message)
-		this.name = 'CacheError'
-		this.code = code
-		this.adapter = adapter
-		this.originalError = originalError
-		Object.setPrototypeOf(this, CacheError.prototype)
+		super(code as ErrorCode, undefined, options?.details, options?.cause)
+		this.adapter = options?.adapter
+		this.operation = options?.operation
 	}
 }

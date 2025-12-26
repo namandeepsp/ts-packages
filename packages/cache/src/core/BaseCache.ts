@@ -1,3 +1,4 @@
+import { CACHE_ERROR_CODES } from 'src/errors/cacheErrorCodes'
 import { CacheError } from '../errors'
 
 import type {
@@ -39,13 +40,12 @@ export abstract class BaseCache<T = unknown> implements ICache<T> {
 	protected deserialize(data: string): T {
 		try {
 			return JSON.parse(data)
-		} catch (err) {
-			throw new CacheError(
-				`Failed to deserialize cache value for key`,
-				'DESERIALIZE_ERROR',
-				this.config.adapter,
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.CACHE_DESERIALIZE_ERROR, {
+				adapter: this.config.adapter,
+				operation: 'deserialize',
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 
@@ -55,13 +55,12 @@ export abstract class BaseCache<T = unknown> implements ICache<T> {
 	protected serialize(value: T): string {
 		try {
 			return JSON.stringify(value)
-		} catch (err) {
-			throw new CacheError(
-				`Failed to serialize cache value`,
-				'SERIALIZE_ERROR',
-				this.config.adapter,
-				err as Error,
-			)
+		} catch (error) {
+			throw new CacheError(CACHE_ERROR_CODES.CACHE_SERIALIZE_ERROR, {
+				adapter: this.config.adapter,
+				operation: 'serialize',
+				cause: error instanceof Error ? error : undefined,
+			})
 		}
 	}
 

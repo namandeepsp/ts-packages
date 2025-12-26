@@ -1,171 +1,143 @@
-// Object prototype extensions
+import { defineExtension } from "src/utils"
+
+
+let objectExtended = false
 
 export function extendObject() {
-	Object.prototype.isEmpty = function (): boolean {
+	if (objectExtended) return
+	objectExtended = true
+
+	defineExtension(Object.prototype, 'isEmpty', function (this: object): boolean {
 		return Object.keys(this).length === 0
-	}
+	})
 
-	Object.prototype.pick = function <
-		T extends Record<string, any>,
-		K extends keyof T,
-	>(keys: K[]): Pick<T, K> {
-		if (this === null || this === undefined) {
-			throw new TypeError('pick: cannot be called on null or undefined')
-		}
-		if (!Array.isArray(keys)) {
-			throw new TypeError(`pick: keys must be an array, got ${typeof keys}`)
-		}
-		if (keys.length === 0) {
-			throw new TypeError('pick: keys array cannot be empty')
-		}
-
+	defineExtension(Object.prototype, 'pick', function <T extends Record<string, any>, K extends keyof T>(this: T, keys: K[]): Pick<T, K> {
+		if (!Array.isArray(keys)) throw new TypeError('pick: keys must be an array')
+		if (!keys.length) throw new TypeError('pick: keys array cannot be empty')
 		const result = {} as Pick<T, K>
-		const obj = this as T
 		keys.forEach((key) => {
-			if (key in obj) {
-				result[key] = obj[key]
-			}
+			if (key in this) result[key] = this[key]
 		})
 		return result
-	}
+	})
 
-	Object.prototype.omit = function <
-		T extends Record<string, any>,
-		K extends keyof T,
-	>(keys: K[]): Omit<T, K> {
-		if (this === null || this === undefined) {
-			throw new TypeError('omit: cannot be called on null or undefined')
-		}
-		if (!Array.isArray(keys)) {
-			throw new TypeError(`omit: keys must be an array, got ${typeof keys}`)
-		}
-		if (keys.length === 0) {
-			throw new TypeError('omit: keys array cannot be empty')
-		}
+	defineExtension(Object.prototype, 'omit', function <T extends Record<string, any>, K extends keyof T>(this: T, keys: K[]): Omit<T, K> {
+		if (!Array.isArray(keys)) throw new TypeError('omit: keys must be an array')
+		if (!keys.length) throw new TypeError('omit: keys array cannot be empty')
+		const result = { ...this }
+		keys.forEach((key) => delete result[key])
+		return result
+	})
 
-		const result = { ...this } as T
-		keys.forEach((key) => {
-			delete result[key]
-		})
-		return result as Omit<T, K>
-	}
-
-	Object.prototype.deepClone = function <T>(): T {
-		// Simple cycle detection without caching key generation
-		if (this === null || typeof this !== 'object') return this
-
-		// Handle Date objects
-		if (this instanceof Date) return new Date(this.getTime()) as unknown as T
-
-		// Handle Array objects
-		if (Array.isArray(this)) {
-			return this.map((item) => {
-				if (
-					item &&
-					typeof item === 'object' &&
-					typeof (item as any).deepClone === 'function'
-				) {
-					return (item as any).deepClone()
-				}
-				return item
-			}) as unknown as T
-		}
-
-		// Handle regular objects with better cycle detection
+	defineExtension(Object.prototype, 'deepClone', function <T>(this: T): T {
 		const visited = new WeakSet()
-
 		function deepCloneSafe(obj: any): any {
 			if (obj === null || typeof obj !== 'object') return obj
-
-			if (visited.has(obj)) {
-				throw new Error('Circular reference detected in deepClone')
-			}
-
+			if (visited.has(obj)) throw new Error('Circular reference detected in deepClone')
 			visited.add(obj)
-
 			if (obj instanceof Date) return new Date(obj.getTime())
 			if (Array.isArray(obj)) return obj.map((item) => deepCloneSafe(item))
-
-			const cloned = {} as Record<string, unknown>
+			const cloned: Record<string, unknown> = {}
 			Object.keys(obj).forEach((key) => {
 				cloned[key] = deepCloneSafe(obj[key])
 			})
-
 			return cloned
 		}
+		return deepCloneSafe(this)
+	})
 
-		return deepCloneSafe(this) as T
-	}
+	defineExtension(Object.prototype, 'merge', function <T extends object>(this: T, other: Partial<T>): T {
+		return { ...this, ...other }
+	})
 
-	Object.prototype.merge = function <T extends Record<string, unknown>>(
-		other: Partial<T>,
-	): T {
-		return { ...this, ...other } as T
-	}
-
-	Object.prototype.deepFreeze = function <T>(): T {
-		const propNames = Object.getOwnPropertyNames(this)
-		for (const name of propNames) {
+	defineExtension(Object.prototype, 'deepFreeze', function <T>(this: T): T {
+		Object.getOwnPropertyNames(this).forEach((name) => {
 			const value = (this as any)[name]
-			if (value && typeof value === 'object') {
-				value.deepFreeze()
-			}
-		}
-		return Object.freeze(this) as T
-	}
+			if (value && typeof value === 'object') value.deepFreeze?.()
+		})
+		return Object.freeze(this)
+	})
 
-	Object.prototype.hasPath = function (path: string): boolean {
-		if (typeof path !== 'string') {
-			throw new TypeError(`hasPath: path must be a string, got ${typeof path}`)
-		}
-		if (path.trim() === '') {
-			throw new TypeError('hasPath: path cannot be empty or whitespace')
-		}
+	defineExtension(Object.prototype, 'hasPath', function (this: object, path: string): boolean {
+		if (!path.trim()) throw new TypeError('hasPath: path cannot be empty')
+		return path.split('.').every((key) => {
+			if (this == null || !(key in this)) return false
+			// @ts-ignore
+			this = this[key]
+			return true
+		})
+	})
 
-		const keys = path.split('.')
-		let current: any = this
-		for (const key of keys) {
-			if (current == null || !(key in current)) return false
-			current = current[key]
-		}
-		return true
-	}
+	defineExtension(Object.prototype, 'getPath', function (this: object, path: string, defaultValue?: any): any {
+		if (!path.trim()) throw new TypeError('getPath: path cannot be empty')
+		return path.split('.').reduce((acc: any, key) => (acc && key in acc ? acc[key] : defaultValue), this as any)
+	})
 
-	Object.prototype.getPath = function (path: string, defaultValue?: any): any {
-		if (typeof path !== 'string') {
-			throw new TypeError(`getPath: path must be a string, got ${typeof path}`)
-		}
-		if (path.trim() === '') {
-			throw new TypeError('getPath: path cannot be empty or whitespace')
-		}
-
-		const keys = path.split('.')
-		let current: any = this
-		for (const key of keys) {
-			if (current == null || !(key in current)) return defaultValue
-			current = current[key]
-		}
-		return current
-	}
-
-	Object.prototype.setPath = function (path: string, value: any): any {
-		if (typeof path !== 'string') {
-			throw new TypeError(`setPath: path must be a string, got ${typeof path}`)
-		}
-		if (path.trim() === '') {
-			throw new TypeError('setPath: path cannot be empty or whitespace')
-		}
-
+	defineExtension(Object.prototype, 'setPath', function (this: object, path: string, value: any): any {
+		if (!path.trim()) throw new TypeError('setPath: path cannot be empty')
 		const keys = path.split('.')
 		let current: any = this
 		for (let i = 0; i < keys.length - 1; i++) {
-			const key = keys[i]
-			if (!(key in current) || typeof current[key] !== 'object') {
-				current[key] = {}
-			}
-			current = current[key]
+			if (!(keys[i] in current) || typeof current[keys[i]] !== 'object') current[keys[i]] = {}
+			current = current[keys[i]]
 		}
 		current[keys[keys.length - 1]] = value
 		return this
-	}
+	})
+
+	defineExtension(Object.prototype, 'mapValues', function <T extends Record<string, any>>(this: T, fn: (value: T[keyof T], key: keyof T) => any): Record<string, any> {
+		if (typeof fn !== 'function') {
+			throw new TypeError(`mapValues: fn must be a function, got ${typeof fn}`);
+		}
+		const result: Record<string, any> = {};
+		for (const key in this) {
+			if (Object.prototype.hasOwnProperty.call(this, key)) {
+				result[key] = fn((this as any)[key], key);
+			}
+		}
+		return result;
+	});
+
+	defineExtension(Object.prototype, 'mapKeys', function <T extends Record<string, any>>(this: T, fn: (key: keyof T) => string | number | symbol): Record<string, any> {
+		if (typeof fn !== 'function') {
+			throw new TypeError(`mapKeys: fn must be a function, got ${typeof fn}`);
+		}
+		const result: Record<string, any> = {};
+		for (const key in this) {
+			if (Object.prototype.hasOwnProperty.call(this, key)) {
+				const newKey = fn(key);
+				result[newKey as string] = (this as any)[key];
+			}
+		}
+		return result;
+	});
+
+	defineExtension(Object.prototype, 'filterKeys', function <T extends Record<string, any>>(this: T, keys: (keyof T)[]): Partial<T> {
+		if (!Array.isArray(keys)) {
+			throw new TypeError(`filterKeys: keys must be an array, got ${typeof keys}`);
+		}
+		const result: Partial<T> = {};
+		for (const key of keys) {
+			if (key in this) {
+				result[key] = (this as any)[key];
+			}
+		}
+		return result;
+	});
+
+	defineExtension(Object.prototype, 'filterValues', function <T extends Record<string, any>>(this: T, fn: (value: T[keyof T], key: keyof T) => boolean): Partial<T> {
+		if (typeof fn !== 'function') {
+			throw new TypeError(`filterValues: fn must be a function, got ${typeof fn}`);
+		}
+		const result: Partial<T> = {};
+		for (const key in this) {
+			if (Object.prototype.hasOwnProperty.call(this, key)) {
+				const val = (this as any)[key];
+				if (fn(val, key)) {
+					result[key] = val;
+				}
+			}
+		}
+		return result;
+	});
 }

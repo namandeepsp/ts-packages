@@ -1,5 +1,4 @@
 import {
-	ERROR_CODES,
 	TokenExpiredError,
 	TokenMalformedError,
 	UnauthorizedError,

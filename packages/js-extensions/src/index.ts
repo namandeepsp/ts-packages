@@ -12,6 +12,7 @@ import { extendString } from './string'
 import {
 	LRUCache,
 	getPerformanceConfig,
+	makeInternalCacheKey,
 	setPerformanceConfig,
 	withCache,
 } from './core/performance'
@@ -63,6 +64,7 @@ export function initializeExtensions(options: ExtensionOptions = {}): void {
 export { extendAll }
 
 /**
+ * Selective prototype extension helpers
  * Initialize only specific extensions
  */
 export const extend = {

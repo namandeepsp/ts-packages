@@ -1,99 +1,70 @@
-// Number prototype extensions
-import { withCache } from '../core/performance'
+import { defineExtension } from 'src/utils'
+import { makeInternalCacheKey, withCache } from '../core/performance'
+
+let numberExtended = false
 
 export function extendNumber() {
-	Number.prototype.toPercent = function (decimals = 2): string {
-		return `${(this.valueOf() * 100).toFixed(decimals)}%`
-	}
+	if (numberExtended) return
+	numberExtended = true
 
-	Number.prototype.toCurrency = function (
-		currency = 'USD',
-		locale = 'en-US',
-	): string {
-		return new Intl.NumberFormat(locale, {
-			style: 'currency',
-			currency,
-		}).format(this.valueOf())
-	}
+	defineExtension(Number.prototype, 'toPercent', function (this: number, decimals = 2): string {
+		return `${(this * 100).toFixed(decimals)}%`
+	})
 
-	Number.prototype.clamp = function (min: number, max: number): number {
-		if (min > max) {
-			throw new RangeError(
-				`clamp: min (${min}) cannot be greater than max (${max})`,
-			)
-		}
-		return Math.min(Math.max(this.valueOf(), min), max)
-	}
+	defineExtension(Number.prototype, 'toCurrency', function (this: number, currency = 'USD', locale = 'en-US'): string {
+		return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(this)
+	})
 
-	Number.prototype.isEven = function (): boolean {
-		return this.valueOf() % 2 === 0
-	}
+	defineExtension(Number.prototype, 'clamp', function (this: number, min: number, max: number): number {
+		if (min > max) throw new RangeError(`clamp: min (${min}) cannot be greater than max (${max})`)
+		return Math.min(Math.max(this, min), max)
+	})
 
-	Number.prototype.isOdd = function (): boolean {
-		return this.valueOf() % 2 !== 0
-	}
+	defineExtension(Number.prototype, 'isEven', function (this: number): boolean {
+		return this % 2 === 0
+	})
 
-	Number.prototype.isPrime = function (): boolean {
-		const num = this.valueOf()
-		return withCache(`prime_${num}`, () => {
+	defineExtension(Number.prototype, 'isOdd', function (this: number): boolean {
+		return this % 2 !== 0
+	})
+
+	defineExtension(Number.prototype, 'isPrime', function (this: number): boolean {
+		const num = this
+		return withCache(makeInternalCacheKey('prime', num), () => {
 			if (num < 2) return false
-			for (let i = 2; i <= Math.sqrt(num); i++) {
-				if (num % i === 0) return false
-			}
+			for (let i = 2; i <= Math.sqrt(num); i++) if (num % i === 0) return false
 			return true
 		})
-	}
+	})
 
-	Number.prototype.factorial = function (): number {
-		const num = Math.floor(this.valueOf())
-		return withCache(`factorial_${num}`, () => {
-			if (num < 0) return Number.NaN
-			if (num === 0 || num === 1) return 1
+	defineExtension(Number.prototype, 'factorial', function (this: number): number {
+		const num = Math.floor(this)
+		return withCache(makeInternalCacheKey('factorial', num), () => {
+			if (num < 0) return NaN
+			if (num <= 1) return 1
 			let result = 1
-			for (let i = 2; i <= num; i++) {
-				result *= i
-			}
+			for (let i = 2; i <= num; i++) result *= i
 			return result
 		})
-	}
+	})
 
-	Number.prototype.toOrdinal = function (): string {
-		const num = Math.floor(this.valueOf())
+	defineExtension(Number.prototype, 'toOrdinal', function (this: number): string {
+		const num = Math.floor(this)
 		const suffix = ['th', 'st', 'nd', 'rd']
 		const v = num % 100
 		return num + (suffix[(v - 20) % 10] || suffix[v] || suffix[0])
-	}
+	})
 
-	Number.prototype.toRoman = function (): string {
-		const num = Math.floor(this.valueOf())
+	defineExtension(Number.prototype, 'toRoman', function (this: number): string {
+		const num = Math.floor(this)
+		if (num <= 0) throw new RangeError('toRoman: number must be positive')
+		if (num >= 4000) throw new RangeError('toRoman: number must be less than 4000')
 
-		// Better validation for roman numerals
-		if (num <= 0) {
-			throw new RangeError('toRoman: number must be positive')
-		}
-		if (num >= 4000) {
-			throw new RangeError('toRoman: number must be less than 4000')
-		}
-
-		return withCache(`roman_${num}`, () => {
+		return withCache(makeInternalCacheKey('roman', num), () => {
 			const values = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1]
-			const symbols = [
-				'M',
-				'CM',
-				'D',
-				'CD',
-				'C',
-				'XC',
-				'L',
-				'XL',
-				'X',
-				'IX',
-				'V',
-				'IV',
-				'I',
-			]
-			let result = ''
+			const symbols = ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I']
 			let n = num
+			let result = ''
 			for (let i = 0; i < values.length; i++) {
 				while (n >= values[i]) {
 					result += symbols[i]
@@ -102,61 +73,57 @@ export function extendNumber() {
 			}
 			return result
 		})
-	}
+	})
 
-	Number.prototype.inRange = function (min: number, max: number): boolean {
-		const num = this.valueOf()
-		return num >= min && num <= max
-	}
+	defineExtension(Number.prototype, 'inRange', function (this: number, min: number, max: number): boolean {
+		return this >= min && this <= max
+	})
 
-	Number.prototype.round = function (decimals = 0): number {
-		if (!Number.isInteger(decimals) || decimals < 0) {
-			throw new TypeError(
-				`round: decimals must be a non-negative integer, got ${decimals}`,
-			)
-		}
+	defineExtension(Number.prototype, 'round', function (this: number, decimals = 0): number {
+		if (!Number.isInteger(decimals) || decimals < 0) throw new TypeError('round: decimals must be non-negative integer')
 		const factor = Math.pow(10, decimals)
-		return Math.round(this.valueOf() * factor) / factor
-	}
+		return Math.round(this * factor) / factor
+	})
 
-	Number.prototype.ceil = function (decimals = 0): number {
-		if (!Number.isInteger(decimals) || decimals < 0) {
-			throw new TypeError(
-				`ceil: decimals must be a non-negative integer, got ${decimals}`,
-			)
-		}
+	defineExtension(Number.prototype, 'ceil', function (this: number, decimals = 0): number {
+		if (!Number.isInteger(decimals) || decimals < 0) throw new TypeError('ceil: decimals must be non-negative integer')
 		const factor = Math.pow(10, decimals)
-		return Math.ceil(this.valueOf() * factor) / factor
-	}
+		return Math.ceil(this * factor) / factor
+	})
 
-	Number.prototype.floor = function (decimals = 0): number {
-		if (!Number.isInteger(decimals) || decimals < 0) {
-			throw new TypeError(
-				`floor: decimals must be a non-negative integer, got ${decimals}`,
-			)
-		}
+	defineExtension(Number.prototype, 'floor', function (this: number, decimals = 0): number {
+		if (!Number.isInteger(decimals) || decimals < 0) throw new TypeError('floor: decimals must be non-negative integer')
 		const factor = Math.pow(10, decimals)
-		return Math.floor(this.valueOf() * factor) / factor
-	}
+		return Math.floor(this * factor) / factor
+	})
 
-	Number.prototype.abs = function (): number {
-		return Math.abs(this.valueOf())
-	}
+	defineExtension(Number.prototype, 'abs', function (this: number): number {
+		return Math.abs(this)
+	})
 
-	Number.prototype.sign = function (): number {
-		return Math.sign(this.valueOf())
-	}
+	defineExtension(Number.prototype, 'sign', function (this: number): number {
+		return Math.sign(this)
+	})
 
-	Number.prototype.times = function (callback: (index: number) => void): void {
-		if (typeof callback !== 'function') {
-			throw new TypeError(
-				`times: callback must be a function, got ${typeof callback}`,
-			)
+	defineExtension(Number.prototype, 'times', function (this: number, callback: (index: number) => void): void {
+		if (typeof callback !== 'function') throw new TypeError('times: callback must be a function')
+		for (let i = 0; i < Math.floor(this); i++) callback(i)
+	})
+
+	defineExtension(Number.prototype, 'toFixedNumber', function (this: number, decimals = 0): number {
+		if (!Number.isInteger(decimals) || decimals < 0) {
+			throw new TypeError(`toFixedNumber: decimals must be a non-negative integer, got ${decimals}`);
 		}
+		const factor = Math.pow(10, decimals);
+		return Math.round(this.valueOf() * factor) / factor;
+	});
 
-		const num = Math.floor(this.valueOf())
-		for (let i = 0; i < num; i++) {
-			callback(i)
+	defineExtension(Number.prototype, 'randomUpTo', function (this: number): number {
+		const max = this.valueOf();
+		if (!Number.isFinite(max)) {
+			throw new TypeError(`randomUpTo: number must be finite, got ${max}`);
 		}
-	}
+		return Math.random() * max;
+	});
+
 }

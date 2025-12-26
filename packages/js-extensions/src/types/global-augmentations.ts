@@ -28,6 +28,7 @@ declare global {
 		sum(): number
 		average(): number
 		compact(): T[]
+		compactTruthy(): T[]
 		pluck<K extends keyof T>(key: K): T[K][]
 		findLast(predicate: (item: T) => boolean): T | undefined
 		partition(predicate: (item: T) => boolean): [T[], T[]]
@@ -77,4 +78,4 @@ declare global {
 	}
 }
 
-export {}
+export { }

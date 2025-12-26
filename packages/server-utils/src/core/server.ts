@@ -262,10 +262,10 @@ export class ExpressServer implements ServerInstance {
 					console.log(
 						`✅ [${serverName}] Cache initialized successfully (adapter: ${cacheConfig.adapter || 'memory'})`,
 					)
-				} catch (err) {
+				} catch (error) {
 					console.error(
 						`❌ [${serverName}] Failed to initialize cache (fallback to memory if enabled):`,
-						err instanceof Error ? err.message : err,
+						error instanceof Error ? error.message : error,
 					)
 					// Cache initialization error is critical but we continue to allow graceful fallback
 				}
@@ -316,18 +316,18 @@ export class ExpressServer implements ServerInstance {
 						console.log(
 							`✅ [${serverName}] Session middleware enabled (cookie: ${cookieName}, TTL: ${ttl}s)`,
 						)
-					} catch (err) {
+					} catch (error) {
 						console.error(
 							`❌ [${serverName}] Session middleware not available:`,
-							err instanceof Error ? err.message : err,
+							error instanceof Error ? error.message : error,
 						)
 					}
 				}
 			}
-		} catch (err) {
+		} catch (error) {
 			console.error(
 				`❌ [${serverName}] Error during cache/session setup:`,
-				err instanceof Error ? err.message : err,
+				error instanceof Error ? error.message : error,
 			)
 		}
 	}

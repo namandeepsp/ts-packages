@@ -38,9 +38,9 @@ export function useSession(cookieName?: string): RequestHandler {
 				if (!sid) return null
 				try {
 					return await (store.get as Function)(sid)
-				} catch (err) {
-					console.error(`[Session] Failed to get session "${sid}":`, err)
-					throw err
+				} catch (error) {
+					console.error(`[Session] Failed to get session "${sid}":`, error)
+					throw error
 				}
 			}
 
@@ -51,15 +51,18 @@ export function useSession(cookieName?: string): RequestHandler {
 			) => {
 				try {
 					return await (store.create as Function)(id, data, ttl)
-				} catch (err) {
-					console.error(`[Session] Failed to create session "${id}":`, err)
-					throw err
+				} catch (error) {
+					console.error(`[Session] Failed to create session "${id}":`, error)
+					throw error
 				}
 			}
 
 			next()
-		} catch (err) {
-			console.error('[Session] Unexpected error in useSession middleware:', err)
+		} catch (error) {
+			console.error(
+				'[Session] Unexpected error in useSession middleware:',
+				error,
+			)
 			next()
 		}
 	}

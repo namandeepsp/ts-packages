@@ -57,10 +57,10 @@ export function cacheResponse(ttl?: number): RequestHandler {
 			}
 
 			next()
-		} catch (err) {
+		} catch (error) {
 			console.error(
 				'[Cache] Unexpected error in cacheResponse middleware:',
-				err,
+				error,
 			)
 			next()
 		}

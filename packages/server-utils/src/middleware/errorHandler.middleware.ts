@@ -8,27 +8,29 @@ import type {
 import { AppError } from '@naman_deep_singh/errors-utils'
 
 export function createErrorHandler(): ErrorRequestHandler {
-	return (err: unknown, _req: Request, res: Response, next: NextFunction) => {
+	return (error: unknown, _req: Request, res: Response, next: NextFunction) => {
 		if (res.headersSent) {
-			return next(err)
+			return next(error)
 		}
 
 		// Use responder if available
 		const responder = (res as any).responder?.() ?? null
 
 		// Known application error
-		if (err instanceof AppError) {
+		if (error instanceof AppError) {
 			if (responder) {
-				return responder.status(err.statusCode).error(err.code, err.details)
+				return responder
+					.status(error.statusCode)
+					.error(error.code, error.details)
 			}
 
 			// Fallback (if responder middleware is not mounted)
-			return res.status(err.statusCode).json({
+			return res.status(error.statusCode).json({
 				success: false,
-				message: err.code,
+				message: error.code,
 				error: {
-					message: err.code,
-					details: err.details,
+					message: error.code,
+					details: error.details,
 				},
 				data: undefined,
 				meta: null,
@@ -36,7 +38,7 @@ export function createErrorHandler(): ErrorRequestHandler {
 		}
 
 		// Unknown / unhandled error
-		console.error('Unhandled error:', err)
+		console.error('Unhandled error:', error)
 
 		const status = 500
 		const message = 'Internal Server Error'

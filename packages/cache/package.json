@@ -1,6 +1,6 @@
 {
     "name": "@naman_deep_singh/cache",
-    "version": "1.3.2",
+    "version": "1.4.0",
     "description": "Extensible caching layer supporting Redis, Memcache, and in-memory caches with automatic fallback, namespacing, session management, and Express middleware.",
     "type": "module",
     "main": "./dist/cjs/index.js",
@@ -36,15 +36,17 @@
     "license": "ISC",
     "packageManager": "pnpm@10.20.0",
     "devDependencies": {
-        "@types/memcached": "^2.2.7",
         "@types/express": "^5.0.5",
+        "@types/memcached": "^2.2.7",
         "@types/node": "^25.0.1",
         "express": "^5.1.0",
-        "typescript": "^5.9.3",
-        "rimraf": "^5.0.5"
+        "rimraf": "^5.0.5",
+        "typescript": "^5.9.3"
     },
     "dependencies": {
-        "redis": "^4.6.10",
-        "memcached": "^2.2.2"
+        "@naman_deep_singh/errors-utils": "^1.4.2",
+        "@naman_deep_singh/response-utils": "^2.1.4",
+        "memcached": "^2.2.2",
+        "redis": "^4.6.10"
     }
 }

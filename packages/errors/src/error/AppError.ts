@@ -1,4 +1,4 @@
-import { HTTP_STATUS } from '@naman_deep_singh/response-utils'
+import { HTTP_STATUS } from '@naman_deep_singh/http-response'
 import { errorMessageRegistry } from 'src'
 import type { ErrorCode } from '../constants'
 

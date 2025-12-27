@@ -1,5 +1,5 @@
-import { HTTP_STATUS } from '@naman_deep_singh/response-utils'
-import type { ExpressResponder } from '@naman_deep_singh/response-utils'
+import { HTTP_STATUS } from '@naman_deep_singh/http-response'
+import type { ExpressResponder } from '@naman_deep_singh/http-response'
 import { ERROR_MESSAGES, type ErrorCode } from 'src/constants'
 import type { AppError } from 'src/error/AppError'
 

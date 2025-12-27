@@ -1,4 +1,4 @@
-import { HTTP_STATUS } from '@naman_deep_singh/response-utils'
+import { HTTP_STATUS } from '@naman_deep_singh/http-response'
 import { ERROR_CODES } from '../constants'
 import { HTTPError } from './HTTPError'
 

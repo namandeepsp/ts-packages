@@ -1,6 +1,6 @@
 {
-    "name": "@naman_deep_singh/errors-utils",
-    "version": "1.4.2",
+    "name": "@naman_deep_singh/errors",
+    "version": "2.0.0",
     "description": "Standardized error classes and Express middleware for consistent error handling with TypeScript",
     "type": "module",
     "main": "./dist/cjs/index.js",
@@ -38,5 +38,8 @@
     },
     "dependencies": {
         "@naman_deep_singh/response-utils": "^2.1.4"
+    },
+    "publishConfig": {
+        "access": "public"
     }
 }

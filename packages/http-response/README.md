@@ -1,6 +1,6 @@
-# @naman_deep_singh/response-utils
+# @naman_deep_singh/http-response
 
-**Version:** 2.1.4
+**Version:** 3.0.0
 
 A flexible, framework-agnostic **TypeScript response utility library** for building consistent, typed, and configurable API responses.
 
@@ -26,22 +26,7 @@ First-class support for **Express.js**, pagination, and standardized HTTP status
 ## 📦 Installation
 
 ```sh
-npm install @naman_deep_singh/response-utils
-🧠 Architecture Overview
-response-utils
-├─ core/               → Framework-agnostic responders
-│  ├─ BaseResponder
-│  ├─ config
-│  ├─ factory
-│  └─ types
-│
-├─ adapters/
-│  └─ express/         → ExpressResponder
-│
-├─ middleware/
-│  └─ express/         → responderMiddleware
-│
-├─ constants/          → HTTP status constants
+npm install @naman_deep_singh/http-response
 
 📄 Response Envelope (Default Shape)
 interface ResponseEnvelope<P = unknown, M = Record<string, unknown>> {
@@ -57,7 +42,7 @@ interface ResponseEnvelope<P = unknown, M = Record<string, unknown>> {
 }
 🛠️ Usage
 ✔ Framework-Agnostic (No Express)
-import { BaseResponder } from '@naman_deep_singh/response-utils'
+import { BaseResponder } from '@naman_deep_singh/http-response'
 
 const responder = new BaseResponder()
 
@@ -69,7 +54,7 @@ console.log(result)
 🌐 Express Integration
 1️⃣ Register Middleware
 import express from 'express'
-import { responderMiddleware } from '@naman_deep_singh/response-utils'
+import { responderMiddleware } from '@naman_deep_singh/http-response'
 
 const app = express()
 
@@ -149,7 +134,7 @@ serverError()	500
 Each also has a *AndSend() variant.
 
 🧩 HTTP Status Constants
-import { HTTP_STATUS } from '@naman_deep_singh/response-utils'
+import { HTTP_STATUS } from '@naman_deep_singh/http-response'
 
 HTTP_STATUS.SUCCESS.OK              // 200
 HTTP_STATUS.CLIENT_ERROR.NOT_FOUND  // 404
@@ -170,7 +155,7 @@ SERVER_ERROR
 🧩 TypeScript: Express Response Augmentation (Recommended)
 For full type safety, add this once in your project:
 
-import type { ExpressResponder } from '@naman_deep_singh/response-utils'
+import type { ExpressResponder } from '@naman_deep_singh/http-response'
 
 declare global {
   namespace Express {
@@ -184,7 +169,7 @@ declare global {
 
 🔗 Integration with Other Packages
 With @naman_deep_singh/server-utils
-import { responderMiddleware } from '@naman_deep_singh/response-utils'
+import { responderMiddleware } from '@naman_deep_singh/http-response'
 
 server.app.use(responderMiddleware())
 With @naman_deep_singh/errors-utils

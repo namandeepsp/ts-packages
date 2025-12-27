@@ -22,7 +22,7 @@ export class BaseResponder<P = unknown, M = PaginationMeta> {
 		code?: string
 		details?: unknown
 	} {
-		// errors-utils AppError compatibility
+		// errors AppError compatibility
 		if (typeof err === 'object' && err !== null) {
 			const e = err as Record<string, unknown>
 

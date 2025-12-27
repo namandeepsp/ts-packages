@@ -88,7 +88,7 @@ export function createValidationMiddleware(
 		}
 
 		if (errors.length > 0) {
-			// Use ValidationError from errors-utils and let error middleware handle response
+			// Use ValidationError from errors and let error middleware handle response
 			const validationError = new ValidationError({
 				fieldErrors: errors,
 			})

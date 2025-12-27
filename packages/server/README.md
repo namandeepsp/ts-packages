@@ -368,7 +368,7 @@ All middleware responses follow the consistent format:
 }
 ```
 
-### Integration with @naman_deep_singh/response-utils
+### Integration with @naman_deep_singh/http-response
 
 For advanced error handling, use with `@naman_deep_singh/errors`:
 
@@ -379,12 +379,12 @@ import { expressErrorHandler } from '@naman_deep_singh/errors';
 server.app.use(expressErrorHandler);
 ```
 
-### Integration with @naman_deep_singh/response-utils
+### Integration with @naman_deep_singh/http-response
 
-For consistent API responses, use with `@naman_deep_singh/response-utils`:
+For consistent API responses, use with `@naman_deep_singh/http-response`:
 
 ```typescript
-import { responderMiddleware } from '@naman_deep_singh/response-utils';
+import { responderMiddleware } from '@naman_deep_singh/http-response';
 
 server.app.use(responderMiddleware());
 

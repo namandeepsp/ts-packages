@@ -168,12 +168,12 @@ declare global {
 ⚠️ Do not use for new projects.
 
 🔗 Integration with Other Packages
-With @naman_deep_singh/server-utils
+With @naman_deep_singh/server
 import { responderMiddleware } from '@naman_deep_singh/http-response'
 
 server.app.use(responderMiddleware())
-With @naman_deep_singh/errors-utils
-import { expressErrorHandler } from '@naman_deep_singh/errors-utils'
+With @naman_deep_singh/errors
+import { expressErrorHandler } from '@naman_deep_singh/errors'
 
 server.app.use(expressErrorHandler)
 Provides consistent error responses across services.

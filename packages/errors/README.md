@@ -11,7 +11,7 @@ A standardized, code-driven error handling system for TypeScript and Express app
 ✅ Strongly-Typed Error Codes — Centralized error identity via constants
 ✅ Centralized Error Messages — One source of truth for user-facing messages
 ✅ Express Middleware — Error converter & global handler
-✅ Response Integration — Works seamlessly with @naman_deep_singh/response-utils
+✅ Response Integration — Works seamlessly with @naman_deep_singh/http-response
 ✅ TypeScript First — Full type safety & IntelliSense
 ✅ Consistent API Responses — Unified error shape across services
 ✅ Extendable Error Messages — Add or override messages at runtime
@@ -109,18 +109,18 @@ Middleware Responsibilities
 
 errorConverter — Converts unknown errors into AppError, preserves operational errors
 
-expressErrorHandler — Sends standardized API responses and integrates with @naman_deep_singh/response-utils
+expressErrorHandler — Sends standardized API responses and integrates with @naman_deep_singh/http-response
 
 🔗 Integration
-With @naman_deep_singh/response-utils
-import { responderMiddleware } from '@naman_deep_singh/response-utils'
+With @naman_deep_singh/http-response
+import { responderMiddleware } from '@naman_deep_singh/http-response'
 import { expressErrorHandler } from '@naman_deep_singh/errors'
 
 app.use(responderMiddleware())
 app.use(expressErrorHandler)
 
-With @naman_deep_singh/server-utils
-import { createServer } from '@naman_deep_singh/server-utils'
+With @naman_deep_singh/server
+import { createServer } from '@naman_deep_singh/server'
 import { expressErrorHandler } from '@naman_deep_singh/errors'
 
 const server = createServer('My API', '1.0.0')

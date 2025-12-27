@@ -14,8 +14,8 @@ import {
 	BadRequestError,
 	UnauthorizedError,
 	ValidationError,
-} from '@naman_deep_singh/errors-utils'
-import { LRUCache } from '@naman_deep_singh/js-extensions'
+} from '@naman_deep_singh/errors'
+import { LRUCache } from '@naman_deep_singh/utils'
 
 export class JWTManager implements ITokenManager {
 	private accessSecret: Secret

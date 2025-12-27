@@ -9,10 +9,7 @@ import type {
 	PasswordValidationResult,
 } from '../../interfaces/password.interface'
 
-import {
-	BadRequestError,
-	ValidationError,
-} from '@naman_deep_singh/errors-utils'
+import { BadRequestError, ValidationError } from '@naman_deep_singh/errors'
 import { ensureValidPassword, estimatePasswordEntropy } from './utils'
 
 export class PasswordManager implements IPasswordManager {

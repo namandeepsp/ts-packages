@@ -1,4 +1,4 @@
-import { CryptoIntegrityError } from '@naman_deep_singh/errors-utils'
+import { CryptoIntegrityError } from '@naman_deep_singh/errors'
 import {
 	decrypt as functionalDecrypt,
 	encrypt as functionalEncrypt,

@@ -8,7 +8,7 @@ export {
 	UnauthorizedError,
 	ValidationError,
 	InternalServerError,
-} from '@naman_deep_singh/errors-utils'
+} from '@naman_deep_singh/errors'
 
 import * as CryptoUtils from './core/crypto'
 import * as JWTUtils from './core/jwt'

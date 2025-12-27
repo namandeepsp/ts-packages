@@ -1,7 +1,7 @@
-import { createRequire } from 'node:module';
+import { createRequire } from 'node:module'
 
-const requireFn = createRequire("../../package.json");
+const requireFn = createRequire('../../package.json')
 
 export const getPackageVersion = (): string => {
-    return requireFn('../package.json').version as string;
+	return requireFn('../package.json').version as string
 }

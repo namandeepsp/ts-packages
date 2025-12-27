@@ -1,4 +1,4 @@
-import { getPackageVersion } from "./version"
+import { getPackageVersion } from './version'
 
 // Performance optimization utilities
 export interface PerformanceConfig {
@@ -77,13 +77,12 @@ function getOrCreateCache(): LRUCache<string, any> {
 	return cache
 }
 
-
 export function makeInternalCacheKey(
 	domain: string,
 	key: string | number,
 ): string {
-	const INTERNAL_CACHE_PREFIX = '@js-ext' + getPackageVersion();
-	return `${INTERNAL_CACHE_PREFIX}:${domain}:${key}`;
+	const INTERNAL_CACHE_PREFIX = '@js-ext' + getPackageVersion()
+	return `${INTERNAL_CACHE_PREFIX}:${domain}:${key}`
 }
 
 export function withCache<T>(key: string, fn: () => T): T {

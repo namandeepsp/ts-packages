@@ -12,7 +12,6 @@ import { extendString } from './string'
 import {
 	LRUCache,
 	getPerformanceConfig,
-	makeInternalCacheKey,
 	setPerformanceConfig,
 	withCache,
 } from './core/performance'

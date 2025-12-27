@@ -1,4 +1,4 @@
-import { AppError, type ErrorCode } from '@naman_deep_singh/errors-utils'
+import { AppError, type ErrorCode } from '@naman_deep_singh/errors'
 import type { CacheErrorCode } from './cacheErrorCodes'
 
 export class CacheError extends AppError {

@@ -1,4 +1,4 @@
-import { InternalServerError } from '@naman_deep_singh/errors-utils'
+import { InternalServerError } from '@naman_deep_singh/errors'
 import bcrypt from 'bcryptjs'
 import { ensureValidPassword } from './utils'
 

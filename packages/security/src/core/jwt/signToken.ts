@@ -1,4 +1,4 @@
-import { ValidationError } from '@naman_deep_singh/errors-utils'
+import { ValidationError } from '@naman_deep_singh/errors'
 import { type Secret, type SignOptions, sign } from 'jsonwebtoken'
 import { parseDuration } from './parseDuration'
 

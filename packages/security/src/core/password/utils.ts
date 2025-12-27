@@ -1,5 +1,5 @@
 import crypto from 'crypto'
-import { BadRequestError } from '@naman_deep_singh/errors-utils'
+import { BadRequestError } from '@naman_deep_singh/errors'
 
 /**
  * Ensure password is a valid non-empty string

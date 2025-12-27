@@ -1,4 +1,4 @@
-import { BadRequestError } from '@naman_deep_singh/errors-utils'
+import { BadRequestError } from '@naman_deep_singh/errors'
 // src/jwt/decodeToken.ts
 import { type JwtPayload, decode } from 'jsonwebtoken'
 

@@ -1,7 +1,7 @@
 ```bash
 @naman_deep_singh/security
 
-Version: 1.5.1
+Version: 1.6.0
 
 A complete, lightweight security toolkit for Node.js & TypeScript providing:
 
@@ -13,7 +13,7 @@ A complete, lightweight security toolkit for Node.js & TypeScript providing:
 🧰 Robust token extraction (Headers, Cookies, Query, Body, WebSocket)
 🧩 Safe & strict JWT decode utilities
 🔒 AES-256-GCM encryption/decryption with HMAC and random utilities
-🚨 Standardized error handling with @naman_deep_singh/errors-utils
+🚨 Standardized error handling with @naman_deep_singh/errors
 
 ✔ Fully typed with TypeScript
 ✔ Branded token types for compile-time safety (AccessToken/RefreshToken)
@@ -220,7 +220,7 @@ const randomHex = cryptoManager.generateRandomHex(32);
 
 🚨 Error Handling
 
-This package uses standardized errors from @naman_deep_singh/errors-utils:
+This package uses standardized errors from @naman_deep_singh/errors:
 
 import {
   BadRequestError,

@@ -1,4 +1,4 @@
-import { UnauthorizedError } from '@naman_deep_singh/errors-utils'
+import { UnauthorizedError } from '@naman_deep_singh/errors'
 import {
 	type JwtPayload,
 	type Secret,

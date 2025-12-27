@@ -1,4 +1,4 @@
-import { ValidationError } from '@naman_deep_singh/errors-utils'
+import { ValidationError } from '@naman_deep_singh/errors'
 
 const TIME_UNITS: Record<string, number> = {
 	s: 1,

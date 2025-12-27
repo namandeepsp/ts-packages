@@ -1,4 +1,4 @@
-import { TokenMalformedError } from '@naman_deep_singh/errors-utils'
+import { TokenMalformedError } from '@naman_deep_singh/errors'
 import type { JwtPayload, Secret } from 'jsonwebtoken'
 import { signToken } from './signToken'
 import type { AccessToken, RefreshToken, TokenPair } from './types'

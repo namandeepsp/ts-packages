@@ -1,4 +1,4 @@
-import { HTTP_STATUS } from '@naman_deep_singh/response-utils'
+import { HTTP_STATUS } from '@naman_deep_singh/http-response'
 import type { NextFunction, Request, Response } from 'express'
 import { ERROR_CODES, type ErrorCode } from '../../constants'
 import { AppError } from '../../error/AppError'

@@ -1,4 +1,4 @@
-import { ExpressResponder, HTTP_STATUS } from '@naman_deep_singh/response-utils'
+import { ExpressResponder, HTTP_STATUS } from '@naman_deep_singh/http-response'
 import type { NextFunction, Request, Response } from 'express'
 import { errorMessageRegistry } from 'src/errorRegistry'
 import { ERROR_CODES } from '../../constants'

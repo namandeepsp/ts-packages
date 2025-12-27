@@ -1,7 +1,7 @@
 ```bash
-@naman_deep_singh/errors-utils
+@naman_deep_singh/errors
 
-Version: 1.4.2
+Version: 2.0.0
 
 A standardized, code-driven error handling system for TypeScript and Express applications, providing consistent error identity, responses, and middleware integration.
 
@@ -17,7 +17,7 @@ A standardized, code-driven error handling system for TypeScript and Express app
 ✅ Extendable Error Messages — Add or override messages at runtime
 
 📦 Installation
-npm install @naman_deep_singh/errors-utils
+npm install @naman_deep_singh/errors
 
 🧠 Design Philosophy
 
@@ -43,7 +43,7 @@ import {
   NotFoundError,
   ValidationError,
   InternalServerError,
-} from '@naman_deep_singh/errors-utils'
+} from '@naman_deep_singh/errors'
 
 // Basic usage
 throw new BadRequestError()
@@ -64,7 +64,7 @@ import {
   ERROR_CODES,
   ERROR_MESSAGES,
   ErrorCode,
-} from '@naman_deep_singh/errors-utils'
+} from '@naman_deep_singh/errors'
 
 
 ERROR_CODES — Canonical list of all supported error codes
@@ -86,7 +86,7 @@ import {
   errorConverter,
   expressErrorHandler,
   ValidationError,
-} from '@naman_deep_singh/errors-utils'
+} from '@naman_deep_singh/errors'
 
 const app = express()
 
@@ -114,14 +114,14 @@ expressErrorHandler — Sends standardized API responses and integrates with @na
 🔗 Integration
 With @naman_deep_singh/response-utils
 import { responderMiddleware } from '@naman_deep_singh/response-utils'
-import { expressErrorHandler } from '@naman_deep_singh/errors-utils'
+import { expressErrorHandler } from '@naman_deep_singh/errors'
 
 app.use(responderMiddleware())
 app.use(expressErrorHandler)
 
 With @naman_deep_singh/server-utils
 import { createServer } from '@naman_deep_singh/server-utils'
-import { expressErrorHandler } from '@naman_deep_singh/errors-utils'
+import { expressErrorHandler } from '@naman_deep_singh/errors'
 
 const server = createServer('My API', '1.0.0')
 server.app.use(expressErrorHandler)
@@ -131,7 +131,7 @@ server.app.use(expressErrorHandler)
 You can safely extend existing errors or add new codes/messages dynamically.
 
 Extending Existing Error Class
-import { InternalServerError, ERROR_CODES } from '@naman_deep_singh/errors-utils'
+import { InternalServerError, ERROR_CODES } from '@naman_deep_singh/errors'
 
 export class CryptoIntegrityError extends InternalServerError {
   constructor(details?: unknown, cause?: Error) {
@@ -140,7 +140,7 @@ export class CryptoIntegrityError extends InternalServerError {
 }
 
 Registering Custom Error Messages
-import { errorMessageRegistry } from '@naman_deep_singh/errors-utils'
+import { errorMessageRegistry } from '@naman_deep_singh/errors'
 
 // Add new messages or override existing ones
 errorMessageRegistry.register({
@@ -151,7 +151,7 @@ errorMessageRegistry.register({
 
 After this, AppError or any derived class will use the updated messages automatically.
 
-import { AppError, ErrorCode } from '@naman_deep_singh/errors-utils'
+import { AppError, ErrorCode } from '@naman_deep_singh/errors'
 
 throw new AppError(
   'CUSTOM_ERROR' as ErrorCode,

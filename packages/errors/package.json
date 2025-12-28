@@ -1,6 +1,6 @@
 {
     "name": "@naman_deep_singh/errors",
-    "version": "2.1.0",
+    "version": "2.1.1",
     "description": "Standardized error classes and Express middleware for consistent error handling with TypeScript",
     "type": "module",
     "main": "./dist/cjs/index.js",
@@ -10,6 +10,26 @@
             "import": "./dist/esm/index.js",
             "require": "./dist/cjs/index.js",
             "types": "./dist/types/index.d.ts"
+        },
+        "./error": {
+            "import": "./dist/esm/error/index.js",
+            "require": "./dist/cjs/error/index.js",
+            "types": "./dist/types/error/index.d.ts"
+        },
+        "./errorRegistry": {
+            "import": "./dist/esm/errorRegistry/index.js",
+            "require": "./dist/cjs/errorRegistry/index.js",
+            "types": "./dist/types/errorRegistry/index.d.ts"
+        },
+        "./constants": {
+            "import": "./dist/esm/constants/index.js",
+            "require": "./dist/cjs/constants/index.js",
+            "types": "./dist/types/constants/index.d.ts"
+        },
+        "./middleware/express": {
+            "import": "./dist/esm/middleware/express/index.js",
+            "require": "./dist/cjs/middleware/express/index.js",
+            "types": "./dist/types/middleware/express/index.d.ts"
         }
     },
     "sideEffects": false,

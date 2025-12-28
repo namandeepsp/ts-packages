@@ -1,7 +1,7 @@
 ```bash
 @naman_deep_singh/errors
 
-Version: 2.1.0
+Version: 2.1.1
 
 A standardized, code-driven error handling system for TypeScript and Express applications, providing consistent error identity, responses, and middleware integration.
 

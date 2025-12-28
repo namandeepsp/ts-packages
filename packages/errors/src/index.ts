@@ -1,3 +1,6 @@
+// =========================
+// error registry
+// =========================
 export * from './errorRegistry'
 // =========================
 // default errors

@@ -1,4 +1,4 @@
-import type { PlainObject } from './types'
+import type { PlainObject } from './types.js'
 
 export type EnvelopeKeys = {
 	success?: string

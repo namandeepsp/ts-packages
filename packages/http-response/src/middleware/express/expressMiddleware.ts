@@ -1,6 +1,6 @@
 import type { RequestHandler } from 'express'
-import type { ResponderConfig } from '../../core/config'
-import { createResponderFactory } from '../../core/factory'
+import type { ResponderConfig } from '../../core/config.js'
+import { createResponderFactory } from '../../core/factory.js'
 
 export const responderMiddleware = (
 	cfg?: Partial<ResponderConfig>,

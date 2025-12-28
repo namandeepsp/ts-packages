@@ -1,8 +1,6 @@
-import { HTTP_STATUS } from '../constants/httpStatus'
-
-import { type ResponderConfig, defaultConfig } from './config'
-
-import type { PaginationMeta, ResponseEnvelope, Sender } from './types'
+import { HTTP_STATUS } from '../constants/httpStatus.js'
+import { type ResponderConfig, defaultConfig } from './config.js'
+import type { PaginationMeta, ResponseEnvelope, Sender } from './types.js'
 
 export class BaseResponder<P = unknown, M = PaginationMeta> {
 	protected readonly cfg: ResponderConfig

@@ -1,6 +1,6 @@
 {
   "name": "@naman_deep_singh/http-response",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "TypeScript utilities for standardized API responses",
   "author": "Naman Deep Singh",
   "license": "MIT",
@@ -13,15 +13,25 @@
       "require": "./dist/cjs/index.js",
       "types": "./dist/types/index.d.ts"
     },
-    "./express": {
-      "import": "./dist/esm/adapters/express/index.js",
-      "require": "./dist/cjs/adapters/express/index.js",
-      "types": "./dist/types/adapters/express/index.d.ts"
+    "./core": {
+      "import": "./dist/esm/core/index.js",
+      "require": "./dist/cjs/core/index.js",
+      "types": "./dist/types/core/index.d.ts"
     },
-    "./legacy": {
-      "import": "./dist/esm/legacy/index.js",
-      "require": "./dist/cjs/legacy/index.js",
-      "types": "./dist/types/legacy/index.d.ts"
+    "./constants": {
+      "import": "./dist/esm/constants/index.js",
+      "require": "./dist/cjs/constants/index.js",
+      "types": "./dist/types/constants/index.d.ts"
+    },
+    "./adapters": {
+      "import": "./dist/esm/adapters/index.js",
+      "require": "./dist/cjs/adapters/index.js",
+      "types": "./dist/types/adapters/index.d.ts"
+    },
+    "./middleware": {
+      "import": "./dist/esm/middleware/index.js",
+      "require": "./dist/cjs/middleware/index.js",
+      "types": "./dist/types/middleware/index.d.ts"
     }
   },
   "sideEffects": false,

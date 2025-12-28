@@ -1,6 +1,5 @@
-import { ExpressResponder } from '../adapters/express/ExpressResponder'
-
-import type { ResponderConfig } from './config'
+import { ExpressResponder } from '../adapters/index.js'
+import type { ResponderConfig } from './config.js'
 
 export const createResponderFactory = (cfg?: Partial<ResponderConfig>) => {
 	return <P = unknown, _M = Record<string, unknown>>(

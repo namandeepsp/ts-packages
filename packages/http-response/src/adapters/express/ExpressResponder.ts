@@ -1,6 +1,6 @@
 import type { Response } from 'express'
-import { BaseResponder } from '../../core/BaseResponder'
-import type { ResponderConfig } from '../../core/config'
+import { BaseResponder } from '../../core/BaseResponder.js'
+import type { ResponderConfig } from '../../core/config.js'
 
 export class ExpressResponder<P = unknown> extends BaseResponder<P> {
 	constructor(

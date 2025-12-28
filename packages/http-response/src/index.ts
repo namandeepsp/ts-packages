@@ -1,13 +1,8 @@
 // Core Responders
-export { BaseResponder } from './core/BaseResponder'
-export { createResponderFactory } from './core/factory'
-export * from './core/types'
-export * from './core/config'
-
-// Adapters (Express)
-export { ExpressResponder } from './adapters/express/ExpressResponder'
-export { responderMiddleware } from './middleware/express/expressMiddleware'
-
+export * from './core/index.js'
 // HTTP Status Constants
-export { HTTP_STATUS } from './constants/httpStatus'
-export type { HttpStatusCode } from './constants/httpStatus'
+export * from './constants/index.js'
+// Adapters (Express)
+export * from './adapters/index.js'
+// Utility Middleware (Express)
+export * from './middleware/index.js'

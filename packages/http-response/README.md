@@ -1,6 +1,6 @@
 # @naman_deep_singh/http-response
 
-**Version:** 3.0.0
+**Version:** 3.1.0
 
 A flexible, framework-agnostic **TypeScript response utility library** for building consistent, typed, and configurable API responses.
 

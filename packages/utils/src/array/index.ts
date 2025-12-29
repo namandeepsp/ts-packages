@@ -1,1 +1,1 @@
-export { extendArray } from './array-extensions'
+export { extendArray } from './array-extensions.js'

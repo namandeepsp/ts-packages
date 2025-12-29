@@ -1,5 +1,5 @@
 // Types for extension options and configurations
-import { PerformanceConfig } from '../core/performance'
+import { type PerformanceConfig } from '../core/index.js'
 
 export interface ExtensionOptions {
 	string?: boolean

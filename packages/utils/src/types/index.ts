@@ -1,3 +1,3 @@
 // Re-export all types
-export * from './extension-types'
-export * from './global-augmentations'
+export * from './extension-types.js'
+export * from './global-augmentations.js'

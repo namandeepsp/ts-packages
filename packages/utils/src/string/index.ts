@@ -1,1 +1,1 @@
-export { extendString } from './string-extensions'
+export { extendString } from './string-extensions.js'

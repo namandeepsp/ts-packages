@@ -1,11 +1,10 @@
-// Extension initialization logic
-import { extendArray } from '../array'
-import { setPerformanceConfig } from '../core/performance'
-import { extendNumber } from '../number'
-import { extendObject } from '../object'
-import { extendString } from '../string'
+import { extendArray } from "../array/index.js"
+import { setPerformanceConfig } from "../core/index.js"
+import { extendNumber } from "../number/index.js"
+import { extendObject } from "../object/index.js"
+import { extendString } from "../string/index.js"
+import type { ExtensionOptions } from "../types/index.js"
 
-import type { ExtensionOptions } from '../types/extension-types'
 
 export function initExtensions(options: ExtensionOptions = {}): void {
 	const {

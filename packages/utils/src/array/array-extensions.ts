@@ -1,4 +1,4 @@
-import { defineExtension } from 'src/utils'
+import { defineExtension } from "../utils/index.js"
 
 let arrayExtended = false
 
@@ -18,7 +18,7 @@ export function extendArray() {
 		const arr = [...this]
 		for (let i = arr.length - 1; i > 0; i--) {
 			const j = Math.floor(Math.random() * (i + 1))
-			;[arr[i], arr[j]] = [arr[j], arr[i]]
+				;[arr[i], arr[j]] = [arr[j], arr[i]]
 		}
 		return arr
 	})
@@ -144,10 +144,10 @@ export function extendArray() {
 		function (this: readonly any[], depth = 1): any[] {
 			return depth > 0
 				? this.reduce(
-						(acc: any[], val) =>
-							acc.concat(Array.isArray(val) ? val.flatten(depth - 1) : val),
-						[],
-					)
+					(acc: any[], val) =>
+						acc.concat(Array.isArray(val) ? val.flatten(depth - 1) : val),
+					[],
+				)
 				: this.slice()
 		},
 	)

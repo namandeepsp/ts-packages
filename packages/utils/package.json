@@ -1,6 +1,6 @@
 {
   "name": "@naman_deep_singh/utils",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "Universal JavaScript prototype extensions for common development utilities",
   "type": "module",
   "main": "./dist/cjs/index.js",
@@ -8,9 +8,54 @@
   "browser": "./dist/esm/index.js",
   "exports": {
     ".": {
+      "types": "./dist/types/index.d.ts",
       "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js",
-      "types": "./dist/types/index.d.ts"
+      "require": "./dist/cjs/index.js"
+    },
+    "./array": {
+      "types": "./dist/types/array/index.d.ts",
+      "import": "./dist/esm/array/index.js",
+      "require": "./dist/cjs/array/index.js"
+    },
+    "./number": {
+      "types": "./dist/types/number/index.d.ts",
+      "import": "./dist/esm/number/index.js",
+      "require": "./dist/cjs/number/index.js"
+    },
+    "./string": {
+      "types": "./dist/types/string/index.d.ts",
+      "import": "./dist/esm/string/index.js",
+      "require": "./dist/cjs/string/index.js"
+    },
+    "./object": {
+      "types": "./dist/types/object/index.d.ts",
+      "import": "./dist/esm/object/index.js",
+      "require": "./dist/cjs/object/index.js"
+    },
+    "./core": {
+      "types": "./dist/types/core/index.d.ts",
+      "import": "./dist/esm/core/index.js",
+      "require": "./dist/cjs/core/index.js"
+    },
+    "./utils": {
+      "types": "./dist/types/utils/index.d.ts",
+      "import": "./dist/esm/utils/index.js",
+      "require": "./dist/cjs/utils/index.js"
+    },
+    "./init": {
+      "types": "./dist/types/init/index.d.ts",
+      "import": "./dist/esm/init/index.js",
+      "require": "./dist/cjs/init/index.js"
+    },
+    "./extensions": {
+      "types": "./dist/types/extensions/index.d.ts",
+      "import": "./dist/esm/extensions/index.js",
+      "require": "./dist/cjs/extensions/index.js"
+    },
+    "./types": {
+      "types": "./dist/types/types/index.d.ts",
+      "import": "./dist/esm/types/index.js",
+      "require": "./dist/cjs/types/index.js"
     }
   },
   "sideEffects": false,
@@ -20,7 +65,7 @@
   ],
   "scripts": {
     "build": "pnpm run build:types && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json",
-    "build:types": "tsc -p tsconfig.base.json --emitDeclarationOnly --outDir dist/types",
+    "build:types": "tsc -p tsconfig.types.json",
     "clean": "rimraf dist",
     "prepublishOnly": "npm run clean && npm run build",
     "clean:js": "find src -type f -name \"*.js\" -delete"

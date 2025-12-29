@@ -37,7 +37,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "pnpm run build:types && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json",
-    "build:types": "tsc -p tsconfig.base.json --emitDeclarationOnly --outDir dist/types",
+    "build:types": "tsc -p tsconfig.types.json",
     "clean": "rimraf dist"
   },
   "keywords": [

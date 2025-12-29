@@ -2,8 +2,7 @@
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "module": "CommonJS",
-    "moduleResolution": "Node",
-    "rootDir": "./src",
+    "moduleResolution": "NodeNext",
     "outDir": "./dist/cjs"
   }
 }

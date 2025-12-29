@@ -1,6 +1,6 @@
 import { HTTP_STATUS } from '@naman_deep_singh/http-response'
-import { errorMessageRegistry } from 'src'
-import type { ErrorCode } from '../constants'
+import type { ErrorCode } from '../constants/errorCodes.js'
+import { errorMessageRegistry } from '../errorRegistry/index.js'
 
 export class AppError extends Error {
 	public statusCode: number

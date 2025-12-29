@@ -1,2 +1,2 @@
-export * from './errorCodes'
-export * from './errorMessages'
+export * from './errorCodes.js'
+export * from './errorMessages.js'

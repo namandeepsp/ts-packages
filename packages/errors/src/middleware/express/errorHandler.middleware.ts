@@ -1,8 +1,8 @@
 import { ExpressResponder, HTTP_STATUS } from '@naman_deep_singh/http-response'
 import type { NextFunction, Request, Response } from 'express'
-import { errorMessageRegistry } from 'src/errorRegistry'
-import { ERROR_CODES } from '../../constants'
-import { AppError } from '../../error/AppError'
+import { ERROR_CODES } from '../../constants/errorCodes.js'
+import { AppError } from '../../error/AppError.js'
+import { errorMessageRegistry } from '../../errorRegistry/index.js'
 
 export function expressErrorHandler(
 	err: unknown,

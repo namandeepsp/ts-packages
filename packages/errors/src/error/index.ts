@@ -1,26 +1,26 @@
-export * from './AppError'
-export * from './HTTPError'
+export * from './AppError.js'
+export * from './HTTPError.js'
 
 // =========================
 // 4xx Client Errors
 // =========================
-export * from './BadRequestError'
-export * from './UnauthorizedError'
-export * from './ForbiddenError'
-export * from './NotFoundError'
-export * from './ConflictError'
-export * from './ValidationError'
-export * from './TooManyRequestsError'
+export * from './BadRequestError.js'
+export * from './UnauthorizedError.js'
+export * from './ForbiddenError.js'
+export * from './NotFoundError.js'
+export * from './ConflictError.js'
+export * from './ValidationError.js'
+export * from './TooManyRequestsError.js'
 
 // =========================
 // Auth / Token Errors
 // =========================
-export * from './TokenExpiredError'
-export * from './TokenMalformedError'
+export * from './TokenExpiredError.js'
+export * from './TokenMalformedError.js'
 
 // =========================
 // 5xx Server Errors
 // =========================
-export * from './InternalServerError'
-export * from './CryptoIntegrityError'
-export * from './ServiceUnavailableError'
+export * from './InternalServerError.js'
+export * from './CryptoIntegrityError.js'
+export * from './ServiceUnavailableError.js'

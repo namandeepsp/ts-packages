@@ -1,6 +1,6 @@
 import { HTTP_STATUS } from '@naman_deep_singh/http-response'
-import { ERROR_CODES } from 'src/constants'
-import { HTTPError } from './HTTPError'
+import { ERROR_CODES } from '../constants/errorCodes.js'
+import { HTTPError } from './HTTPError.js'
 
 export class ConflictError extends HTTPError {
 	constructor(details?: unknown, cause?: Error) {

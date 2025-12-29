@@ -1,6 +1,6 @@
 @naman_deep_singh/utils
 
-Version: 2.1.1
+Version: 2.2.0
 
 Universal JavaScript prototype extensions for common development utilities. Works in both Node.js and browser environments with 70+ utility methods.
 

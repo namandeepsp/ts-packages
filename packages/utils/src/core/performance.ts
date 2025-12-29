@@ -1,4 +1,4 @@
-import { getPackageVersion } from './version'
+import { getPackageVersion } from './version.js'
 
 // Performance optimization utilities
 export interface PerformanceConfig {

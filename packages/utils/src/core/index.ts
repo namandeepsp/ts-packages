@@ -1,3 +1,3 @@
 // Re-export core utilities
-export * from './validation'
-export * from './performance'
+export * from './validation.js'
+export * from './performance.js'

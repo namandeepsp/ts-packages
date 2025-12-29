@@ -1,5 +1,5 @@
-import { ERROR_CODES } from 'src/constants'
-import { InternalServerError } from './InternalServerError'
+import { ERROR_CODES } from '../constants/errorCodes.js'
+import { InternalServerError } from './InternalServerError.js'
 
 export class CryptoIntegrityError extends InternalServerError {
 	constructor(details?: unknown, cause?: Error) {

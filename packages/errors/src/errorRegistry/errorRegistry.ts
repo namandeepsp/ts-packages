@@ -1,7 +1,8 @@
-import { HTTP_STATUS } from '@naman_deep_singh/http-response'
-import type { ExpressResponder } from '@naman_deep_singh/http-response'
-import { ERROR_MESSAGES, type ErrorCode } from 'src/constants'
-import type { AppError } from 'src/error/AppError'
+
+import { type ExpressResponder, HTTP_STATUS } from '@naman_deep_singh/http-response'
+import type { ErrorCode } from '../constants/errorCodes.js'
+import { ERROR_MESSAGES } from '../constants/errorMessages.js'
+import type { AppError } from '../error/AppError.js'
 
 export class ErrorMessageRegistry {
 	private static instance: ErrorMessageRegistry

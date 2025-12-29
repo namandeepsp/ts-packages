@@ -1,2 +1,2 @@
-export * from './errorHandler.middleware'
-export * from './errorConverter.middleware'
+export * from './errorHandler.middleware.js'
+export * from './errorConverter.middleware.js'

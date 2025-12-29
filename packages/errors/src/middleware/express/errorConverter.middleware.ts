@@ -1,7 +1,7 @@
 import { HTTP_STATUS } from '@naman_deep_singh/http-response'
 import type { NextFunction, Request, Response } from 'express'
-import { ERROR_CODES, type ErrorCode } from '../../constants'
-import { AppError } from '../../error/AppError'
+import { ERROR_CODES, type ErrorCode } from '../../constants/errorCodes.js'
+import { AppError } from '../../error/AppError.js'
 
 export function errorConverter(
 	err: unknown,

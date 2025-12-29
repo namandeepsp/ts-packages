@@ -1,6 +1,6 @@
 import { HTTP_STATUS } from '@naman_deep_singh/http-response'
-import { ERROR_CODES, type ErrorCode } from 'src/constants'
-import { HTTPError } from './HTTPError'
+import { ERROR_CODES, type ErrorCode } from '../constants/errorCodes.js'
+import { HTTPError } from './HTTPError.js'
 
 export class TooManyRequestsError extends HTTPError {
 	constructor(

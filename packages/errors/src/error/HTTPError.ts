@@ -1,5 +1,5 @@
-import type { ErrorCode } from '../constants'
-import { AppError } from './AppError'
+import type { ErrorCode } from '../constants/errorCodes.js'
+import { AppError } from './AppError.js'
 
 export class HTTPError extends AppError {
 	public status: 'fail' | 'error'

@@ -1,9 +1,7 @@
-import { createClient, createCluster } from 'redis'
-import type { RedisClientOptions } from 'redis'
-import { CACHE_ERROR_CODES } from 'src/errors/cacheErrorCodes'
-import { BaseCache } from '../../core/BaseCache'
-import { CacheError } from '../../errors'
-import type { HealthCheckResponse, RedisCacheConfig } from '../../types'
+import { type RedisClientOptions, createClient, createCluster } from 'redis'
+import { BaseCache } from '../../core/index.js'
+import { CACHE_ERROR_CODES, CacheError } from '../../errors/index.js'
+import type { HealthCheckResponse, RedisCacheConfig } from '../../types.js'
 
 /**
  * Redis cache adapter

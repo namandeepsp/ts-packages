@@ -1,8 +1,7 @@
 import Memcached from 'memcached'
-import { CACHE_ERROR_CODES } from 'src/errors/cacheErrorCodes'
-import { BaseCache } from '../../core/BaseCache'
-import { CacheError } from '../../errors'
-import type { HealthCheckResponse, MemcacheCacheConfig } from '../../types'
+import { BaseCache } from '../../core/index.js'
+import { CACHE_ERROR_CODES, CacheError } from '../../errors/index.js'
+import type { HealthCheckResponse, MemcacheCacheConfig } from '../../types.js'
 
 export class MemcacheCache<T = unknown> extends BaseCache<T> {
 	private client: Memcached | null = null

@@ -1,5 +1,1 @@
-export {
-	cacheSessionMiddleware,
-	cacheHealthCheckMiddleware,
-	cacheResponseMiddleware,
-} from './cacheMiddleware'
+export * from './cacheMiddleware.js'

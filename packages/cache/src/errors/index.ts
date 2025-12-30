@@ -1,6 +1,7 @@
 import { errorMessageRegistry } from '@naman_deep_singh/errors'
-import { CACHE_ERROR_CODES } from './cacheErrorCodes'
+import { CACHE_ERROR_CODES } from './cacheErrorCodes.js'
 
 errorMessageRegistry.register(CACHE_ERROR_CODES)
 
-export { CacheError } from './CacheError'
+export * from './CacheError.js'
+export * from './cacheErrorCodes.js'

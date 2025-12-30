@@ -1,4 +1,4 @@
-import type { SessionData } from '../../types'
+import type { SessionData } from '../../types.js'
 
 /**
  * Session store interface

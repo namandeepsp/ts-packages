@@ -1,40 +1,17 @@
 // Types
-export type {
-	CacheConfig,
-	RedisCacheConfig,
-	MemcacheCacheConfig,
-	MemoryCacheConfig,
-	SessionData,
-	SessionOptions,
-	CacheStats,
-	HealthCheckResponse,
-	BatchResult,
-	CacheEntry,
-} from './types'
+export * from './types.js'
 
 // Errors
-export { CacheError } from './errors'
+export * from './errors/index.js'
 
-// Interfaces
-export type { ICache, ISession } from './core/interfaces'
+// Core abstractions & interfaces
+export * from './core/index.js'
 
-// Base Cache
-export { BaseCache } from './core/BaseCache'
+// Cache adapters (Redis, Memory, Memcache)
+export * from './adapters/index.js'
 
-// Adapters
-export { RedisCache } from './adapters/redis'
-export { MemcacheCache } from './adapters/memcache'
-export { MemoryCache } from './adapters/memory'
+// Session management
+export * from './session/index.js'
 
-// Factory
-export { CacheFactory } from './core/factory'
-
-// Session
-export { SessionStore } from './session'
-
-// Middleware
-export {
-	cacheSessionMiddleware,
-	cacheHealthCheckMiddleware,
-	cacheResponseMiddleware,
-} from './middleware/express'
+// Middleware integrations
+export * from './middleware/index.js'

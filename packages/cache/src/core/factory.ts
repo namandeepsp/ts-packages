@@ -1,16 +1,12 @@
-import { CACHE_ERROR_CODES } from 'src/errors/cacheErrorCodes'
-import { MemcacheCache } from '../adapters/memcache'
-import { MemoryCache } from '../adapters/memory'
-import { RedisCache } from '../adapters/redis'
-import { CacheError } from '../errors'
-
+import { MemcacheCache, MemoryCache, RedisCache } from '../adapters/index.js'
+import { CACHE_ERROR_CODES, CacheError } from '../errors/index.js'
 import type {
 	CacheConfig,
 	MemcacheCacheConfig,
 	MemoryCacheConfig,
 	RedisCacheConfig,
-} from '../types'
-import type { ICache } from './interfaces'
+} from '../types.js'
+import type { ICache } from './interfaces/index.js'
 
 /**
  * Factory for creating cache instances

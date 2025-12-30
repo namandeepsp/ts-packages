@@ -1,4 +1,8 @@
-import type { BatchResult, CacheStats, HealthCheckResponse } from '../../types'
+import type {
+	BatchResult,
+	CacheStats,
+	HealthCheckResponse,
+} from '../../types.js'
 
 /**
  * Main cache interface - defines all cache operations

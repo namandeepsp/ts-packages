@@ -1,4 +1,4 @@
-export { }
+export {}
 
 declare global {
 	// ─────────────────────────────────────────────────────────────
@@ -75,9 +75,7 @@ declare global {
 		shuffle(): T[]
 		chunk(size: number): T[][]
 
-		groupBy<K extends string | number>(
-			keyFn: (item: T) => K,
-		): Record<K, T[]>
+		groupBy<K extends string | number>(keyFn: (item: T) => K): Record<K, T[]>
 
 		sum(): number
 		average(): number
@@ -135,9 +133,7 @@ declare global {
 			fn: (key: keyof T) => string | number | symbol,
 		): Record<string, any>
 
-		filterKeys<T extends Record<string, any>>(
-			keys: (keyof T)[],
-		): Partial<T>
+		filterKeys<T extends Record<string, any>>(keys: (keyof T)[]): Partial<T>
 
 		filterValues<T extends Record<string, any>>(
 			fn: (value: T[keyof T], key: keyof T) => boolean,

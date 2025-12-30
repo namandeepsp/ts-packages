@@ -1,5 +1,3 @@
-// Shared helper functions for extensions
-
 export function isValidArrayIndex(index: number): boolean {
 	return Number.isInteger(index) && index >= 0
 }

@@ -1,10 +1,9 @@
-import { extendArray } from "../array/index.js"
-import { setPerformanceConfig } from "../core/index.js"
-import { extendNumber } from "../number/index.js"
-import { extendObject } from "../object/index.js"
-import { extendString } from "../string/index.js"
-import type { ExtensionOptions } from "../types/index.js"
-
+import { extendArray } from '../array/index.js'
+import { setPerformanceConfig } from '../core/index.js'
+import { extendNumber } from '../number/index.js'
+import { extendObject } from '../object/index.js'
+import { extendString } from '../string/index.js'
+import type { ExtensionOptions } from '../types/index.js'
 
 export function initExtensions(options: ExtensionOptions = {}): void {
 	const {

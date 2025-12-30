@@ -1,15 +1,46 @@
 {
     "name": "@naman_deep_singh/cache",
-    "version": "1.6.0",
+    "version": "1.6.1",
     "description": "Extensible caching layer supporting Redis, Memcache, and in-memory caches with automatic fallback, namespacing, session management, and Express middleware.",
     "type": "module",
     "main": "./dist/cjs/index.js",
     "module": "./dist/esm/index.js",
+    "types": "./dist/types/index.d.ts",
     "exports": {
         ".": {
             "import": "./dist/esm/index.js",
             "require": "./dist/cjs/index.js",
             "types": "./dist/types/index.d.ts"
+        },
+        "./types": {
+            "import": "./dist/esm/types.js",
+            "require": "./dist/cjs/types.js",
+            "types": "./dist/types/types.d.ts"
+        },
+        "./errors": {
+            "import": "./dist/esm/errors/index.js",
+            "require": "./dist/cjs/errors/index.js",
+            "types": "./dist/types/errors/index.d.ts"
+        },
+        "./core": {
+            "import": "./dist/esm/core/index.js",
+            "require": "./dist/cjs/core/index.js",
+            "types": "./dist/types/core/index.d.ts"
+        },
+        "./adapters": {
+            "import": "./dist/esm/adapters/index.js",
+            "require": "./dist/cjs/adapters/index.js",
+            "types": "./dist/types/adapters/index.d.ts"
+        },
+        "./session": {
+            "import": "./dist/esm/session/index.js",
+            "require": "./dist/cjs/session/index.js",
+            "types": "./dist/types/session/index.d.ts"
+        },
+        "./middleware": {
+            "import": "./dist/esm/middleware/index.js",
+            "require": "./dist/cjs/middleware/index.js",
+            "types": "./dist/types/middleware/index.d.ts"
         }
     },
     "sideEffects": false,
@@ -44,7 +75,7 @@
         "typescript": "^5.9.3"
     },
     "dependencies": {
-        "@naman_deep_singh/errors": "^2.2.2",
+        "@naman_deep_singh/errors": "^2.2.3",
         "memcached": "^2.2.2",
         "redis": "^4.6.10"
     },

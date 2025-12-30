@@ -1,4 +1,3 @@
-
 import { HTTP_STATUS } from '@naman_deep_singh/http-response'
 import type { ErrorCode } from '../constants/errorCodes.js'
 import { errorMessageRegistry } from '../errorRegistry/index.js'

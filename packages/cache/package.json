@@ -1,6 +1,6 @@
 {
     "name": "@naman_deep_singh/cache",
-    "version": "1.5.0",
+    "version": "1.6.0",
     "description": "Extensible caching layer supporting Redis, Memcache, and in-memory caches with automatic fallback, namespacing, session management, and Express middleware.",
     "type": "module",
     "main": "./dist/cjs/index.js",
@@ -19,7 +19,7 @@
     ],
     "scripts": {
         "build": "pnpm run build:types && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json",
-        "build:types": "tsc -p tsconfig.base.json --emitDeclarationOnly --outDir dist/types",
+        "build:types": "tsc -p tsconfig.types.json",
         "clean": "rimraf dist",
         "prepublishOnly": "npm run clean && npm run build"
     },
@@ -44,7 +44,7 @@
         "typescript": "^5.9.3"
     },
     "dependencies": {
-        "@naman_deep_singh/errors": "^2.1.0",
+        "@naman_deep_singh/errors": "^2.2.2",
         "memcached": "^2.2.2",
         "redis": "^4.6.10"
     },

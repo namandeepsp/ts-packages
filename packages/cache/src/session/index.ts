@@ -1,2 +1,1 @@
-export { SessionStore } from './SessionStore'
-export type { SessionOptions } from '../types'
+export * from './SessionStore.js'

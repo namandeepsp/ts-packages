@@ -1,8 +1,6 @@
-import { CacheError } from '../errors'
-
-import { CACHE_ERROR_CODES } from 'src/errors/cacheErrorCodes'
-import type { ICache } from '../core/interfaces'
-import type { SessionData, SessionOptions } from '../types'
+import type { ICache } from '../core/index.js'
+import { CACHE_ERROR_CODES, CacheError } from '../errors/index.js'
+import type { SessionData, SessionOptions } from '../types.js'
 
 /**
  * Session store wrapper around cache adapters

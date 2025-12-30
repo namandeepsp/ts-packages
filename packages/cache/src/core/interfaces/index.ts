@@ -1,2 +1,2 @@
-export { ICache } from './ICache'
-export { ISession } from './ISession'
+export * from './ICache.js'
+export * from './ISession.js'

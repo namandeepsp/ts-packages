@@ -1,5 +1,5 @@
 import { AppError, type ErrorCode } from '@naman_deep_singh/errors'
-import type { CacheErrorCode } from './cacheErrorCodes'
+import type { CacheErrorCode } from './cacheErrorCodes.js'
 
 export class CacheError extends AppError {
 	readonly adapter?: string

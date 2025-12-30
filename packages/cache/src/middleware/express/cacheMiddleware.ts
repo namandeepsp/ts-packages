@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from 'express'
-import type { ICache } from '../../core/interfaces'
-import type { SessionStore } from '../../session/SessionStore'
+import type { ICache } from '../../core/index.js'
+import type { SessionStore } from '../../session/index.js'
 
 /**
  * Express middleware for session management using cache

@@ -1,7 +1,6 @@
-import { CACHE_ERROR_CODES } from 'src/errors/cacheErrorCodes'
-import { BaseCache } from '../../core/BaseCache'
-import { CacheError } from '../../errors'
-import type { HealthCheckResponse, MemoryCacheConfig } from '../../types'
+import { BaseCache } from '../../core/index.js'
+import { CACHE_ERROR_CODES, CacheError } from '../../errors/index.js'
+import type { HealthCheckResponse, MemoryCacheConfig } from '../../types.js'
 
 /**
  * In-memory cache adapter for development and testing

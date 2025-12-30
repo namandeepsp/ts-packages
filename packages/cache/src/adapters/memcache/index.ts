@@ -1,1 +1,1 @@
-export { MemcacheCache } from './MemcacheCache'
+export { MemcacheCache } from './MemcacheCache.js'

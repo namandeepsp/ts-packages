@@ -1,4 +1,3 @@
-
 /**
  * Canonical error messages mapped to ERROR_CODES
  * - Human-readable
@@ -7,7 +6,7 @@
  * - Can be overridden by services if needed
  */
 
-import { ERROR_CODES, type ErrorCode } from "./errorCodes.js";
+import { ERROR_CODES, type ErrorCode } from './errorCodes.js'
 
 export const ERROR_MESSAGES: Record<ErrorCode, string> = {
 	/* ------------------------------------------------------------------ */

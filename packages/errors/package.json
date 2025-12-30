@@ -1,10 +1,11 @@
 {
     "name": "@naman_deep_singh/errors",
-    "version": "2.2.0",
+    "version": "2.2.1",
     "description": "Standardized error classes and Express middleware for consistent error handling with TypeScript",
     "type": "module",
     "main": "./dist/cjs/index.js",
     "module": "./dist/esm/index.js",
+    "types": "./dist/types/index.d.ts",
     "exports": {
         ".": {
             "import": "./dist/esm/index.js",

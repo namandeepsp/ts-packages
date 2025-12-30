@@ -1,12 +1,13 @@
 {
   "name": "@naman_deep_singh/http-response",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "TypeScript utilities for standardized API responses",
   "author": "Naman Deep Singh",
   "license": "MIT",
   "type": "module",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/esm/index.js",

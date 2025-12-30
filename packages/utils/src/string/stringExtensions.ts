@@ -1,5 +1,4 @@
-import { defineExtension } from "../utils/index.js"
-
+import { defineExtension } from '../utils/index.js'
 
 let stringExtended = false
 

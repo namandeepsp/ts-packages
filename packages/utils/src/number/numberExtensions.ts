@@ -1,5 +1,5 @@
-import { makeInternalCacheKey, withCache } from "../core/index.js"
-import { defineExtension } from "../utils/index.js"
+import { makeInternalCacheKey, withCache } from '../core/index.js'
+import { defineExtension } from '../utils/index.js'
 
 let numberExtended = false
 

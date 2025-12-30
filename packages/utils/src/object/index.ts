@@ -1,1 +1,1 @@
-export { extendObject } from './object-extensions.js'
+export { extendObject } from './objectExtensions.js'

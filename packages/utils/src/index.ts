@@ -1,5 +1,5 @@
 // Global type / prototype augmentations
-import './types/global-augmentations.js'
+import './types/globalAugmentations.js'
 
 // Core language extensions
 export * from './array/index.js'

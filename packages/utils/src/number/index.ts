@@ -1,1 +1,1 @@
-export { extendNumber } from './number-extensions.js'
+export { extendNumber } from './numberExtensions.js'

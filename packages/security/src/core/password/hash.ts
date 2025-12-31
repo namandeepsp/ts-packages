@@ -1,6 +1,6 @@
 import { InternalServerError } from '@naman_deep_singh/errors'
 import bcrypt from 'bcryptjs'
-import { ensureValidPassword } from './utils'
+import { ensureValidPassword } from './utils.js'
 
 /**
  * Hash a password asynchronously using bcrypt.
@@ -15,6 +15,7 @@ export const hashPassword = async (
 		return bcrypt.hash(password, salt)
 	} catch (error) {
 		throw new InternalServerError(
+			undefined,
 			{ reason: 'Password hashing failed' },
 			error instanceof Error ? error : undefined,
 		)
@@ -35,6 +36,7 @@ export const hashPasswordSync = (password: string, saltRounds = 10): string => {
 		return bcrypt.hashSync(password, salt)
 	} catch (error) {
 		throw new InternalServerError(
+			undefined,
 			{ reason: 'Password hashing failed' },
 			error instanceof Error ? error : undefined,
 		)

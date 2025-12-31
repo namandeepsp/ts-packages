@@ -5,7 +5,7 @@ import {
 	type VerifyOptions,
 	verify,
 } from 'jsonwebtoken'
-import type { VerificationResult } from './types'
+import type { VerificationResult } from './types.js'
 
 /**
  * Verify token (throws UnauthorizedError if invalid or expired)

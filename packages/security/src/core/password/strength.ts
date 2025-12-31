@@ -1,5 +1,5 @@
 import { BadRequestError, ValidationError } from '@naman_deep_singh/errors'
-import type { PasswordStrengthOptions } from './types'
+import type { PasswordStrengthOptions } from './types.js'
 
 export const isPasswordStrong = (
 	password: string,

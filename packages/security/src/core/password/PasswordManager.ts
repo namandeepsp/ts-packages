@@ -7,10 +7,10 @@ import type {
 	PasswordConfig,
 	PasswordStrength,
 	PasswordValidationResult,
-} from '../../interfaces/password.interface'
+} from '../../interfaces/index.js'
 
 import { BadRequestError, ValidationError } from '@naman_deep_singh/errors'
-import { ensureValidPassword, estimatePasswordEntropy } from './utils'
+import { ensureValidPassword, estimatePasswordEntropy } from './utils.js'
 
 export class PasswordManager implements IPasswordManager {
 	private defaultConfig: PasswordConfig

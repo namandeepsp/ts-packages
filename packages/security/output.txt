@@ -1,0 +1,2122 @@
+
+===== ./package.json =====
+{
+  "name": "@naman_deep_singh/security",
+  "version": "1.6.0",
+  "description": "Security utilities for password hashing and JWT token management with TypeScript",
+  "type": "module",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./core": {
+      "import": "./dist/esm/core/index.js",
+      "require": "./dist/cjs/core/index.js",
+      "types": "./dist/types/core/index.d.ts"
+    },
+    "./interfaces": {
+      "import": "./dist/esm/interfaces/index.js",
+      "require": "./dist/cjs/interfaces/index.js",
+      "types": "./dist/types/interfaces/index.d.ts"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "pnpm run build:types && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json",
+    "build:types": "tsc -p tsconfig.types.json",
+    "clean": "rimraf dist",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "keywords": [
+    "security",
+    "jwt",
+    "bcrypt",
+    "authentication",
+    "password",
+    "token"
+  ],
+  "author": "Naman Deep Singh",
+  "license": "ISC",
+  "packageManager": "pnpm@10.20.0",
+  "dependencies": {
+    "@naman_deep_singh/errors": "^2.2.3",
+    "@naman_deep_singh/utils": "^2.3.0",
+    "bcryptjs": "^3.0.3",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.9.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
+===== ./tsconfig.json =====
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
+}
+===== ./output.txt =====
+
+===== ./README.md =====
+```bash
+@naman_deep_singh/security
+
+Version: 1.6.0
+
+A complete, lightweight security toolkit for Node.js & TypeScript providing:
+
+🔐 Password hashing & validation with bcrypt (async/sync, peppered variants)
+🔑 JWT signing & verification (safe, strict, and cached)
+🧮 Duration parser ("15m", "7d", etc.)
+🪪 Token generator (access + refresh pair with branded types)
+♻️ Refresh token rotation helper
+🧰 Robust token extraction (Headers, Cookies, Query, Body, WebSocket)
+🧩 Safe & strict JWT decode utilities
+🔒 AES-256-GCM encryption/decryption with HMAC and random utilities
+🚨 Standardized error handling with @naman_deep_singh/errors
+
+✔ Fully typed with TypeScript
+✔ Branded token types for compile-time safety (AccessToken/RefreshToken)
+✔ Class-based managers for advanced features (PasswordManager, JWTManager, CryptoManager)
+✔ Functional exports for simple use cases
+✔ Password strength checking and validation
+✔ Token caching for performance
+✔ Consistent errors across your application ecosystem
+✔ Works in both ESM and CommonJS
+
+📦 Installation
+npm install @naman_deep_singh/security
+
+🔧 Features
+Password Security
+
+Async & sync bcrypt hashing
+
+Peppered hashing variants
+
+Password validation & strength checking
+
+Configurable complexity requirements
+
+Secure password generation
+
+JWT Security
+
+Custom expiry using duration strings
+
+Token pair generation (access + refresh)
+
+Refresh token rotation
+
+Safe & unsafe JWT verification
+
+Strict vs flexible decoding
+
+Token caching for performance
+
+Cryptography
+
+AES-256-GCM encryption/decryption
+
+HMAC signing and verification
+
+Cryptographically secure random generation
+
+Utilities
+
+Duration parsing (e.g., "15m" → 900 seconds)
+
+Token extraction from headers, cookies, query, body, and WebSocket messages
+
+Fully typed interfaces and branded token types
+
+📘 Quick Start
+Functional Approach (Simple)
+import {
+  hashPassword,
+  verifyPassword,
+  generateTokens,
+  verifyToken,
+  safeVerifyToken,
+  extractToken,
+  encrypt,
+  decrypt,
+  parseDuration,
+  decodeToken,
+  decodeTokenStrict,
+} from "@naman_deep_singh/security";
+
+// Password operations
+const hashed = await hashPassword("mypassword");
+const isValid = await verifyPassword("mypassword", hashed);
+
+// JWT operations
+const tokens = generateTokens(
+  { userId: 42 },
+  process.env.ACCESS_SECRET!,
+  process.env.REFRESH_SECRET!,
+  "15m",
+  "7d"
+);
+
+// Safe verification
+const result = safeVerifyToken(tokens.accessToken, process.env.ACCESS_SECRET!);
+if (!result.valid) {
+  console.log(result.error.message); // UnauthorizedError instance
+}
+
+// Decode without verification
+const decoded = decodeToken(tokens.accessToken); // null | string | JwtPayload
+const strictPayload = decodeTokenStrict(tokens.accessToken); // throws if invalid
+
+// Parse duration
+const seconds = parseDuration("15m"); // 900
+
+// Token extraction
+const token = extractToken({
+  header: req.headers.authorization,
+  cookies: req.cookies,
+  query: req.query,
+  body: req.body,
+  wsMessage: message, // string or { token: "..." }
+});
+
+// Crypto operations
+const encrypted = encrypt("sensitive data", "secret-key");
+const decrypted = decrypt(encrypted, "secret-key");
+
+Class-Based Approach (Advanced)
+PasswordManager
+import { PasswordManager } from "@naman_deep_singh/security";
+
+const passwordManager = new PasswordManager({
+  minLength: 12,
+  requireUppercase: true,
+  requireNumbers: true,
+  requireSpecialChars: true,
+  customRules: [
+    { test: (pwd) => !pwd.includes("password"), message: 'Cannot contain "password"' }
+  ]
+});
+
+// Validate password
+const validation = passwordManager.validate("MySecurePass123!");
+if (!validation.isValid) console.log(validation.errors);
+
+// Hash password
+const { hash, salt } = await passwordManager.hash("MySecurePass123!");
+
+// Verify password
+const isValid = await passwordManager.verify("MySecurePass123!", hash, salt);
+
+// Generate secure password
+const generated = passwordManager.generate(16, {
+  requireUppercase: true,
+  requireNumbers: true,
+  requireSpecialChars: true
+});
+
+// Check password strength
+const strength = passwordManager.checkStrength("MySecurePass123!");
+console.log(strength);
+
+JWTManager
+import { JWTManager } from "@naman_deep_singh/security";
+
+const jwtManager = new JWTManager({
+  accessSecret: process.env.ACCESS_SECRET!,
+  refreshSecret: process.env.REFRESH_SECRET!,
+  accessExpiry: "15m",
+  refreshExpiry: "7d",
+  enableCaching: true,
+  maxCacheSize: 100
+});
+
+// Generate tokens
+const tokens = await jwtManager.generateTokens({ userId: 42 });
+
+// Verify tokens
+const accessPayload = await jwtManager.verifyAccessToken(tokens.accessToken);
+const refreshPayload = await jwtManager.verifyRefreshToken(tokens.refreshToken);
+
+// Rotate refresh token
+const rotatedRefreshToken = await jwtManager.rotateRefreshToken(tokens.refreshToken);
+
+// Decode without verification
+const decoded = jwtManager.decodeToken(tokens.accessToken);
+const strictPayload = jwtManager.decodeTokenStrict(tokens.accessToken);
+
+// Extract token from header
+const token = jwtManager.extractTokenFromHeader("Bearer eyJ...");
+
+// Validate token without throwing
+const isValid = jwtManager.validateToken(tokens.accessToken, process.env.ACCESS_SECRET!);
+
+// Check token expiration
+const isExpired = jwtManager.isTokenExpired(tokens.accessToken);
+const expiresAt = jwtManager.getTokenExpiration(tokens.accessToken);
+
+// Cache management
+jwtManager.clearCache();
+const stats = jwtManager.getCacheStats(); // { size: -1, maxSize: 100 }
+
+CryptoManager
+import { CryptoManager } from "@naman_deep_singh/security";
+
+const cryptoManager = new CryptoManager("your-secret-key");
+
+// Encryption
+const encrypted = cryptoManager.encrypt("data");
+const decrypted = cryptoManager.decrypt(encrypted);
+
+// HMAC
+const hmac = cryptoManager.createHMAC("data");
+const isValid = cryptoManager.verifyHMAC("data", hmac);
+
+// Random generation
+const randomBytes = cryptoManager.generateRandomBytes(32);
+const randomString = cryptoManager.generateRandomString(16);
+const randomHex = cryptoManager.generateRandomHex(32);
+
+🚨 Error Handling
+
+This package uses standardized errors from @naman_deep_singh/errors:
+
+import {
+  BadRequestError,
+  UnauthorizedError,
+  ValidationError,
+  InternalServerError
+} from '@naman_deep_singh/security';
+
+try {
+  const hash = await hashPassword('mypassword');
+} catch (error) {
+  if (error instanceof BadRequestError) console.log("Invalid password input");
+  if (error instanceof InternalServerError) console.log("Server error during hashing");
+}
+
+try {
+  const isValid = await verifyPassword('password', hash);
+} catch (error) {
+  if (error instanceof UnauthorizedError) console.log("Invalid credentials");
+}
+
+
+Error Types:
+
+BadRequestError (400) — invalid input
+
+UnauthorizedError (401) — authentication failures
+
+ValidationError (422) — password strength validation
+
+InternalServerError (500) — server-side errors
+
+🧩 Authentication Example
+Registration
+async function registerUser(email: string, password: string) {
+  const validation = passwordManager.validate(password);
+  if (!validation.isValid) {
+    throw new ValidationError(`Password validation failed: ${validation.errors.join(', ')}`);
+  }
+
+  const { hash, salt } = await passwordManager.hash(password);
+
+  return { email, passwordHash: hash, passwordSalt: salt };
+}
+
+Login
+async function loginUser(email: string, password: string, storedHash: string, storedSalt: string) {
+  const isValid = await passwordManager.verify(password, storedHash, storedSalt);
+  if (!isValid) throw new UnauthorizedError("Invalid credentials");
+
+  return jwtManager.generateTokens({ email });
+}
+
+Token Refresh
+async function refreshTokens(oldRefreshToken: string) {
+  const decoded = await jwtManager.verifyRefreshToken(oldRefreshToken);
+
+  const newTokens = await jwtManager.generateTokens(decoded);
+  const rotatedRefreshToken = await jwtManager.rotateRefreshToken(oldRefreshToken);
+
+  return { accessToken: newTokens.accessToken, refreshToken: rotatedRefreshToken };
+}
+
+Express Middleware
+import { extractToken, safeVerifyToken } from '@naman_deep_singh/security';
+
+export function authMiddleware(req, res, next) {
+  const token = extractToken({
+    header: req.headers.authorization,
+    cookies: req.cookies,
+    query: req.query,
+    body: req.body
+  });
+
+  if (!token) return res.status(401).json({ error: "Token missing" });
+
+  const result = safeVerifyToken(token, process.env.ACCESS_SECRET!);
+  if (!result.valid) return res.status(401).json({ error: result.error.message });
+
+  req.user = result.payload;
+  next();
+}
+
+🔐 Security Best Practices
+
+Use 32+ character secrets for JWT and encryption
+
+Store secrets in environment variables
+
+Always use HTTPS in production
+
+Keep refresh tokens secure (HttpOnly cookie recommended)
+
+Never store passwords in plain text
+
+Use password peppering for extra security
+
+Enable JWT caching carefully, monitor memory
+
+Handle errors with proper HTTP status codes
+
+Rotate secrets and tokens regularly
+
+Use secure random generation for cryptographic operations
+```
+===== ./tsconfig.types.json =====
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "dist/types"
+  },
+  "include": [
+    "src"
+  ]
+}
+===== ./src/index.ts =====
+// Core modules
+export * from './core/index.js'
+
+// Public interfaces
+export * from './interfaces/index.js'
+
+===== ./src/interfaces/index.ts =====
+export * from './jwt.interface.js'
+export * from './password.interface.js'
+
+===== ./src/interfaces/password.interface.ts =====
+export interface PasswordConfig {
+	saltRounds?: number
+	minLength?: number
+	maxLength?: number
+	requireUppercase?: boolean
+	requireLowercase?: boolean
+	requireNumbers?: boolean
+	requireSpecialChars?: boolean
+	customRules?: PasswordRule[]
+}
+
+export interface PasswordRule {
+	test: (password: string) => boolean
+	message: string
+}
+
+export interface PasswordStrength {
+	score: number // 0-4 (very weak to very strong)
+	label: 'very-weak' | 'weak' | 'fair' | 'good' | 'strong'
+	feedback: string[]
+	suggestions: string[]
+}
+
+export interface PasswordValidationResult {
+	isValid: boolean
+	errors: string[]
+	strength: PasswordStrength
+}
+
+export interface HashedPassword {
+	hash: string
+	salt: string
+}
+
+export interface IPasswordManager {
+	hash(password: string, salt?: string): Promise<HashedPassword>
+	verify(password: string, hash: string, salt: string): Promise<boolean>
+	generate(length?: number, options?: PasswordConfig): string
+	validate(password: string, config?: PasswordConfig): PasswordValidationResult
+	checkStrength(password: string): PasswordStrength
+	needsUpgrade(hash: string, currentConfig: PasswordConfig): boolean
+}
+
+export interface IPasswordStrengthChecker {
+	analyze(password: string): PasswordStrength
+	checkLength(password: string): { valid: boolean; message: string }
+	checkComplexity(
+		password: string,
+		config: PasswordConfig,
+	): { valid: boolean; message: string }[]
+	checkCommonPasswords(password: string): { valid: boolean; message: string }
+	checkSequential(password: string): { valid: boolean; message: string }
+	checkRepetition(password: string): { valid: boolean; message: string }
+}
+
+===== ./src/interfaces/jwt.interface.ts =====
+import type { JwtPayload, Secret } from 'jsonwebtoken'
+
+export interface AccessToken extends String {
+	readonly __type: 'AccessToken'
+}
+
+export interface RefreshToken extends String {
+	readonly __type: 'RefreshToken'
+}
+
+export interface TokenPair {
+	accessToken: AccessToken
+	refreshToken: RefreshToken
+}
+
+export interface JWTConfig {
+	accessSecret: Secret
+	refreshSecret: Secret
+	accessExpiry?: string | number
+	refreshExpiry?: string | number
+	enableCaching?: boolean
+	maxCacheSize?: number
+}
+
+export interface TokenValidationOptions {
+	ignoreExpiration?: boolean
+	ignoreNotBefore?: boolean
+	audience?: string | string[]
+	issuer?: string
+	algorithms?: string[]
+}
+
+export interface TokenGenerationOptions {
+	algorithm?: string
+	expiresIn?: string | number
+	audience?: string | string[]
+	issuer?: string
+	subject?: string
+	kid?: string
+}
+
+export interface ITokenManager {
+	generateTokens(payload: Record<string, unknown>): Promise<TokenPair>
+	generateAccessToken(payload: Record<string, unknown>): Promise<AccessToken>
+	generateRefreshToken(payload: Record<string, unknown>): Promise<RefreshToken>
+	verifyAccessToken(token: string): Promise<JwtPayload | string>
+	verifyRefreshToken(token: string): Promise<JwtPayload | string>
+	decodeToken(token: string, complete?: boolean): JwtPayload | string | null
+	extractTokenFromHeader(authHeader: string): string | null
+	validateToken(
+		token: string,
+		secret: Secret,
+		options?: TokenValidationOptions,
+	): boolean
+	rotateRefreshToken(oldToken: string): Promise<RefreshToken>
+	isTokenExpired(token: string): boolean
+	getTokenExpiration(token: string): Date | null
+}
+
+===== ./src/core/index.ts =====
+export * from './crypto/index.js'
+export * from './jwt/index.js'
+export * from './password/index.js'
+===== ./src/core/jwt/decode.ts =====
+import { BadRequestError } from '@naman_deep_singh/errors'
+import { type JwtPayload, decode } from 'jsonwebtoken'
+
+/**
+ * Flexible decode
+ * Returns: null | string | JwtPayload
+ * Mirrors jsonwebtoken.decode()
+ */
+export function decodeToken(token: string): null | string | JwtPayload {
+	return decode(token)
+}
+
+/**
+ * Strict decode
+ * Always returns JwtPayload or throws error
+ */
+export function decodeTokenStrict(token: string): JwtPayload {
+	const decoded = decode(token)
+
+	if (!decoded || typeof decoded === 'string') {
+		throw new BadRequestError({
+			reason: 'Invalid JWT payload structure',
+		})
+	}
+
+	return decoded
+}
+
+===== ./src/core/jwt/parseDuration.ts =====
+import { ValidationError } from '@naman_deep_singh/errors'
+
+const TIME_UNITS: Record<string, number> = {
+	s: 1,
+	m: 60,
+	h: 3600,
+	d: 86400,
+	w: 604800,
+}
+
+export function parseDuration(input: string | number): number {
+	if (typeof input === 'number') return input
+
+	const regex = /(\d+)\s*(s|m|h|d|w)/gi
+	let totalSeconds = 0
+	let match
+
+	while ((match = regex.exec(input)) !== null) {
+		const value = Number.parseInt(match[1], 10)
+		const unit = match[2].toLowerCase()
+
+		if (!TIME_UNITS[unit]) {
+			throw new ValidationError({ reason: `Invalid time unit: ${unit}` })
+		}
+
+		totalSeconds += value * TIME_UNITS[unit]
+	}
+
+	if (totalSeconds === 0) {
+		throw new ValidationError({ reason: `Invalid expiry format: "${input}"` })
+	}
+
+	return totalSeconds
+}
+
+===== ./src/core/jwt/index.ts =====
+export * from './decode.js'
+export * from './extractToken.js'
+export * from './generateTokens.js'
+export * from './parseDuration.js'
+export * from './signToken.js'
+export * from './types.js'
+export * from './validateToken.js'
+export * from './verify.js'
+
+===== ./src/core/jwt/JWTManager.ts =====
+import {
+	BadRequestError,
+	UnauthorizedError,
+	ValidationError,
+} from '@naman_deep_singh/errors'
+import { LRUCache } from '@naman_deep_singh/utils'
+import jwt, { type JwtPayload, type Secret } from 'jsonwebtoken'
+import type {
+	AccessToken,
+	ITokenManager,
+	JWTConfig,
+	RefreshToken,
+	TokenPair,
+} from '../../interfaces/index.js'
+import { safeVerifyToken, signToken } from './index.js'
+
+export class JWTManager implements ITokenManager {
+	private accessSecret: Secret
+	private refreshSecret: Secret
+	private accessExpiry: string | number
+	private refreshExpiry: string | number
+	private cache?: LRUCache<
+		string,
+		{ valid: boolean; payload: JwtPayload; timestamp: number }
+	>
+	private cacheTTL: number
+
+	constructor(config: JWTConfig) {
+		this.accessSecret = config.accessSecret
+		this.refreshSecret = config.refreshSecret
+		this.accessExpiry = config.accessExpiry || '15m'
+		this.refreshExpiry = config.refreshExpiry || '7d'
+		this.cacheTTL = 5 * 60 * 1000 // 5 minutes
+
+		if (config.enableCaching) {
+			this.cache = new LRUCache(config.maxCacheSize || 100)
+		}
+	}
+
+	/** Generate both access and refresh tokens */
+	async generateTokens(payload: Record<string, unknown>): Promise<TokenPair> {
+		try {
+			this.validatePayload(payload)
+
+			const accessToken = await this.generateAccessToken(payload)
+			const refreshToken = await this.generateRefreshToken(payload)
+
+			return { accessToken, refreshToken }
+		} catch (error) {
+			if (error instanceof BadRequestError || error instanceof ValidationError)
+				throw error
+			throw new BadRequestError(
+				{ reason: 'Failed to generate tokens' },
+				error instanceof Error ? error : undefined,
+			)
+		}
+	}
+
+	/** Generate access token */
+	async generateAccessToken(
+		payload: Record<string, unknown>,
+	): Promise<AccessToken> {
+		try {
+			this.validatePayload(payload)
+			const token = signToken(payload, this.accessSecret, this.accessExpiry, {
+				algorithm: 'HS256',
+			})
+			return token as unknown as AccessToken
+		} catch (error) {
+			if (error instanceof BadRequestError || error instanceof ValidationError)
+				throw error
+			throw new BadRequestError(
+				{ reason: 'Failed to generate access token' },
+				error instanceof Error ? error : undefined,
+			)
+		}
+	}
+
+	/** Generate refresh token */
+	async generateRefreshToken(
+		payload: Record<string, unknown>,
+	): Promise<RefreshToken> {
+		try {
+			this.validatePayload(payload)
+			const token = signToken(payload, this.refreshSecret, this.refreshExpiry, {
+				algorithm: 'HS256',
+			})
+			return token as unknown as RefreshToken
+		} catch (error) {
+			if (error instanceof BadRequestError || error instanceof ValidationError)
+				throw error
+			throw new BadRequestError(
+				{ reason: 'Failed to generate refresh token' },
+				error instanceof Error ? error : undefined,
+			)
+		}
+	}
+
+	/** Verify access token */
+	async verifyAccessToken(token: string): Promise<JwtPayload> {
+		return this.verifyTokenWithCache(token, this.accessSecret, 'access')
+	}
+
+	/** Verify refresh token */
+	async verifyRefreshToken(token: string): Promise<JwtPayload> {
+		return this.verifyTokenWithCache(token, this.refreshSecret, 'refresh')
+	}
+
+	/** Decode token without verification */
+	decodeToken(token: string, complete = false): JwtPayload | string | null {
+		if (!token || typeof token !== 'string') return null
+		return jwt.decode(token, { complete }) as JwtPayload | string | null
+	}
+
+	/** Extract token from Authorization header */
+	extractTokenFromHeader(authHeader: string): string | null {
+		if (!authHeader || typeof authHeader !== 'string') return null
+		const parts = authHeader.split(' ')
+		if (parts.length !== 2 || parts[0] !== 'Bearer') return null
+		return parts[1]
+	}
+
+	/** Validate token without throwing exceptions */
+	validateToken(token: string, secret: Secret): boolean {
+		if (!token || typeof token !== 'string') return false
+		return safeVerifyToken(token, secret).valid
+	}
+
+	/** Rotate refresh token */
+	async rotateRefreshToken(oldToken: string): Promise<RefreshToken> {
+		if (!oldToken || typeof oldToken !== 'string') {
+			throw new ValidationError({
+				reason: 'Old refresh token must be a non-empty string',
+			})
+		}
+
+		const decoded = await this.verifyRefreshToken(oldToken)
+		const payload: JwtPayload = { ...decoded }
+		delete payload.iat
+		delete payload.exp
+
+		const newToken = signToken(payload, this.refreshSecret, this.refreshExpiry)
+		return newToken as unknown as RefreshToken
+	}
+
+	/** Check if token is expired */
+	isTokenExpired(token: string): boolean {
+		try {
+			const decoded = this.decodeToken(token) as JwtPayload | null
+			if (!decoded || !decoded.exp) return true
+			return decoded.exp < Math.floor(Date.now() / 1000)
+		} catch {
+			return true
+		}
+	}
+
+	/** Get token expiration date */
+	getTokenExpiration(token: string): Date | null {
+		try {
+			const decoded = this.decodeToken(token) as JwtPayload | null
+			if (!decoded || !decoded.exp) return null
+			return new Date(decoded.exp * 1000)
+		} catch {
+			return null
+		}
+	}
+
+	/** Clear token cache */
+	clearCache(): void {
+		this.cache?.clear()
+	}
+
+	/** Get cache statistics */
+	getCacheStats(): { size: number; maxSize: number } | null {
+		if (!this.cache) return null
+		return { size: -1, maxSize: (this.cache as any).maxSize }
+	}
+
+	/** Private helper methods */
+	private validatePayload(payload: Record<string, unknown>): void {
+		if (!payload || typeof payload !== 'object') {
+			throw new ValidationError({
+				reason: 'Payload must be a non-null object',
+			})
+		}
+		if (Object.keys(payload).length === 0) {
+			throw new ValidationError({ reason: 'Payload cannot be empty' })
+		}
+	}
+
+	private async verifyTokenWithCache(
+		token: string,
+		secret: Secret,
+		type: 'access' | 'refresh',
+	): Promise<JwtPayload> {
+		if (!token || typeof token !== 'string') {
+			throw new ValidationError({
+				reason: `${type} token must be a non-empty string`,
+			})
+		}
+
+		const cacheKey = `${type}_${token}`
+		if (this.cache) {
+			const cached = this.cache.get(cacheKey)
+			if (cached && Date.now() - cached.timestamp <= this.cacheTTL) {
+				if (!cached.valid)
+					throw new UnauthorizedError({
+						reason: `${type} token is invalid or expired`,
+					})
+				return cached.payload
+			}
+		}
+
+		const { valid, payload, error } = safeVerifyToken(token, secret)
+		if (!valid || !payload || typeof payload === 'string') {
+			this.cache?.set(cacheKey, {
+				valid: false,
+				payload: {} as JwtPayload,
+				timestamp: Date.now(),
+			})
+			throw new UnauthorizedError({
+				reason: `${type} token is invalid or expired`,
+				cause: error,
+			})
+		}
+
+		this.cache?.set(cacheKey, { valid: true, payload, timestamp: Date.now() })
+		return payload
+	}
+}
+
+===== ./src/core/jwt/extractToken.ts =====
+export interface TokenSources {
+	header?: string | undefined | null
+	cookies?: Record<string, string> | undefined
+	query?: Record<string, string | undefined> | undefined
+	body?: Record<string, unknown> | undefined
+	wsMessage?: string | Record<string, unknown> | undefined // NEW
+}
+
+/**
+ * Universal token extractor
+ */
+export function extractToken(sources: TokenSources): string | null {
+	const { header, cookies, query, body, wsMessage } = sources
+
+	// 1. Authorization: Bearer <token>
+	if (header) {
+		const parts = header.split(' ')
+		if (parts.length === 2 && parts[0] === 'Bearer') return parts[1]
+	}
+
+	// 2. Cookies: token / accessToken
+	if (cookies) {
+		if (cookies['token']) return cookies['token']
+		if (cookies['accessToken']) return cookies['accessToken']
+	}
+
+	// 3. Query params: ?token=xxx
+	if (query?.token) return query.token
+
+	// 4. Body: { token: "" }
+	if (body?.token && typeof body.token === 'string') return body.token
+
+	// 5. WebSocket message extraction (NEW)
+	if (wsMessage) {
+		try {
+			let msg: unknown = wsMessage
+
+			// If it's a JSON string → parse safely
+			if (typeof wsMessage === 'string') {
+				msg = JSON.parse(wsMessage) as unknown
+			}
+
+			// Ensure msg is an object before property access
+			if (typeof msg === 'object' && msg !== null) {
+				const m = msg as Record<string, unknown>
+				if (typeof m['token'] === 'string') return m['token'] as string
+				const auth = m['auth']
+				if (typeof auth === 'object' && auth !== null) {
+					const a = auth as Record<string, unknown>
+					if (typeof a['token'] === 'string') return a['token'] as string
+				}
+			}
+		} catch {
+			// Ignore parse errors gracefully
+		}
+	}
+
+	return null
+}
+
+===== ./src/core/jwt/verify.ts =====
+import { UnauthorizedError } from '@naman_deep_singh/errors'
+import {
+	type JwtPayload,
+	type Secret,
+	type VerifyOptions,
+	verify,
+} from 'jsonwebtoken'
+import type { VerificationResult } from './types.js'
+
+/**
+ * Verify token (throws UnauthorizedError if invalid or expired)
+ */
+export const verifyToken = (
+	token: string,
+	secret: Secret,
+): string | JwtPayload => {
+	try {
+		return verify(token, secret)
+	} catch (error: any) {
+		if (error.name === 'TokenExpiredError') {
+			throw new UnauthorizedError({ reason: 'Token has expired' }, error)
+		}
+		if (error.name === 'JsonWebTokenError') {
+			throw new UnauthorizedError({ reason: 'Invalid token' }, error)
+		}
+		throw new UnauthorizedError({ reason: 'Failed to verify token' }, error)
+	}
+}
+
+/**
+ * Verify token with options
+ */
+export const verifyTokenWithOptions = (
+	token: string,
+	secret: Secret,
+	options: VerifyOptions = {},
+): string | JwtPayload => {
+	try {
+		return verify(token, secret, options)
+	} catch (error: any) {
+		if (error.name === 'TokenExpiredError') {
+			throw new UnauthorizedError({ reason: 'Token has expired' }, error)
+		}
+		if (error.name === 'JsonWebTokenError') {
+			throw new UnauthorizedError({ reason: 'Invalid token' }, error)
+		}
+		throw new UnauthorizedError({ reason: 'Failed to verify token' }, error)
+	}
+}
+
+/**
+ * Safe verify — never throws, returns structured result with UnauthorizedError on failure
+ */
+export const safeVerifyToken = (
+	token: string,
+	secret: Secret,
+): VerificationResult => {
+	try {
+		const decoded = verify(token, secret)
+		return { valid: true, payload: decoded }
+	} catch (error: any) {
+		let wrappedError: UnauthorizedError
+
+		if (error.name === 'TokenExpiredError') {
+			wrappedError = new UnauthorizedError(
+				{ reason: 'Token has expired' },
+				error,
+			)
+		} else if (error.name === 'JsonWebTokenError') {
+			wrappedError = new UnauthorizedError({ reason: 'Invalid token' }, error)
+		} else {
+			wrappedError = new UnauthorizedError(
+				{ reason: 'Failed to verify token' },
+				error,
+			)
+		}
+
+		return { valid: false, error: wrappedError }
+	}
+}
+
+/**
+ * Safe verify with options — never throws, returns structured result with UnauthorizedError on failure
+ */
+export const safeVerifyTokenWithOptions = (
+	token: string,
+	secret: Secret,
+	options: VerifyOptions = {},
+): VerificationResult => {
+	try {
+		const decoded = verify(token, secret, options)
+		return { valid: true, payload: decoded }
+	} catch (error: any) {
+		let wrappedError: UnauthorizedError
+
+		if (error.name === 'TokenExpiredError') {
+			wrappedError = new UnauthorizedError(
+				{ reason: 'Token has expired' },
+				error instanceof Error ? error : undefined,
+			)
+		} else if (error.name === 'JsonWebTokenError') {
+			wrappedError = new UnauthorizedError(
+				{
+					reason: 'Invalid token',
+				},
+				error instanceof Error ? error : undefined,
+			)
+		} else {
+			wrappedError = new UnauthorizedError(
+				{ reason: 'Failed to verify token' },
+				error instanceof Error ? error : undefined,
+			)
+		}
+
+		return { valid: false, error: wrappedError }
+	}
+}
+
+===== ./src/core/jwt/generateTokens.ts =====
+import { TokenMalformedError } from '@naman_deep_singh/errors'
+import type { JwtPayload, Secret } from 'jsonwebtoken'
+import {
+	type AccessToken,
+	type RefreshToken,
+	type TokenPair,
+	signToken,
+	verifyToken,
+} from './index.js'
+
+// Helper function to create branded tokens
+/* const createBrandedToken = <T extends string>(token: string, _brand: T): T => {
+	return token as T
+} */
+
+export const generateTokens = (
+	payload: Record<string, unknown>,
+	accessSecret: Secret,
+	refreshSecret: Secret,
+	accessExpiry: string | number = '15m',
+	refreshExpiry: string | number = '7d',
+): TokenPair => {
+	const accessToken = signToken(payload, accessSecret, accessExpiry, {
+		algorithm: 'HS256',
+	})
+	const refreshToken = signToken(payload, refreshSecret, refreshExpiry, {
+		algorithm: 'HS256',
+	})
+
+	return {
+		accessToken: accessToken as AccessToken,
+		refreshToken: refreshToken as RefreshToken,
+	}
+}
+
+export function rotateRefreshToken(
+	oldToken: string,
+	secret: Secret,
+): RefreshToken {
+	const decoded = verifyToken(oldToken, secret)
+
+	if (typeof decoded === 'string') {
+		throw new TokenMalformedError({
+			reason: 'Invalid token payload — expected JWT payload object',
+		})
+	}
+
+	const payload: JwtPayload = { ...decoded }
+
+	delete payload.iat
+	delete payload.exp
+
+	const newToken = signToken(payload, secret, '7d')
+	return newToken as RefreshToken
+}
+
+===== ./src/core/jwt/validateToken.ts =====
+import { ValidationError } from '@naman_deep_singh/errors'
+import type { JwtPayload } from 'jsonwebtoken'
+
+export interface TokenRequirements {
+	requiredFields?: string[]
+	forbiddenFields?: string[]
+	validateTypes?: Record<string, 'string' | 'number' | 'boolean'>
+}
+
+/**
+ * Validates a JWT payload according to the provided rules.
+ * Throws ValidationError if validation fails.
+ */
+export function validateTokenPayload(
+	payload: Record<string, unknown>,
+	rules: TokenRequirements = { requiredFields: ['exp', 'iat'] },
+): void {
+	const {
+		requiredFields = [],
+		forbiddenFields = [],
+		validateTypes = {},
+	} = rules
+
+	// 1. Required fields
+	for (const field of requiredFields) {
+		if (!(field in payload)) {
+			throw new ValidationError({
+				reason: `Missing required field: ${field}`,
+			})
+		}
+	}
+
+	// 2. Forbidden fields
+	for (const field of forbiddenFields) {
+		if (field in payload) {
+			throw new ValidationError({
+				reason: `Forbidden field in token: ${field}`,
+			})
+		}
+	}
+
+	// 3. Type validation
+	for (const key in validateTypes) {
+		const expectedType = validateTypes[key]
+		if (key in payload && typeof payload[key] !== expectedType) {
+			throw new ValidationError({
+				reason: `Invalid type for ${key}. Expected ${expectedType}, got ${typeof payload[key]}`,
+			})
+		}
+	}
+}
+
+/**
+ * Checks if a JWT payload is expired.
+ * Returns true if expired or missing 'exp'.
+ */
+export function isTokenExpired(payload: JwtPayload): boolean {
+	if (!payload.exp) return true
+	return Date.now() >= payload.exp * 1000
+}
+
+===== ./src/core/jwt/signToken.ts =====
+import { ValidationError } from '@naman_deep_singh/errors'
+import { type Secret, type SignOptions, sign } from 'jsonwebtoken'
+import { parseDuration } from './index.js'
+
+function getExpiryTimestamp(seconds: number) {
+	return Math.floor(Date.now() / 1000) + seconds
+}
+
+export const signToken = (
+	payload: Record<string, unknown>,
+	secret: Secret,
+	expiresIn: string | number = '1h',
+	options: SignOptions = {},
+): string => {
+	const seconds = parseDuration(expiresIn)
+
+	if (!seconds || seconds < 10) {
+		throw new ValidationError({ reason: 'Token expiry too small' })
+	}
+
+	const tokenPayload = {
+		...payload,
+	}
+
+	if (!('exp' in payload)) tokenPayload.exp = getExpiryTimestamp(seconds)
+	if (!('iat' in payload)) tokenPayload.iat = Math.floor(Date.now() / 1000)
+
+	return sign(tokenPayload, secret, {
+		algorithm: 'HS256',
+		...options,
+	})
+}
+
+===== ./src/core/jwt/types.ts =====
+import type { JwtPayload } from 'jsonwebtoken'
+
+// Branded types to prevent token mixing
+export interface AccessTokenBrand {
+	readonly access: unique symbol
+}
+export interface RefreshTokenBrand {
+	readonly refresh: unique symbol
+}
+
+export type AccessToken = string & AccessTokenBrand
+export type RefreshToken = string & RefreshTokenBrand
+
+export interface TokenPair {
+	accessToken: AccessToken
+	refreshToken: RefreshToken
+}
+
+// Enhanced verification result types
+export interface VerificationResult<T = JwtPayload> {
+	valid: boolean
+	payload?: T | string
+	error?: Error
+}
+
+export interface TokenValidationOptions {
+	ignoreExpiration?: boolean
+	ignoreIssuedAt?: boolean
+}
+
+===== ./src/core/password/index.ts =====
+export * from './hash.js'
+export * from './strength.js'
+export * from './verify.js'
+export * from './PasswordManager.js'
+export * from './types.js'
+export * from './utils.js'
+
+===== ./src/core/password/verify.ts =====
+import { UnauthorizedError } from '@naman_deep_singh/errors'
+import bcrypt from 'bcryptjs'
+
+/**
+ * Compare a password with a stored hash asynchronously.
+ */
+export const verifyPassword = async (
+	password: string,
+	hash: string,
+): Promise<boolean> => {
+	try {
+		const result = await bcrypt.compare(password, hash)
+		if (!result)
+			throw new UnauthorizedError({ reason: 'Password verification failed' })
+		return result
+	} catch {
+		throw new UnauthorizedError({ reason: 'Password verification failed' })
+	}
+}
+
+export async function verifyPasswordWithPepper(
+	password: string,
+	pepper: string,
+	hash: string,
+) {
+	return verifyPassword(password + pepper, hash)
+}
+
+/**
+ * Compare a password with a stored hash synchronously.
+ */
+export const verifyPasswordSync = (password: string, hash: string): boolean => {
+	try {
+		const result = bcrypt.compareSync(password, hash)
+		if (!result)
+			throw new UnauthorizedError({ reason: 'Password verification failed' })
+		return result
+	} catch (_error) {
+		throw new UnauthorizedError({ reason: 'Password verification failed' })
+	}
+}
+
+export async function verifyPasswordWithPepperSync(
+	password: string,
+	pepper: string,
+	hash: string,
+) {
+	return verifyPasswordSync(password + pepper, hash)
+}
+
+===== ./src/core/password/PasswordManager.ts =====
+import crypto from 'crypto'
+import bcrypt from 'bcryptjs'
+
+import type {
+	HashedPassword,
+	IPasswordManager,
+	PasswordConfig,
+	PasswordStrength,
+	PasswordValidationResult,
+} from '../../interfaces/index.js'
+
+import { BadRequestError, ValidationError } from '@naman_deep_singh/errors'
+import { ensureValidPassword, estimatePasswordEntropy } from './utils.js'
+
+export class PasswordManager implements IPasswordManager {
+	private defaultConfig: PasswordConfig
+
+	constructor(config: PasswordConfig = {}) {
+		this.defaultConfig = {
+			saltRounds: 10,
+			minLength: 8,
+			maxLength: 128,
+			requireUppercase: true,
+			requireLowercase: true,
+			requireNumbers: true,
+			requireSpecialChars: false,
+			...config,
+		}
+	}
+
+	/**
+	 * Hash a password asynchronously using bcrypt
+	 */
+	async hash(password: string, salt?: string): Promise<HashedPassword> {
+		try {
+			ensureValidPassword(password)
+			this.validate(password)
+
+			const saltRounds = this.defaultConfig.saltRounds!
+
+			let finalSalt = salt
+			if (!finalSalt) {
+				finalSalt = await bcrypt.genSalt(saltRounds)
+			}
+
+			const hash = await bcrypt.hash(password, finalSalt)
+
+			return { hash, salt: finalSalt }
+		} catch (error) {
+			if (
+				error instanceof BadRequestError ||
+				error instanceof ValidationError
+			) {
+				throw error
+			}
+			throw new BadRequestError(
+				{ reason: 'Failed to hash password' },
+				error instanceof Error ? error : undefined,
+			)
+		}
+	}
+
+	/**
+	 * Verify password against hash and salt
+	 */
+	async verify(password: string, hash: string, salt: string): Promise<boolean> {
+		try {
+			if (!password || !hash || !salt) return false
+
+			// bcrypt compare works directly with hash
+			return await bcrypt.compare(password, hash)
+		} catch {
+			return false
+		}
+	}
+
+	/**
+	 * Generate a random password
+	 */
+	generate(length = 16, options: PasswordConfig = {}): string {
+		const config = { ...this.defaultConfig, ...options }
+
+		if (length < config.minLength! || length > config.maxLength!) {
+			throw new ValidationError({
+				reason: `Password length must be between ${config.minLength} and ${config.maxLength}`,
+			})
+		}
+
+		let charset = 'abcdefghijklmnopqrstuvwxyz'
+		if (config.requireUppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+		if (config.requireNumbers) charset += '0123456789'
+		if (config.requireSpecialChars) charset += '!@#$%^&*()_+-=[]{}|;:,.<>?'
+
+		const randomBytes = crypto.randomBytes(length)
+		let password = ''
+		for (let i = 0; i < length; i++) {
+			password += charset[randomBytes[i] % charset.length]
+		}
+
+		// Ensure requirements
+		if (config.requireUppercase && !/[A-Z]/.test(password))
+			password = password.replace(/[a-z]/, 'A')
+		if (config.requireLowercase && !/[a-z]/.test(password))
+			password = password.replace(/[A-Z]/, 'a')
+		if (config.requireNumbers && !/[0-9]/.test(password))
+			password = password.replace(/[A-Za-z]/, '0')
+		if (config.requireSpecialChars && !/[^A-Za-z0-9]/.test(password))
+			password = password.replace(/[A-Za-z0-9]/, '!')
+
+		return password
+	}
+
+	/**
+	 * Validate password against configuration
+	 */
+	validate(
+		password: string,
+		config: PasswordConfig = {},
+	): PasswordValidationResult {
+		const finalConfig = { ...this.defaultConfig, ...config }
+		const errors: string[] = []
+
+		if (!password || typeof password !== 'string')
+			errors.push('Password must be a non-empty string')
+		if (password.length < finalConfig.minLength!)
+			errors.push(
+				`Password must be at least ${finalConfig.minLength} characters`,
+			)
+		if (password.length > finalConfig.maxLength!)
+			errors.push(
+				`Password must not exceed ${finalConfig.maxLength} characters`,
+			)
+		if (finalConfig.requireUppercase && !/[A-Z]/.test(password))
+			errors.push('Password must contain at least one uppercase letter')
+		if (finalConfig.requireLowercase && !/[a-z]/.test(password))
+			errors.push('Password must contain at least one lowercase letter')
+		if (finalConfig.requireNumbers && !/[0-9]/.test(password))
+			errors.push('Password must contain at least one number')
+		if (finalConfig.requireSpecialChars && !/[^A-Za-z0-9]/.test(password))
+			errors.push('Password must contain at least one special character')
+
+		if (finalConfig.customRules) {
+			finalConfig.customRules.forEach((rule) => {
+				if (!rule.test(password)) errors.push(rule.message)
+			})
+		}
+
+		return {
+			isValid: errors.length === 0,
+			errors,
+			strength: this.checkStrength(password),
+		}
+	}
+
+	/**
+	 * Check password strength
+	 */
+	checkStrength(password: string): PasswordStrength {
+		const entropy = estimatePasswordEntropy(password)
+		let score = 0
+		const feedback: string[] = []
+		const suggestions: string[] = []
+
+		if (entropy < 28) {
+			feedback.push('Password is easy to guess')
+			suggestions.push('Use more unique characters and length')
+		} else if (entropy < 36) score++
+		else if (entropy < 60) score += 2
+		else score += 3
+
+		if (password.length >= 12) score++
+		if (password.length >= 16) score++
+
+		if (/[a-z]/.test(password)) score++
+		if (/[A-Z]/.test(password)) score++
+		if (/[0-9]/.test(password)) score++
+		if (/[^A-Za-z0-9]/.test(password)) score++
+
+		if (/^[A-Za-z]+$/.test(password)) {
+			score--
+			feedback.push('Consider adding numbers or symbols')
+		}
+		if (/^[0-9]+$/.test(password)) {
+			score -= 2
+			feedback.push('Avoid using only numbers')
+		}
+		if (/([a-zA-Z0-9])\1{2,}/.test(password)) {
+			score--
+			feedback.push('Avoid repeated characters')
+		}
+		if (/(?:012|123|234|345|456|567|678|789)/.test(password)) {
+			score--
+			feedback.push('Avoid sequential patterns')
+		}
+
+		const commonPasswords = ['password', '123456', 'qwerty', 'admin', 'letmein']
+		if (
+			commonPasswords.some((common) => password.toLowerCase().includes(common))
+		) {
+			score = 0
+			feedback.push('Avoid common passwords')
+		}
+
+		score = Math.max(0, Math.min(4, score))
+
+		let label: PasswordStrength['label']
+		switch (score) {
+			case 0:
+				label = 'very-weak'
+				suggestions.push('Use a longer password with mixed characters')
+				break
+			case 1:
+				label = 'weak'
+				suggestions.push('Add more character variety')
+				break
+			case 2:
+				label = 'fair'
+				suggestions.push('Consider increasing length or randomness')
+				break
+			case 3:
+				label = 'good'
+				suggestions.push('Your password is reasonably secure')
+				break
+			case 4:
+				label = 'strong'
+				suggestions.push('Your password is very secure')
+				break
+			default:
+				label = 'very-weak'
+		}
+
+		return { score, label, feedback, suggestions }
+	}
+
+	/**
+	 * Check if password hash needs upgrade (saltRounds change)
+	 */
+	needsUpgrade(_hash: string, _currentConfig: PasswordConfig): boolean {
+		return false
+	}
+}
+
+===== ./src/core/password/strength.ts =====
+import { BadRequestError, ValidationError } from '@naman_deep_singh/errors'
+import type { PasswordStrengthOptions } from './types.js'
+
+export const isPasswordStrong = (
+	password: string,
+	options: PasswordStrengthOptions = {},
+): boolean => {
+	if (!password)
+		throw new BadRequestError({ reason: 'Invalid password provided' })
+
+	const {
+		minLength = 8,
+		requireUppercase = true,
+		requireLowercase = true,
+		requireNumbers = true,
+		requireSymbols = false,
+	} = options
+
+	if (password.length < minLength)
+		throw new ValidationError({
+			reason: `Password must be at least ${minLength} characters long`,
+		})
+	if (requireUppercase && !/[A-Z]/.test(password))
+		throw new ValidationError({
+			reason: 'Password must include uppercase letters',
+		})
+	if (requireLowercase && !/[a-z]/.test(password))
+		throw new ValidationError({
+			reason: 'Password must include lowercase letters',
+		})
+	if (requireNumbers && !/[0-9]/.test(password))
+		throw new ValidationError({ reason: 'Password must include numbers' })
+	if (requireSymbols && !/[^A-Za-z0-9]/.test(password))
+		throw new ValidationError({ reason: 'Password must include symbols' })
+
+	return true
+}
+
+===== ./src/core/password/hash.ts =====
+import { InternalServerError } from '@naman_deep_singh/errors'
+import bcrypt from 'bcryptjs'
+import { ensureValidPassword } from './utils.js'
+
+/**
+ * Hash a password asynchronously using bcrypt.
+ */
+export const hashPassword = async (
+	password: string,
+	saltRounds = 10,
+): Promise<string> => {
+	try {
+		ensureValidPassword(password)
+		const salt = await bcrypt.genSalt(saltRounds)
+		return bcrypt.hash(password, salt)
+	} catch (error) {
+		throw new InternalServerError(
+			undefined,
+			{ reason: 'Password hashing failed' },
+			error instanceof Error ? error : undefined,
+		)
+	}
+}
+
+export function hashPasswordWithPepper(password: string, pepper: string) {
+	return hashPassword(password + pepper)
+}
+
+/**
+ * Hash a password synchronously using bcrypt.
+ */
+export const hashPasswordSync = (password: string, saltRounds = 10): string => {
+	try {
+		ensureValidPassword(password)
+		const salt = bcrypt.genSaltSync(saltRounds)
+		return bcrypt.hashSync(password, salt)
+	} catch (error) {
+		throw new InternalServerError(
+			undefined,
+			{ reason: 'Password hashing failed' },
+			error instanceof Error ? error : undefined,
+		)
+	}
+}
+
+export function hashPasswordWithPepperSync(password: string, pepper: string) {
+	return hashPasswordSync(password + pepper)
+}
+
+===== ./src/core/password/utils.ts =====
+import crypto from 'crypto'
+import { BadRequestError } from '@naman_deep_singh/errors'
+
+/**
+ * Ensure password is a valid non-empty string
+ */
+export function ensureValidPassword(password: string): void {
+	if (!password || typeof password !== 'string') {
+		throw new BadRequestError({ reason: 'Invalid password provided' })
+	}
+}
+
+/**
+ * Timing-safe comparison between two strings
+ */
+export function safeCompare(a: string, b: string): boolean {
+	const bufA = Buffer.from(a)
+	const bufB = Buffer.from(b)
+
+	if (bufA.length !== bufB.length) return false
+
+	return crypto.timingSafeEqual(bufA, bufB)
+}
+
+/**
+ * Estimate password entropy based on character pool
+ */
+export function estimatePasswordEntropy(password: string): number {
+	let pool = 0
+
+	if (/[a-z]/.test(password)) pool += 26
+	if (/[A-Z]/.test(password)) pool += 26
+	if (/[0-9]/.test(password)) pool += 10
+	if (/[^A-Za-z0-9]/.test(password)) pool += 32
+
+	// If no characters matched, fallback to 1 to avoid log2(0)
+	if (pool === 0) pool = 1
+
+	return password.length * Math.log2(pool)
+}
+
+/**
+ * Normalize password string to a consistent form
+ */
+export function normalizePassword(password: string): string {
+	return password.normalize('NFKC')
+}
+
+===== ./src/core/password/types.ts =====
+export interface PasswordStrengthOptions {
+	minLength?: number
+	requireUppercase?: boolean
+	requireLowercase?: boolean
+	requireNumbers?: boolean
+	requireSymbols?: boolean
+}
+
+===== ./src/core/crypto/CryptoManager.ts =====
+import { CryptoIntegrityError } from '@naman_deep_singh/errors'
+import {
+	decrypt as functionalDecrypt,
+	encrypt as functionalEncrypt,
+	hmacSign as functionalHmacSign,
+	hmacVerify as functionalHmacVerify,
+	randomToken as functionalRandomToken,
+} from './index.js'
+
+/**
+ * Configuration options for CryptoManager
+ */
+export interface CryptoManagerConfig {
+	defaultAlgorithm?: string
+	defaultEncoding?: BufferEncoding
+	hmacAlgorithm?: string
+}
+
+/**
+ * Default configuration
+ */
+const DEFAULT_CONFIG: Required<CryptoManagerConfig> = {
+	defaultAlgorithm: 'aes-256-gcm',
+	defaultEncoding: 'utf8',
+	hmacAlgorithm: 'sha256',
+}
+
+/**
+ * CryptoManager - Class-based wrapper for all cryptographic operations
+ * Provides a consistent interface for encryption, decryption, HMAC generation, and secure random generation
+ */
+export class CryptoManager {
+	private config: Required<CryptoManagerConfig>
+
+	constructor(config: CryptoManagerConfig = {}) {
+		this.config = { ...DEFAULT_CONFIG, ...config }
+	}
+
+	/**
+	 * Update configuration
+	 */
+	public updateConfig(config: Partial<CryptoManagerConfig>): void {
+		this.config = { ...this.config, ...config }
+	}
+
+	/**
+	 * Get current configuration
+	 */
+	public getConfig(): Required<CryptoManagerConfig> {
+		return { ...this.config }
+	}
+
+	/**
+	 * Encrypt data using the default or specified algorithm
+	 */
+	public encrypt(
+		plaintext: string,
+		key: string,
+		_options?: {
+			algorithm?: string
+			encoding?: BufferEncoding
+			iv?: string
+		},
+	): string {
+		try {
+			return functionalEncrypt(plaintext, key)
+		} catch (error) {
+			throw new CryptoIntegrityError(
+				{
+					reason: 'Encryption failed',
+				},
+				error instanceof Error ? error : undefined,
+			)
+		}
+	}
+
+	/**
+	 * Decrypt data using the default or specified algorithm
+	 */
+	public decrypt(
+		encryptedData: string,
+		key: string,
+		_options?: {
+			algorithm?: string
+			encoding?: BufferEncoding
+			iv?: string
+		},
+	): string {
+		try {
+			return functionalDecrypt(encryptedData, key)
+		} catch (error) {
+			throw new CryptoIntegrityError(
+				{
+					reason: 'Decryption failed',
+				},
+				error instanceof Error ? error : undefined,
+			)
+		}
+	}
+
+	/**
+	 * Generate HMAC signature
+	 */
+	public generateHmac(
+		data: string,
+		secret: string,
+		_options?: {
+			algorithm?: string
+			encoding?: BufferEncoding
+		},
+	): string {
+		// Use the basic HMAC sign function for now
+		// TODO: Add support for different algorithms
+		return functionalHmacSign(data, secret)
+	}
+
+	/**
+	 * Generate cryptographically secure random bytes
+	 */
+	public generateSecureRandom(
+		length: number,
+		_encoding: BufferEncoding = 'hex',
+	): string {
+		// Use the basic random token function
+		return functionalRandomToken(length)
+	}
+
+	/**
+	 * Verify HMAC signature
+	 */
+	public verifyHmac(
+		data: string,
+		secret: string,
+		signature: string,
+		_options?: {
+			algorithm?: string
+			encoding?: BufferEncoding
+		},
+	): boolean {
+		// Use the basic HMAC verify function
+		return functionalHmacVerify(data, secret, signature)
+	}
+
+	/**
+	 * Create a key derivation function using PBKDF2
+	 */
+	public deriveKey(
+		password: string,
+		salt: string,
+		iterations = 100000,
+		keyLength = 32,
+	): Promise<string> {
+		return new Promise((resolve, reject) => {
+			const crypto = require('crypto')
+
+			crypto.pbkdf2(
+				password,
+				salt,
+				iterations,
+				keyLength,
+				'sha256',
+				(error: Error | null, derivedKey: Buffer) => {
+					if (error) {
+						reject(
+							new CryptoIntegrityError(
+								{
+									reason: 'Key derivation failed',
+								},
+								error instanceof Error ? error : undefined,
+							),
+						)
+					} else {
+						resolve(derivedKey.toString('hex'))
+					}
+				},
+			)
+		})
+	}
+
+	/**
+	 * Hash data using SHA-256
+	 */
+	public sha256(data: string, encoding: BufferEncoding = 'hex'): string {
+		const crypto = require('crypto')
+		return crypto.createHash('sha256').update(data).digest(encoding)
+	}
+
+	/**
+	 * Hash data using SHA-512
+	 */
+	public sha512(data: string, encoding: BufferEncoding = 'hex'): string {
+		const crypto = require('crypto')
+		return crypto.createHash('sha512').update(data).digest(encoding)
+	}
+
+	/**
+	 * Generate a secure key pair for asymmetric encryption
+	 */
+	public generateKeyPair(options?: {
+		modulusLength?: number
+		publicKeyEncoding?: { type: string; format: string }
+		privateKeyEncoding?: { type: string; format: string }
+	}): Promise<{ publicKey: string; privateKey: string }> {
+		return new Promise((resolve, _reject) => {
+			const crypto = require('crypto')
+
+			const keyPair = crypto.generateKeyPairSync('rsa', {
+				modulusLength: options?.modulusLength || 2048,
+				publicKeyEncoding: options?.publicKeyEncoding || {
+					type: 'spki',
+					format: 'pem',
+				},
+				privateKeyEncoding: options?.privateKeyEncoding || {
+					type: 'pkcs8',
+					format: 'pem',
+				},
+			})
+
+			resolve(keyPair)
+		})
+	}
+
+	/**
+	 * Encrypt data using RSA public key
+	 */
+	public rsaEncrypt(data: string, publicKey: string): Promise<string> {
+		return new Promise((resolve, _reject) => {
+			const crypto = require('crypto')
+
+			const buffer = Buffer.from(data, 'utf8')
+			const encrypted = crypto.publicEncrypt(publicKey, buffer)
+			resolve(encrypted.toString('base64'))
+		})
+	}
+
+	/**
+	 * Decrypt data using RSA private key
+	 */
+	public rsaDecrypt(
+		encryptedData: string,
+		privateKey: string,
+	): Promise<string> {
+		return new Promise((resolve, _reject) => {
+			const crypto = require('crypto')
+
+			const buffer = Buffer.from(encryptedData, 'base64')
+			const decrypted = crypto.privateDecrypt(privateKey, buffer)
+			resolve(decrypted.toString('utf8'))
+		})
+	}
+
+	/**
+	 * Create digital signature using RSA private key
+	 */
+	public rsaSign(
+		data: string,
+		privateKey: string,
+		algorithm = 'sha256',
+	): Promise<string> {
+		return new Promise((resolve, reject) => {
+			const crypto = require('crypto')
+			try {
+				const sign = crypto.createSign(algorithm)
+				sign.update(data)
+				sign.end()
+				const signature = sign.sign(privateKey, 'base64')
+				resolve(signature)
+			} catch (error) {
+				reject(
+					new CryptoIntegrityError(
+						{
+							reason: 'RSA signing failed',
+						},
+						error instanceof Error ? error : undefined,
+					),
+				)
+			}
+		})
+	}
+
+	/**
+	 * Verify digital signature using RSA public key
+	 */
+	public rsaVerify(
+		data: string,
+		signature: string,
+		publicKey: string,
+		algorithm = 'sha256',
+	): Promise<boolean> {
+		return new Promise((resolve, reject) => {
+			const crypto = require('crypto')
+			try {
+				const verify = crypto.createVerify(algorithm)
+				verify.update(data)
+				verify.end()
+				const isValid = verify.verify(publicKey, signature, 'base64')
+				resolve(isValid)
+			} catch (error) {
+				reject(
+					new CryptoIntegrityError(
+						{
+							reason: 'RSA verification failed',
+						},
+						error instanceof Error ? error : undefined,
+					),
+				)
+			}
+		})
+	}
+}
+
+/**
+ * Create a CryptoManager instance with default configuration
+ */
+export const createCryptoManager = (
+	config?: CryptoManagerConfig,
+): CryptoManager => {
+	return new CryptoManager(config)
+}
+
+/**
+ * Default CryptoManager instance
+ */
+export const cryptoManager = new CryptoManager()
+
+===== ./src/core/crypto/index.ts =====
+export * from './CryptoManager.js'
+export * from './encrypt.js'
+export * from './decrypt.js'
+export * from './hmac.js'
+export * from './random.js'
+
+===== ./src/core/crypto/random.ts =====
+import crypto from 'crypto'
+
+/**
+ * Generate cryptographically secure random string
+ */
+export const randomToken = (length = 32): string => {
+	return crypto.randomBytes(length).toString('hex')
+}
+
+/**
+ * Generate a strong random password
+ */
+export const generateStrongPassword = (length = 16): string => {
+	return crypto.randomBytes(length).toString('hex').slice(0, length)
+}
+
+===== ./src/core/crypto/hmac.ts =====
+import crypto from 'crypto'
+
+/**
+ * Sign message using HMAC SHA-256
+ */
+export const hmacSign = (message: string, secret: string): string => {
+	return crypto.createHmac('sha256', secret).update(message).digest('hex')
+}
+
+/**
+ * Verify HMAC signature
+ */
+export const hmacVerify = (
+	message: string,
+	secret: string,
+	signature: string,
+): boolean => {
+	const expected = hmacSign(message, secret)
+
+	if (signature.length !== expected.length) return false
+
+	return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))
+}
+
+===== ./src/core/crypto/decrypt.ts =====
+import crypto from 'crypto'
+
+const ALGO = 'AES-256-GCM'
+
+export const decrypt = (data: string, secret: string): string => {
+	const [ivHex, encryptedHex] = data.split(':')
+
+	const iv = Buffer.from(ivHex, 'hex')
+	const encrypted = Buffer.from(encryptedHex, 'hex')
+
+	const key = crypto.createHash('sha256').update(secret).digest()
+	const decipher = crypto.createDecipheriv(ALGO, key, iv)
+
+	const decrypted = Buffer.concat([
+		decipher.update(encrypted),
+		decipher.final(),
+	])
+
+	return decrypted.toString('utf8')
+}
+
+===== ./src/core/crypto/encrypt.ts =====
+import crypto from 'crypto'
+
+const ALGO = 'AES-256-GCM'
+
+export const encrypt = (text: string, secret: string): string => {
+	const key = crypto.createHash('sha256').update(secret).digest()
+	const iv = crypto.randomBytes(16)
+
+	const cipher = crypto.createCipheriv(ALGO, key, iv)
+
+	const encrypted = Buffer.concat([cipher.update(text, 'utf8'), cipher.final()])
+
+	return `${iv.toString('hex')}:${encrypted.toString('hex')}`
+}
+
+===== ./tsconfig.cjs.json =====
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "strict": true,
+    "esModuleInterop": true,
+    "outDir": "dist/cjs"
+  },
+  "include": [
+    "src"
+  ]
+}
+===== ./tsconfig.esm.json =====
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "outDir": "dist/esm"
+  },
+  "include": [
+    "src"
+  ]
+}

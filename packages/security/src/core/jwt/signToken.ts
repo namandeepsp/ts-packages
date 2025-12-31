@@ -1,6 +1,6 @@
 import { ValidationError } from '@naman_deep_singh/errors'
 import { type Secret, type SignOptions, sign } from 'jsonwebtoken'
-import { parseDuration } from './parseDuration'
+import { parseDuration } from './index.js'
 
 function getExpiryTimestamp(seconds: number) {
 	return Math.floor(Date.now() / 1000) + seconds

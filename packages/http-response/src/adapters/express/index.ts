@@ -1,1 +1,1 @@
-export * from './ExpressResponder.js'
+export { ExpressResponder } from './ExpressResponder.js'

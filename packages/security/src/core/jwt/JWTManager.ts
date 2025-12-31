@@ -1,21 +1,18 @@
-import jwt, { type JwtPayload, type Secret } from 'jsonwebtoken'
-
-import type {
-	AccessToken,
-	ITokenManager,
-	JWTConfig,
-	RefreshToken,
-	TokenPair,
-} from '../../interfaces/jwt.interface'
-import { signToken } from './signToken'
-import { safeVerifyToken } from './verify'
-
 import {
 	BadRequestError,
 	UnauthorizedError,
 	ValidationError,
 } from '@naman_deep_singh/errors'
 import { LRUCache } from '@naman_deep_singh/utils'
+import jwt, { type JwtPayload, type Secret } from 'jsonwebtoken'
+import type {
+	AccessToken,
+	ITokenManager,
+	JWTConfig,
+	RefreshToken,
+	TokenPair,
+} from '../../interfaces/index.js'
+import { safeVerifyToken, signToken } from './index.js'
 
 export class JWTManager implements ITokenManager {
 	private accessSecret: Secret

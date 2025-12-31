@@ -1,8 +1,12 @@
 import { TokenMalformedError } from '@naman_deep_singh/errors'
 import type { JwtPayload, Secret } from 'jsonwebtoken'
-import { signToken } from './signToken'
-import type { AccessToken, RefreshToken, TokenPair } from './types'
-import { verifyToken } from './verify'
+import {
+	type AccessToken,
+	type RefreshToken,
+	type TokenPair,
+	signToken,
+	verifyToken,
+} from './index.js'
 
 // Helper function to create branded tokens
 /* const createBrandedToken = <T extends string>(token: string, _brand: T): T => {

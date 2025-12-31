@@ -5,11 +5,37 @@
   "type": "module",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js",
       "types": "./dist/types/index.d.ts"
+    },
+    "./core": {
+      "import": "./dist/esm/core/index.js",
+      "require": "./dist/cjs/core/index.js",
+      "types": "./dist/types/core/index.d.ts"
+    },
+    "./core/crypto": {
+      "import": "./dist/esm/core/crypto/index.js",
+      "require": "./dist/cjs/core/crypto/index.js",
+      "types": "./dist/types/core/crypto/index.d.ts"
+    },
+    "./core/jwt": {
+      "import": "./dist/esm/core/jwt/index.js",
+      "require": "./dist/cjs/core/jwt/index.js",
+      "types": "./dist/types/core/jwt/index.d.ts"
+    },
+    "./core/password": {
+      "import": "./dist/esm/core/password/index.js",
+      "require": "./dist/cjs/core/password/index.js",
+      "types": "./dist/types/core/password/index.d.ts"
+    },
+    "./interfaces": {
+      "import": "./dist/esm/interfaces/index.js",
+      "require": "./dist/cjs/interfaces/index.js",
+      "types": "./dist/types/interfaces/index.d.ts"
     }
   },
   "sideEffects": false,
@@ -19,7 +45,7 @@
   ],
   "scripts": {
     "build": "pnpm run build:types && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json",
-    "build:types": "tsc -p tsconfig.base.json --emitDeclarationOnly --outDir dist/types",
+    "build:types": "tsc -p tsconfig.types.json",
     "clean": "rimraf dist",
     "prepublishOnly": "npm run clean && npm run build"
   },
@@ -35,8 +61,8 @@
   "license": "ISC",
   "packageManager": "pnpm@10.20.0",
   "dependencies": {
-    "@naman_deep_singh/errors": "^2.1.0",
-    "@naman_deep_singh/utils": "^2.1.1",
+    "@naman_deep_singh/errors": "^2.2.3",
+    "@naman_deep_singh/utils": "^2.3.0",
     "bcryptjs": "^3.0.3",
     "jsonwebtoken": "^9.0.2"
   },

@@ -1,1 +1,1 @@
-export * from './expressMiddleware.js'
+export { responderMiddleware } from './expressMiddleware.js'

@@ -1,0 +1,2634 @@
+
+===== ./package.json =====
+{
+  "name": "@naman_deep_singh/server",
+  "version": "1.6.0",
+  "description": "Extensible server utilities for Express.js microservices with TypeScript",
+  "type": "module",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/types/index.d.ts"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "pnpm run build:types && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json",
+    "build:types": "tsc -p tsconfig.base.json --emitDeclarationOnly --outDir dist/types",
+    "clean": "rimraf dist",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "keywords": [
+    "server",
+    "express",
+    "microservices",
+    "utils",
+    "typescript"
+  ],
+  "author": "Naman Deep Singh",
+  "license": "ISC",
+  "packageManager": "pnpm@10.20.0",
+  "dependencies": {
+    "@naman_deep_singh/cache": "^1.7.0",
+    "@naman_deep_singh/errors": "^2.3.0",
+    "@naman_deep_singh/security": "^1.7.0",
+    "@types/express": "^5.0.5",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.9.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
+===== ./tsconfig.base.json =====
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "baseUrl": ".",
+    "paths": {
+      "*": ["*", "*.ts", "*.js"]
+    }
+  },
+  "include": ["src/**/*"]
+}
+===== ./tsconfig.json =====
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "baseUrl": ".",
+    "paths": {
+      "*": ["*", "*.ts", "*.js"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+===== ./output.txt =====
+
+===== ./README.md =====
+# @naman_deep_singh/server
+
+**Version:** 1.6.0 (with integrated cache & session support)
+
+Extensible server utilities for Express.js microservices with multi-protocol support, integrated caching, session management, and TypeScript.
+
+## Installation
+
+```bash
+npm install @naman_deep_singh/server
+```
+
+## Features
+
+- ✅ **Multi-protocol support** - HTTP, gRPC, JSON-RPC, WebSockets, Webhooks
+- ✅ **Integrated caching** - Redis, Memcache, in-memory with automatic fallback
+- ✅ **Session management** - Distributed session store with configurable TTL
+- ✅ **Express.js integration** with middleware collection
+- ✅ **Graceful shutdown** handling with cache/session cleanup
+- ✅ **Health checks** with custom checks and cache health integration
+- ✅ **TypeScript support** with full type safety
+
+- ✅ **Built-in middleware** - logging, validation, rate limiting, auth, caching, sessions
+
+
+## Quick Start
+
+### Basic Usage
+```typescript
+import { createServer } from '@naman_deep_singh/server';
+
+const server = createServer('My API', '1.0.0', {
+  port: 3000,
+  cors: true,
+  helmet: true
+});
+
+// Add routes
+server.app.get('/users', (req, res) => {
+  res.json({ users: [] });
+});
+
+// Start server
+await server.start();
+```
+
+## Multi-Protocol Support
+
+### HTTP + Express Routes
+```typescript
+const server = createServer('Multi-Protocol Server', '1.0.0');
+
+server.app.get('/api/users', (req, res) => {
+  res.json({ users: [] });
+});
+
+await server.start();
+```
+
+### gRPC Support
+```typescript
+// Add gRPC service (requires @grpc/grpc-js)
+server.addGrpcService(userProto.UserService.service, {
+  getUser: (call, callback) => {
+    callback(null, { id: call.request.id, name: 'John' });
+  }
+}, 50051); // Custom port
+```
+
+### JSON-RPC Support
+```typescript
+// Add JSON-RPC methods (requires jayson)
+server.addRpcMethods({
+  add: (params, callback) => {
+    callback(null, params[0] + params[1]);
+  },
+  getUser: (id, callback) => {
+    callback(null, { id, name: 'John' });
+  }
+}, '/rpc'); // Custom path
+```
+
+### WebSocket Support
+```typescript
+// Add Socket.IO (requires socket.io)
+const io = server.addSocketIO({
+  cors: true,
+  onConnection: (socket) => {
+    console.log('Client connected:', socket.id);
+    
+    socket.on('message', (data) => {
+      socket.broadcast.emit('message', data);
+    });
+  },
+  onDisconnection: (socket, reason) => {
+    console.log('Client disconnected:', socket.id, reason);
+  }
+});
+```
+
+### Webhook Support
+```typescript
+// Add secure webhooks
+server.addWebhook({
+  path: '/webhooks/github',
+  secret: process.env.GITHUB_WEBHOOK_SECRET,
+  handler: async (payload, headers) => {
+    if (payload.action === 'opened') {
+      console.log('New PR opened:', payload.pull_request.title);
+    }
+  }
+});
+
+server.addWebhook({
+  path: '/webhooks/stripe',
+  secret: process.env.STRIPE_WEBHOOK_SECRET,
+  handler: async (payload) => {
+    if (payload.type === 'payment_intent.succeeded') {
+      // Handle successful payment
+    }
+  }
+});
+```
+
+## Built-in Middleware
+
+
+### Logging Middleware
+```typescript
+import { createLoggingMiddleware } from '@naman_deep_singh/server';
+
+// Direct usage
+server.app.use(createLoggingMiddleware('detailed'));
+```
+
+### Validation Middleware
+```typescript
+import { validateFields } from '@naman_deep_singh/server';
+
+server.app.post('/users', validateFields([
+  { field: 'email', required: true, type: 'email' },
+  { field: 'password', required: true, minLength: 8 },
+  { field: 'age', type: 'number', custom: (value) => value >= 18 || 'Must be 18+' }
+]), (req, res) => {
+  // Validation passed
+  res.json({ success: true });
+});
+```
+
+### Rate Limiting
+```typescript
+import { rateLimit } from '@naman_deep_singh/server';
+
+server.app.use('/api', rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  maxRequests: 100,
+  message: 'Too many requests'
+}));
+```
+
+
+### Authentication Middleware
+```typescript
+import { requireAuth } from '@naman_deep_singh/server';
+
+server.app.use('/protected', requireAuth({
+  secret: process.env.JWT_SECRET!,
+  unauthorizedMessage: 'Invalid or expired token'
+}));
+```
+
+**Advanced Configuration:**
+```typescript
+import { createAuthMiddleware } from '@naman_deep_singh/server';
+
+server.app.use('/api', createAuthMiddleware({
+  secret: process.env.JWT_SECRET!,
+  unauthorizedMessage: 'Access denied',
+  tokenExtractor: (req) => {
+    // Custom token extraction logic
+    // By default, uses sophisticated extractToken from @naman_deep_singh/security
+    // that checks Authorization headers, cookies, query params, and body
+    return req.headers.authorization?.substring(7);
+  }
+}));
+```
+
+## Health Checks
+
+
+### Basic Health Check
+```typescript
+import { createHealthCheck } from '@naman_deep_singh/server';
+
+// The health check is automatically enabled when healthCheck is not false
+// Health endpoint is available at /health by default
+
+// If you need to customize or disable it:
+server.app.get('/health', createHealthCheck());
+```
+
+## Server Management
+
+### Server Information
+```typescript
+const info = server.getInfo();
+console.log(info);
+// {
+//   name: 'My API',
+//   version: '1.0.0',
+//   port: 3000,
+//   uptime: 12345,
+//   status: 'running',
+//   startTime: Date
+// }
+```
+
+### Graceful Shutdown
+```typescript
+const server = createServer('My API', '1.0.0', {
+  gracefulShutdown: true // Enabled by default
+});
+
+// Handles SIGINT and SIGTERM
+process.on('SIGINT', async () => {
+  await server.stop();
+  process.exit(0);
+});
+```
+
+## Configuration Options
+
+```typescript
+interface ServerConfig {
+  port?: number;                    // Default: 3000
+  cors?: boolean | CorsOptions;     // Default: true
+  helmet?: boolean;                 // Default: true
+  json?: boolean;                   // Default: true
+  customMiddleware?: RequestHandler[];
+  healthCheck?: boolean | string;   // Default: true
+  gracefulShutdown?: boolean;       // Default: true
+  socketIO?: SocketIOConfig;
+}
+```
+
+## Environment Utilities
+
+```typescript
+import { getEnv, getEnvNumber, getEnvBoolean } from '@naman_deep_singh/server';
+
+// Get string environment variable
+const dbUrl = getEnv('DATABASE_URL'); // Throws if missing
+const dbUrl = getEnv('DATABASE_URL', 'localhost'); // With default
+
+// Get number environment variable
+const port = getEnvNumber('PORT', 3000);
+const maxConnections = getEnvNumber('MAX_CONNECTIONS'); // Throws if missing
+
+// Get boolean environment variable
+const enableLogging = getEnvBoolean('ENABLE_LOGGING', true);
+const isProduction = getEnvBoolean('NODE_ENV'); // Must be 'true' or 'false'
+```
+
+## Periodic Health Monitoring
+
+```typescript
+import { PeriodicHealthMonitor } from '@naman_deep_singh/server';
+
+const server = createServer('My API', '1.0.0', {
+  periodicHealthCheck: {
+    enabled: true,
+    interval: 30000, // 30 seconds
+    services: [
+      {
+        name: 'database',
+        url: 'http://localhost:5432/health',
+        timeout: 5000
+      },
+      {
+        name: 'redis',
+        url: 'http://localhost:6379/ping'
+      }
+    ]
+  }
+});
+
+// Manual health check
+const monitor = new PeriodicHealthMonitor(config, 'My Service');
+monitor.start();
+const status = await monitor.getHealthStatus();
+console.log(status); // { database: true, redis: false }
+```
+
+## Express Re-exports
+
+```typescript
+// Import Express types and classes directly from server
+import { Request, Response, NextFunction, Router, Application } from '@naman_deep_singh/server';
+import type { RequestHandler, ErrorRequestHandler } from '@naman_deep_singh/server';
+
+// No need to install Express separately in your services
+
+## TypeScript Notes
+
+- This package includes TypeScript augmentations for Express `Request` and `Application` that expose runtime helpers used by the middleware (for example `req.cache`, `req.sessionStore`, `req.getSession`, and `req.createSession`). Installing and importing `@naman_deep_singh/server` in your project will surface these types automatically.
+- Middleware that attaches runtime props uses `unknown` internally and runtime guards — prefer the provided helpers rather than casting `req` to `any`.
+
+```
+
+## API Reference
+
+### Core Functions
+- `createServer(name?, version?, config?)` - Create server instance
+- `ExpressServer` - Server class for advanced usage
+
+### Environment Utilities
+- `getEnv(key, defaultValue?)` - Get string environment variable
+- `getEnvNumber(key, defaultValue?)` - Get number environment variable  
+- `getEnvBoolean(key, defaultValue?)` - Get boolean environment variable
+
+### Health Monitoring
+- `PeriodicHealthMonitor` - Automated service health checking
+
+### Middleware Functions
+- `createLoggingMiddleware(format?)` - Request logging
+- `createErrorHandler()` - Error handling
+- `createValidationMiddleware(rules)` - Input validation
+- `createRateLimitMiddleware(config?)` - Rate limiting
+- `createAuthMiddleware(config)` - Authentication
+
+### Health & Monitoring
+- `createHealthCheck(config?)` - Create health check middleware
+- `withHealthCheck(path?, config?)` - Health check plugin
+- `addHealthCheck(app, path?, config?)` - Add health check to app
+- `PeriodicHealthMonitor` - Automated service health checking
+
+### Graceful Shutdown
+- `createGracefulShutdown(server, config?)` - Setup graceful shutdown
+- `startServerWithShutdown(app, port, config?)` - Start with shutdown handling
+
+## Dependencies
+
+### Required
+- **express** - Web framework (v5.1.0+)
+
+### Optional (for specific features)
+- **cors** - CORS middleware (if using CORS)
+- **helmet** - Security middleware (if using Helmet)
+- **cookie-parser** - Cookie parsing (if using cookies)
+- **@grpc/grpc-js** - For gRPC support
+- **jayson** - For JSON-RPC support
+- **socket.io** - For WebSocket support
+
+## Response Format
+
+All middleware responses follow the consistent format:
+
+```json
+{
+  "success": true/false,
+  "message": "Operation message",
+  "data": {...} | undefined,
+  "error": {
+    "message": "Error message",
+    "details": {...}
+  } | null,
+  "meta": {...} | null
+}
+```
+
+### Integration with @naman_deep_singh/http-response
+
+For advanced error handling, use with `@naman_deep_singh/errors`:
+
+```typescript
+import { expressErrorHandler } from '@naman_deep_singh/errors';
+
+// Replace basic error handler with advanced one
+server.app.use(expressErrorHandler);
+```
+
+### Integration with @naman_deep_singh/http-response
+
+For consistent API responses, use with `@naman_deep_singh/http-response`:
+
+```typescript
+import { responderMiddleware } from '@naman_deep_singh/http-response';
+
+server.app.use(responderMiddleware());
+
+// Now use responder in routes
+server.app.get('/users', (req, res) => {
+  const responder = (res as any).responder();
+  return responder.okAndSend({ users: [] });
+});
+```
+
+## Cache & Session Integration
+
+Built-in support for distributed caching and session management (disabled by default).
+
+### Enable Redis Cache
+
+```typescript
+const server = createServer('My API', '1.0.0', {
+  port: 3000,
+  cache: {
+    enabled: true,
+    adapter: 'redis',
+    options: {
+      host: 'localhost',
+      port: 6379,
+      password: 'your_password'
+    },
+    defaultTTL: 3600 // seconds
+  }
+});
+
+// Access cache in routes
+server.app.get('/user/:id', async (req, res) => {
+  const key = `user:${req.params.id}`;
+  const cached = await (req as any).cache.get(key);
+  if (cached) return res.json(cached);
+
+  // Fetch from DB, then cache
+  const user = { id: req.params.id, name: 'John' };
+  await (req as any).cache.set(key, user, 3600);
+  return res.json(user);
+});
+```
+
+### Enable Redis Cluster Cache
+
+```typescript
+const server = createServer('My API', '1.0.0', {
+  port: 3000,
+  cache: {
+    enabled: true,
+    adapter: 'redis',
+    options: {
+      cluster: [
+        { host: 'redis-node-1', port: 6379 },
+        { host: 'redis-node-2', port: 6379 },
+        { host: 'redis-node-3', port: 6379 }
+      ]
+    }
+  }
+});
+```
+
+### Enable Memcache
+
+```typescript
+const server = createServer('My API', '1.0.0', {
+  port: 3000,
+  cache: {
+    enabled: true,
+    adapter: 'memcache',
+    options: {
+      servers: ['localhost:11211', 'localhost:11212']
+    }
+  }
+});
+```
+
+### Enable Sessions
+
+```typescript
+const server = createServer('My API', '1.0.0', {
+  port: 3000,
+  cache: {
+    enabled: true,
+    adapter: 'redis',
+    options: { host: 'localhost', port: 6379 }
+  },
+  session: {
+    enabled: true,
+    cookieName: 'my_app.sid', // Defaults to {servername}.sid
+    ttl: 3600, // 1 hour
+    cookieOptions: {
+      httpOnly: true,
+      secure: true, // HTTPS only
+      sameSite: 'strict'
+    }
+  }
+});
+
+// Use sessions in routes
+server.app.post('/login', async (req, res) => {
+  const sessionStore = (req.app as any).locals.sessionStore;
+  const sessionId = Math.random().toString(36).substring(7);
+
+  await sessionStore.create(sessionId, {
+    userId: 123,
+    username: 'john_doe',
+    loginTime: new Date()
+  });
+
+  res.cookie((req.app as any).locals.sessionCookieName, sessionId, {
+    httpOnly: true,
+    secure: true
+  });
+
+  return res.json({ message: 'Logged in' });
+});
+
+server.app.get('/profile', async (req, res) => {
+  const sessionId = (req as any).sessionId;
+  if (!sessionId) return res.status(401).json({ error: 'No session' });
+
+  const session = await (req as any).getSession();
+  if (!session) return res.status(401).json({ error: 'Session expired' });
+
+  return res.json({ user: session.username, loginTime: session.loginTime });
+});
+```
+
+### Per-Route Response Caching
+
+```typescript
+import { cacheResponse } from '@naman_deep_singh/server';
+
+// Cache GET response for 1 hour (3600 seconds)
+server.app.get('/api/posts', cacheResponse(3600), (req, res) => {
+  // This endpoint's response is cached
+  res.json({ posts: [...] });
+});
+
+// Cache with default TTL from server config
+server.app.get('/api/trending', cacheResponse(), (req, res) => {
+  res.json({ trending: [...] });
+});
+```
+
+### Health Check with Cache Status
+
+```typescript
+const server = createServer('My API', '1.0.0', {
+  healthCheck: '/health', // Automatic health endpoint
+  cache: { enabled: true, adapter: 'redis', ... }
+});
+
+// Health endpoint now includes cache status
+// GET /health returns:
+// {
+//   "status": "healthy",
+//   "service": "My API",
+//   "version": "1.0.0",
+//   "uptime": 12345,
+//   "timestamp": "2025-12-12T...",
+//   "cache": {
+//     "isAlive": true,
+//     "adapter": "redis",
+//     "timestamp": "2025-12-12T..."
+//   }
+// }
+```
+
+### Cache Configuration Options
+
+All configuration is optional — cache and session are disabled by default:
+
+```typescript
+interface CacheConfig {
+  enabled?: boolean;          // Default: false
+  adapter?: 'redis' | 'memcache' | 'memory'; // Default: 'memory'
+  options?: {
+    // Redis single instance
+    host?: string;           // Default: 'localhost'
+    port?: number;           // Default: 6379
+    username?: string;
+    password?: string;
+    db?: number;             // 0-15
+    tls?: boolean;
+    
+    // Redis cluster
+    cluster?: Array<{ host: string; port: number }> | {
+      nodes: Array<{ host: string; port: number }>;
+      options?: { maxRedirections?: number; ... };
+    };
+    
+    // Memcache
+    servers?: string | string[]; // e.g., 'localhost:11211'
+    
+    namespace?: string;      // Key prefix
+    ttl?: number;           // Default TTL in seconds
+  };
+  defaultTTL?: number;        // Fallback TTL for routes
+}
+
+interface SessionConfig {
+  enabled?: boolean;          // Default: false
+  cookieName?: string;        // Default: {servername}.sid
+  ttl?: number;              // Default: 3600 (1 hour)
+  cookieOptions?: {
+    path?: string;
+    httpOnly?: boolean;      // Default: true
+    secure?: boolean;        // HTTPS only
+    sameSite?: 'lax' | 'strict' | 'none';
+  };
+}
+```
+
+### Graceful Shutdown
+
+Cache and session stores are automatically closed on graceful shutdown:
+
+```typescript
+const server = createServer('My API', '1.0.0', {
+  gracefulShutdown: true, // Enabled by default
+  cache: { enabled: true, adapter: 'redis', ... },
+  session: { enabled: true, ... }
+});
+
+// On SIGTERM/SIGINT, server will:
+// 1. Stop accepting requests
+// 2. Close cache connection (Redis/Memcache)
+// 3. Close session store
+// 4. Exit gracefully
+```
+
+## Feature Flags
+
+All major features can be toggled independently:
+
+```typescript
+const server = createServer('My API', '1.0.0', {
+  port: 3000,
+  cors: true,              // Default: true
+  helmet: true,            // Default: true
+  json: true,              // Default: true
+  cookieParser: false,     // Default: false
+  healthCheck: '/health',  // Default: true
+  gracefulShutdown: true,  // Default: true
+  cache: { enabled: false }, // Default: disabled
+  session: { enabled: false }, // Default: disabled
+  socketIO: { enabled: false }, // Default: disabled
+  periodicHealthCheck: { // Default: disabled
+    enabled: false,
+    interval: 30000,
+    services: [...]
+  }
+});
+```
+===== ./src/index.ts =====
+// Core server utilities
+export { ExpressServer, createServer } from './core/server'
+export type {
+	ServerInstance,
+	ServerInfo,
+	GrpcService,
+	RpcMethod,
+	WebhookConfig,
+} from './core/server'
+
+// Express re-exports (to avoid direct Express dependency in services)
+export { Request, Response, NextFunction, Router, Application } from 'express'
+export type { RequestHandler, ErrorRequestHandler } from 'express'
+
+// Health check utilities
+export {
+	createHealthCheck,
+	withHealthCheck,
+	addHealthCheck,
+} from './core/health'
+
+// Graceful shutdown utilities
+export {
+	createGracefulShutdown,
+	withGracefulShutdown,
+	startServerWithShutdown,
+} from './core/shutdown'
+
+// Middleware utilities
+export {
+	createLoggingMiddleware,
+	createErrorHandler,
+	createRequestIdMiddleware,
+	createValidationMiddleware,
+	createRateLimitMiddleware,
+	createAuthMiddleware,
+	withLogging,
+	withErrorHandler,
+	withRequestId,
+	withValidation,
+	withRateLimit,
+	withAuth,
+	validateFields,
+	rateLimit,
+	requireAuth,
+	cacheResponse,
+	useSession,
+	type ValidationRule,
+	type RateLimitConfig,
+	type AuthConfig,
+} from './middleware'
+
+// Utility functions
+export {
+	getEnv,
+	getEnvNumber,
+	getEnvBoolean,
+} from './utils/utils'
+
+// Periodic health monitoring
+export { PeriodicHealthMonitor } from './core/periodic-health'
+
+// Types
+export type {
+	ServerConfig,
+	HealthCheckConfig,
+	HealthCheck,
+	GracefulShutdownConfig,
+	ServerPlugin,
+	SocketIOConfig,
+	SocketInstance,
+	PeriodicHealthCheckConfig,
+	HealthCheckService,
+} from './types'
+
+import {
+	addHealthCheck,
+	createHealthCheck,
+	withHealthCheck,
+} from './core/health'
+import { PeriodicHealthMonitor } from './core/periodic-health'
+// Import all exports for default export
+import { ExpressServer, createServer } from './core/server'
+import {
+	createGracefulShutdown,
+	startServerWithShutdown,
+	withGracefulShutdown,
+} from './core/shutdown'
+import {
+	createAuthMiddleware,
+	createErrorHandler,
+	createLoggingMiddleware,
+	createRateLimitMiddleware,
+	createRequestIdMiddleware,
+	createValidationMiddleware,
+	rateLimit,
+	requireAuth,
+	validateFields,
+	withAuth,
+	withErrorHandler,
+	withLogging,
+	withRateLimit,
+	withRequestId,
+	withValidation,
+} from './middleware'
+import { getEnv, getEnvBoolean, getEnvNumber } from './utils/utils'
+
+// Default export for namespace usage
+const ServerUtils = {
+	// Server creation
+	createServer,
+	ExpressServer,
+
+	// Health checks
+	createHealthCheck,
+	withHealthCheck,
+	addHealthCheck,
+
+	// Graceful shutdown
+	createGracefulShutdown,
+	withGracefulShutdown,
+	startServerWithShutdown,
+
+	// Middleware
+	createLoggingMiddleware,
+	createErrorHandler,
+	createRequestIdMiddleware,
+	createValidationMiddleware,
+	createRateLimitMiddleware,
+	createAuthMiddleware,
+	withLogging,
+	withErrorHandler,
+	withRequestId,
+	withValidation,
+	withRateLimit,
+	withAuth,
+	validateFields,
+	rateLimit,
+	requireAuth,
+
+	// Utils
+	getEnv,
+	getEnvNumber,
+	getEnvBoolean,
+
+	// Periodic Health Monitoring
+	PeriodicHealthMonitor,
+}
+
+export default ServerUtils
+
+===== ./src/utils/index.ts =====
+// Environment utilities
+export { getEnv, getEnvNumber, getEnvBoolean } from './utils.js'
+===== ./src/utils/utils.ts =====
+export function getEnv(key: string, defaultValue?: string): string {
+	const value = process.env[key]
+	if (value === undefined) {
+		if (defaultValue === undefined) {
+			throw new Error(`Environment variable ${key} is required`)
+		}
+		return defaultValue
+	}
+	return value // empty string allowed
+}
+
+export function getEnvNumber(key: string, defaultValue?: number): number {
+	const value = process.env[key]
+	if (value === undefined) {
+		if (defaultValue === undefined) {
+			throw new Error(`Environment variable ${key} is required`)
+		}
+		return defaultValue
+	}
+
+	const parsed = Number(value)
+	if (Number.isNaN(parsed)) {
+		throw new Error(`Environment variable ${key} must be a valid number`)
+	}
+	return parsed
+}
+
+export function getEnvBoolean(key: string, defaultValue?: boolean): boolean {
+	const value = process.env[key]
+	if (value === undefined) {
+		if (defaultValue === undefined) {
+			throw new Error(`Environment variable ${key} is required`)
+		}
+		return defaultValue
+	}
+
+	const normalized = value.toLowerCase()
+	if (normalized !== 'true' && normalized !== 'false') {
+		throw new Error(`Environment variable ${key} must be 'true' or 'false'`)
+	}
+
+	return normalized === 'true'
+}
+
+===== ./src/middleware/auth.middleware.ts =====
+import {
+	TokenExpiredError,
+	TokenMalformedError,
+	UnauthorizedError,
+} from '@naman_deep_singh/errors'
+import { extractToken, safeVerifyToken } from '@naman_deep_singh/security'
+
+import type { NextFunction, Request, RequestHandler, Response } from 'express'
+
+export interface AuthConfig {
+	secret: string
+	tokenExtractor?: (req: Request) => string | null
+}
+
+export function createAuthMiddleware(config: AuthConfig): RequestHandler {
+	const {
+		secret,
+		tokenExtractor = (req) =>
+			extractToken({
+				header: req.headers.authorization || undefined,
+				cookies: req.cookies,
+				query: req.query as Record<string, any>,
+				body: req.body,
+			}),
+	} = config
+
+	return async (req: Request, _res: Response, next: NextFunction) => {
+		try {
+			// 1️⃣ Extract token
+			const token = tokenExtractor(req)
+
+			if (!token) {
+				// No cause → client mistake
+				return next(
+					new TokenMalformedError({
+						reason: 'No token provided',
+					}),
+				)
+			}
+
+			// 2️⃣ Verify token
+			const result = safeVerifyToken(token, secret)
+
+			if (!result.valid) {
+				// Token expired
+				if (result.error?.name === 'TokenExpiredError') {
+					return next(
+						new TokenExpiredError(
+							{ reason: 'Token expired' },
+							result.error, // ✅ cause
+						),
+					)
+				}
+
+				// Token invalid / malformed
+				return next(
+					new TokenMalformedError(
+						{
+							reason: 'Invalid token',
+						},
+						result.error, // ✅ cause
+					),
+				)
+			}
+
+			// 3️⃣ Attach payload
+			req.user = result.payload
+			next()
+		} catch (error) {
+			// Unexpected error → always pass cause
+			return next(
+				new UnauthorizedError(
+					{ reason: 'Authentication failed' },
+					error instanceof Error ? error : undefined,
+				),
+			)
+		}
+	}
+}
+
+===== ./src/middleware/index.ts =====
+// Authentication Middleware
+export { type AuthConfig, createAuthMiddleware } from './auth.middleware.js'
+
+// Cache Middleware
+export { cacheResponse } from './cache.middleware.js'
+
+// Error Handler Middleware
+export { createErrorHandler } from './errorHandler.middleware.js'
+
+// Logging Middleware
+export { createLoggingMiddleware } from './logging.middleware.js'
+
+// Rate Limiter Middleware
+export {
+	type RateLimitConfig,
+	createRateLimitMiddleware,
+} from './rateLimiter.middleware.js'
+
+// Request ID Middleware
+export { createRequestIdMiddleware } from './requestId.middleware.js'
+
+// Session Middleware
+export { useSession } from './session.middleware.js'
+
+// Validation Middleware
+export {
+	type ValidationRule,
+	createValidationMiddleware,
+} from './validation.middleware.js'
+
+// Plugin middleware functions (for application-level middleware)
+export {
+	withLogging,
+	withErrorHandler,
+	withRequestId,
+	withValidation,
+	withRateLimit,
+	withAuth,
+} from './plugins.middleware.js'
+
+// Convenience middleware functions (for route-level middleware)
+export {
+	validateFields,
+	rateLimit,
+	requireAuth,
+} from './plugins.middleware.js'
+===== ./src/middleware/logging.middleware.ts =====
+import type {
+	NextFunction,
+	Request,
+	RequestHandler,
+	Response,
+} from 'express'
+
+// Logging middleware
+export function createLoggingMiddleware(
+	format: 'simple' | 'detailed' = 'simple',
+): RequestHandler {
+	return (req: Request, res: Response, next: NextFunction) => {
+		const start = Date.now()
+
+		res.on('finish', () => {
+			const duration = Date.now() - start
+
+			if (format === 'detailed') {
+				console.log(
+					`${req.method} ${req.url} - ${res.statusCode} - ${duration}ms - ${req.ip}`,
+				)
+			} else {
+				console.log(`${req.method} ${req.url} - ${res.statusCode}`)
+			}
+		})
+
+		next()
+	}
+}
+
+===== ./src/middleware/requestId.middleware.ts =====
+import type {
+	NextFunction,
+	Request,
+	RequestHandler,
+	Response,
+} from 'express'
+
+// Request ID middleware
+export function createRequestIdMiddleware(): RequestHandler {
+	return (req: Request, res: Response, next: NextFunction) => {
+		const requestId = Math.random().toString(36).substring(2, 15)
+		req.requestId = requestId
+		res.setHeader('X-Request-ID', requestId)
+		next()
+	}
+}
+
+===== ./src/middleware/plugins.middleware.ts =====
+import { createAuthMiddleware } from './auth.middleware'
+import { createErrorHandler } from './errorHandler.middleware'
+import { createLoggingMiddleware } from './logging.middleware'
+import { createRateLimitMiddleware } from './rateLimiter.middleware'
+import { createRequestIdMiddleware } from './requestId.middleware'
+import { createValidationMiddleware } from './validation.middleware'
+
+import type { Application, RequestHandler } from 'express'
+import type { ServerPlugin } from '../types'
+import type { AuthConfig } from './auth.middleware'
+import type { RateLimitConfig } from './rateLimiter.middleware'
+import type { ValidationRule } from './validation.middleware'
+
+// Plugin versions
+export function withLogging(
+	format: 'simple' | 'detailed' = 'simple',
+): ServerPlugin {
+	return (app: Application) => {
+		app.use(createLoggingMiddleware(format))
+	}
+}
+
+export function withErrorHandler(): ServerPlugin {
+	return (app: Application) => {
+		app.use(createErrorHandler())
+	}
+}
+
+export function withRequestId(): ServerPlugin {
+	return (app: Application) => {
+		app.use(createRequestIdMiddleware())
+	}
+}
+
+export function withValidation(rules: ValidationRule[]): ServerPlugin {
+	return (app: Application) => {
+		app.use(createValidationMiddleware(rules))
+	}
+}
+
+export function withRateLimit(config: RateLimitConfig = {}): ServerPlugin {
+	return (app: Application) => {
+		app.use(createRateLimitMiddleware(config))
+	}
+}
+
+export function withAuth(config: AuthConfig): ServerPlugin {
+	return (app: Application) => {
+		app.use(createAuthMiddleware(config))
+	}
+}
+
+// Convenience functions for route-specific middleware
+export function validateFields(rules: ValidationRule[]): RequestHandler {
+	return createValidationMiddleware(rules)
+}
+
+export function rateLimit(config: RateLimitConfig = {}): RequestHandler {
+	return createRateLimitMiddleware(config)
+}
+
+export function requireAuth(config: AuthConfig): RequestHandler {
+	return createAuthMiddleware(config)
+}
+
+===== ./src/middleware/cache.middleware.ts =====
+import type {
+	NextFunction,
+	Request,
+	RequestHandler,
+	Response,
+} from 'express'
+
+// Cache response middleware (per-route opt-in)
+export function cacheResponse(ttl?: number): RequestHandler {
+	return async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			if (req.method !== 'GET') return next()
+
+			const cache = (req.cache ?? req.app.locals.cache) as
+				| { get?: Function; set?: Function }
+				| undefined
+			const defaultTTL = req.app.locals.cacheDefaultTTL as number | undefined
+			if (!cache || typeof cache.get !== 'function') return next()
+
+			const key = `${req.originalUrl}`
+			try {
+				const cached = await (cache.get as Function)(key)
+				if (cached !== null && cached !== undefined) {
+					res.setHeader('X-Cache', 'HIT')
+					return res.json(cached)
+				}
+			} catch (cacheErr) {
+				console.error(`[Cache] Failed to retrieve key "${key}":`, cacheErr)
+				// Continue without cache hit
+			}
+
+			const originalJson = res.json.bind(res)
+			res.json = (body: unknown) => {
+				try {
+					const expiry = ttl ?? defaultTTL
+					if (expiry && cache && typeof cache.set === 'function') {
+						; (cache.set as Function)(key, body, expiry).catch(
+							(err: unknown) => {
+								console.error(
+									`[Cache] Failed to set key "${key}" with TTL ${expiry}:`,
+									err,
+								)
+							},
+						)
+					} else if (cache) {
+						if (typeof cache.set === 'function') {
+							; (cache.set as Function)(key, body).catch((err: unknown) => {
+								console.error(`[Cache] Failed to set key "${key}":`, err)
+							})
+						}
+					}
+				} catch (e) {
+					console.error(`[Cache] Error during cache.set operation:`, e)
+				}
+				res.setHeader('X-Cache', 'MISS')
+				return originalJson(body)
+			}
+
+			next()
+		} catch (error) {
+			console.error(
+				'[Cache] Unexpected error in cacheResponse middleware:',
+				error,
+			)
+			next()
+		}
+	}
+}
+
+===== ./src/middleware/errorHandler.middleware.ts =====
+import type {
+	ErrorRequestHandler,
+	NextFunction,
+	Request,
+	Response,
+} from 'express'
+
+import { AppError } from '@naman_deep_singh/errors'
+
+export function createErrorHandler(): ErrorRequestHandler {
+	return (error: unknown, _req: Request, res: Response, next: NextFunction) => {
+		if (res.headersSent) {
+			return next(error)
+		}
+
+		// Use responder if available
+		const responder = (res as any).responder?.() ?? null
+
+		// Known application error
+		if (error instanceof AppError) {
+			if (responder) {
+				return responder
+					.status(error.statusCode)
+					.error(error.code, error.details)
+			}
+
+			// Fallback (if responder middleware is not mounted)
+			return res.status(error.statusCode).json({
+				success: false,
+				message: error.code,
+				error: {
+					message: error.code,
+					details: error.details,
+				},
+				data: undefined,
+				meta: null,
+			})
+		}
+
+		// Unknown / unhandled error
+		console.error('Unhandled error:', error)
+
+		const status = 500
+		const message = 'Internal Server Error'
+
+		if (responder) {
+			return responder.status(status).error(message)
+		}
+
+		// Final fallback
+		return res.status(status).json({
+			success: false,
+			message,
+			error: { message },
+			data: undefined,
+			meta: null,
+		})
+	}
+}
+
+===== ./src/middleware/rateLimiter.middleware.ts =====
+import type {
+	NextFunction,
+	Request,
+	RequestHandler,
+	Response,
+} from 'express'
+
+// Rate limiting middleware
+export interface RateLimitConfig {
+	windowMs?: number
+	maxRequests?: number
+	message?: string
+	keyGenerator?: (req: Request) => string
+}
+
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>()
+
+export function createRateLimitMiddleware(
+	config: RateLimitConfig = {},
+): RequestHandler {
+	const {
+		windowMs = 15 * 60 * 1000,
+		maxRequests = 100,
+		message = 'Too many requests, please try again later',
+		keyGenerator = (req) => req.ip || 'unknown',
+	} = config
+
+	return (req: Request, res: Response, next: NextFunction) => {
+		const key = keyGenerator(req)
+		const now = Date.now()
+		const record = rateLimitStore.get(key)
+
+		if (!record || now > record.resetTime) {
+			rateLimitStore.set(key, {
+				count: 1,
+				resetTime: now + windowMs,
+			})
+			return next()
+		}
+
+		if (record.count >= maxRequests) {
+			return res.status(429).json({
+				success: false,
+				message,
+				data: undefined,
+				error: {
+					message,
+					details: {
+						retryAfter: Math.ceil((record.resetTime - now) / 1000),
+					},
+				},
+				meta: null,
+			})
+		}
+
+		record.count++
+		next()
+	}
+}
+
+===== ./src/middleware/session.middleware.ts =====
+import type {
+	NextFunction,
+	Request,
+	RequestHandler,
+	Response,
+} from 'express'
+
+// Session middleware helper (attaches sessionStore and helpers to req)
+export function useSession(cookieName?: string): RequestHandler {
+	return async (req: Request, _res: Response, next: NextFunction) => {
+		try {
+			const store = req.app.locals.sessionStore as
+				| { get?: Function; create?: Function }
+				| undefined
+			if (!store) return next()
+
+			const name =
+				cookieName || (req.app.locals.sessionCookieName as string) || 'sid'
+			let sid: string | undefined = (
+				req.cookies as Record<string, string> | undefined
+			)?.[name]
+
+			if (!sid) {
+				const cookieHeader = req.headers.cookie
+				if (cookieHeader) {
+					const match = cookieHeader
+						.split(';')
+						.map((s) => s.trim())
+						.find((s) => s.startsWith(`${name}=`))
+					if (match) sid = match.split('=')[1]
+				}
+			}
+
+			req.sessionId = sid
+			req.sessionStore = store
+
+			req.getSession = async () => {
+				if (!sid) return null
+				try {
+					return await (store.get as Function)(sid)
+				} catch (error) {
+					console.error(`[Session] Failed to get session "${sid}":`, error)
+					throw error
+				}
+			}
+
+			req.createSession = async (
+				id: string,
+				data: Record<string, unknown>,
+				ttl?: number,
+			) => {
+				try {
+					return await (store.create as Function)(id, data, ttl)
+				} catch (error) {
+					console.error(`[Session] Failed to create session "${id}":`, error)
+					throw error
+				}
+			}
+
+			next()
+		} catch (error) {
+			console.error(
+				'[Session] Unexpected error in useSession middleware:',
+				error,
+			)
+			next()
+		}
+	}
+}
+
+===== ./src/middleware/validation.middleware.ts =====
+import { ValidationError } from '@naman_deep_singh/errors'
+import type {
+	NextFunction,
+	Request,
+	RequestHandler,
+	Response,
+} from 'express'
+
+// Validation middleware
+export interface ValidationRule {
+	field: string
+	required?: boolean
+	type?: 'string' | 'number' | 'email' | 'boolean'
+	minLength?: number
+	maxLength?: number
+	pattern?: RegExp
+	custom?: (value: unknown) => boolean | string
+}
+
+export function createValidationMiddleware(
+	rules: ValidationRule[],
+): RequestHandler {
+	return (req: Request, _res: Response, next: NextFunction) => {
+		const errors: string[] = []
+
+		for (const rule of rules) {
+			const value = req.body[rule.field]
+
+			if (
+				rule.required &&
+				(value === undefined || value === null || value === '')
+			) {
+				errors.push(`${rule.field} is required`)
+				continue
+			}
+
+			if (value === undefined || value === null) continue
+
+			if (rule.type) {
+				switch (rule.type) {
+					case 'email':
+						const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+						if (!emailRegex.test(value)) {
+							errors.push(`${rule.field} must be a valid email`)
+						}
+						break
+					case 'string':
+						if (typeof value !== 'string') {
+							errors.push(`${rule.field} must be a string`)
+						}
+						break
+					case 'number':
+						if (typeof value !== 'number' && isNaN(Number(value))) {
+							errors.push(`${rule.field} must be a number`)
+						}
+						break
+					case 'boolean':
+						if (typeof value !== 'boolean') {
+							errors.push(`${rule.field} must be a boolean`)
+						}
+						break
+				}
+			}
+
+			if (rule.minLength && value.length < rule.minLength) {
+				errors.push(
+					`${rule.field} must be at least ${rule.minLength} characters`,
+				)
+			}
+			if (rule.maxLength && value.length > rule.maxLength) {
+				errors.push(
+					`${rule.field} must be no more than ${rule.maxLength} characters`,
+				)
+			}
+
+			if (rule.pattern && !rule.pattern.test(value)) {
+				errors.push(`${rule.field} format is invalid`)
+			}
+
+			if (rule.custom) {
+				const result = rule.custom(value)
+				if (result !== true) {
+					errors.push(
+						typeof result === 'string' ? result : `${rule.field} is invalid`,
+					)
+				}
+			}
+		}
+
+		if (errors.length > 0) {
+			// Use ValidationError from errors and let error middleware handle response
+			const validationError = new ValidationError({
+				fieldErrors: errors,
+			})
+			return next(validationError)
+		}
+
+		next()
+	}
+}
+
+===== ./src/core/index.ts =====
+// Core server
+export { ExpressServer, createServer } from './server.js'
+export type {
+    ServerInstance,
+    ServerInfo,
+    GrpcService,
+    RpcMethod,
+    WebhookConfig,
+    ServerInstanceConfig,
+} from './server.js'
+
+// Health utilities
+export {
+    createHealthCheck,
+    withHealthCheck,
+    addHealthCheck,
+} from './health.js'
+
+// Graceful shutdown
+export {
+    createGracefulShutdown,
+    withGracefulShutdown,
+    startServerWithShutdown,
+} from './shutdown.js'
+
+// Periodic health monitoring
+export { PeriodicHealthMonitor } from './periodic-health.js'
+===== ./src/core/periodic-health.ts =====
+import type { HealthCheckService, PeriodicHealthCheckConfig } from '../types'
+
+export class PeriodicHealthMonitor {
+	private intervals: NodeJS.Timeout[] = []
+	private config: PeriodicHealthCheckConfig
+	private serviceName: string
+
+	constructor(config: PeriodicHealthCheckConfig, serviceName: string) {
+		this.config = config
+		this.serviceName = serviceName
+	}
+
+	start(): void {
+		if (!this.config.enabled || !this.config.services?.length) {
+			return
+		}
+
+		const interval = this.config.interval || 30000
+
+		this.config.services.forEach((service) => {
+			const intervalId = setInterval(async () => {
+				await this.checkServiceHealth(service)
+			}, interval)
+
+			this.intervals.push(intervalId)
+		})
+
+		console.log(
+			`📊 ${this.serviceName}: Periodic health monitoring enabled (${interval}ms interval) for ${this.config.services.length} service(s)`,
+		)
+	}
+
+	stop(): void {
+		this.intervals.forEach((interval) => clearInterval(interval))
+		this.intervals = []
+		console.log(`🛑 ${this.serviceName}: Periodic health monitoring stopped`)
+	}
+
+	private async checkServiceHealth(
+		service: HealthCheckService,
+	): Promise<boolean> {
+		try {
+			const controller = new AbortController()
+			const timeout = service.timeout || 5000
+			const timeoutId = setTimeout(() => controller.abort(), timeout)
+
+			const response = await fetch(service.url, {
+				method: 'GET',
+				signal: controller.signal,
+				headers: {
+					'User-Agent': `${this.serviceName}-health-monitor`,
+				},
+			})
+
+			clearTimeout(timeoutId)
+
+			if (response.ok) {
+				console.log(`🟢 ${service.name} is healthy`)
+				return true
+			} else {
+				console.log(`🔴 ${service.name} returned ${response.status}`)
+				return false
+			}
+		} catch (error) {
+			const errorMessage =
+				error instanceof Error ? error.message : 'Unknown error'
+			console.log(`🔴 ${service.name} health check failed: ${errorMessage}`)
+			return false
+		}
+	}
+
+	// Get current health status of all services
+	async getHealthStatus(): Promise<Record<string, boolean>> {
+		if (!this.config.services?.length) {
+			return {}
+		}
+
+		const results: Record<string, boolean> = {}
+
+		await Promise.all(
+			this.config.services.map(async (service) => {
+				results[service.name] = await this.checkServiceHealth(service)
+			}),
+		)
+
+		return results
+	}
+}
+
+===== ./src/core/shutdown.ts =====
+import type { Server } from 'http'
+import type { GracefulShutdownConfig, ServerPlugin } from '../types'
+
+export function createGracefulShutdown(
+	server: Server,
+	config: GracefulShutdownConfig = {},
+): void {
+	const { timeout = 10000, onShutdown, serverName, serverVersion } = config
+	const nameVersion =
+		serverName && serverVersion ? `${serverName} v${serverVersion}` : 'Server'
+
+	const shutdown = async (signal: string) => {
+		console.log(
+			`🛑 ${nameVersion} received ${signal}, shutting down gracefully...`,
+		)
+
+		const shutdownTimer = setTimeout(() => {
+			console.log(`⏰ ${nameVersion} shutdown timeout reached, forcing exit`)
+			process.exit(1)
+		}, timeout)
+
+		try {
+			// Run custom shutdown logic
+			if (onShutdown) {
+				await onShutdown()
+			}
+
+			// Close server
+			server.close(() => {
+				clearTimeout(shutdownTimer)
+				console.log(`👋 ${nameVersion} closed. Exiting now.`)
+				process.exit(0)
+			})
+		} catch (error) {
+			clearTimeout(shutdownTimer)
+			console.error(`❌ ${nameVersion} error during shutdown:`, error)
+			process.exit(1)
+		}
+	}
+
+	process.on('SIGINT', () => shutdown('SIGINT'))
+	process.on('SIGTERM', () => shutdown('SIGTERM'))
+}
+
+export function withGracefulShutdown(
+	config: GracefulShutdownConfig = {},
+): ServerPlugin {
+	return (app, _serverConfig) => {
+		// This plugin needs to be applied after server.listen()
+		// Store config for later use
+		;(app as any).__gracefulShutdownConfig = config
+	}
+}
+
+export function startServerWithShutdown(
+	app: import('express').Application,
+	port: number,
+	shutdownConfig: GracefulShutdownConfig = {},
+	serverName?: string,
+	serverVersion?: string,
+): Server {
+	const server = app.listen(port, () => {
+		const nameVersion =
+			serverName && serverVersion ? `${serverName} v${serverVersion}` : 'Server'
+		console.log(`🚀 ${nameVersion} running on http://localhost:${port}`)
+	})
+
+	// Apply graceful shutdown from stored config or provided config
+	const config = (app as any).__gracefulShutdownConfig || shutdownConfig
+	const enhancedConfig = {
+		...config,
+		serverName,
+		serverVersion,
+	}
+	createGracefulShutdown(server, enhancedConfig)
+
+	return server
+}
+
+===== ./src/core/health.ts =====
+import type { Application, Request, RequestHandler, Response } from 'express'
+import type { HealthCheckConfig, ServerPlugin } from '../types'
+
+export function createHealthCheck(
+	config: HealthCheckConfig = {},
+): RequestHandler {
+	const { customChecks = [] } = config
+
+	return async (_req: Request, res: Response) => {
+		try {
+			const checks: Record<string, boolean> = {
+				server: true,
+				timestamp: Date.now() as any,
+			}
+
+			// Run custom health checks
+			for (const check of customChecks) {
+				try {
+					checks[check.name] = await check.check()
+				} catch (_error) {
+					checks[check.name] = false
+				}
+			}
+
+			const isHealthy = Object.values(checks).every(
+				(status) => status === true || typeof status === 'number',
+			)
+
+			res.status(isHealthy ? 200 : 503).json({
+				status: isHealthy ? 'healthy' : 'unhealthy',
+				checks,
+			})
+		} catch (_error) {
+			res.status(503).json({
+				status: 'unhealthy',
+				error: 'Health check failed',
+			})
+		}
+	}
+}
+
+export function withHealthCheck(
+	path = '/health',
+	config: HealthCheckConfig = {},
+): ServerPlugin {
+	return (app: Application) => {
+		app.get(path, createHealthCheck(config))
+	}
+}
+
+// Convenience function for direct use
+export function addHealthCheck(
+	app: Application,
+	path = '/health',
+	config: HealthCheckConfig = {},
+): void {
+	app.get(path, createHealthCheck(config))
+}
+
+===== ./src/core/server.ts =====
+import crypto from 'crypto'
+
+import {
+	type CacheConfig,
+	CacheFactory,
+	type ICache,
+	type SessionData,
+	SessionStore,
+} from '@naman_deep_singh/cache'
+import express, { json, raw } from 'express'
+
+import { PeriodicHealthMonitor } from './periodic-health'
+import { createGracefulShutdown } from './shutdown'
+
+import type { Server } from 'http'
+import type { Application, RequestHandler } from 'express'
+import { useSession } from '../middleware'
+import type { ServerConfig, SocketIOConfig, SocketInstance } from '../types'
+
+export interface GrpcService {
+	service: Record<string, unknown>
+	implementation: Record<string, (...args: unknown[]) => unknown>
+}
+
+export interface RpcMethod {
+	[key: string]: (
+		params: unknown[],
+		callback: (error: Error | null, result?: unknown) => void,
+	) => void
+}
+
+export interface WebhookConfig {
+	path: string
+	secret?: string
+	handler: (
+		payload: Record<string, unknown>,
+		headers: Record<string, string | string[]>,
+	) => void | Promise<void>
+}
+
+export interface GrpcServerInstance {
+	start(): void
+	forceShutdown(): void
+	addService(service: unknown, implementation: unknown): void
+	bindAsync(address: string, credentials: unknown, callback: () => void): void
+}
+
+export interface ServerInstanceConfig
+	extends Required<Omit<ServerConfig, 'socketIO' | 'name' | 'version'>> {
+	name: string
+	version: string
+	startTime: Date
+	socketIO?: SocketIOConfig
+}
+
+export interface ServerInstance {
+	app: Application
+	server?: Server
+	config: ServerInstanceConfig
+	start(): Promise<ServerInstance>
+	stop(): Promise<void>
+	getInfo(): ServerInfo
+
+	// Multi-protocol support
+	addGrpcService(
+		service: Record<string, unknown>,
+		implementation: Record<string, (...args: unknown[]) => unknown>,
+		port?: number,
+	): void
+	addRpcMethods(methods: RpcMethod, path?: string): void
+	addWebhook(config: WebhookConfig): void
+	addSocketIO(config?: SocketIOConfig): unknown
+}
+
+export interface ServerInfo {
+	name: string
+	version: string
+	port: number
+	uptime: number
+	status: 'starting' | 'running' | 'stopping' | 'stopped'
+	startTime: Date
+}
+
+export class ExpressServer implements ServerInstance {
+	public app: Application
+	public server?: Server
+	public config: ServerInstanceConfig
+	public cache?: ICache<unknown>
+	public sessionStore?: SessionStore | undefined
+	private status: 'starting' | 'running' | 'stopping' | 'stopped' = 'stopped'
+	private grpcServices: GrpcService[] = []
+	private grpcServer?: GrpcServerInstance
+	private rpcMethods: RpcMethod = {}
+	private socketIO?: { close(): void }
+	private healthMonitor?: PeriodicHealthMonitor
+
+	constructor(
+		name = 'Express Server',
+		version = '1.0.0',
+		config: ServerConfig = {},
+	) {
+		this.app = express()
+		this.config = {
+			name,
+			version,
+			startTime: new Date(),
+			port: config.port || 3000,
+			cors: config.cors ?? true,
+			helmet: config.helmet ?? true,
+			json: config.json ?? true,
+			cookieParser: config.cookieParser ?? false,
+			customMiddleware: config.customMiddleware || [],
+			healthCheck: config.healthCheck ?? true,
+			gracefulShutdown: config.gracefulShutdown ?? true,
+			socketIO: config.socketIO,
+			periodicHealthCheck: config.periodicHealthCheck || { enabled: false },
+			cache: config.cache || { enabled: false },
+			session: config.session || { enabled: false },
+		}
+
+		// Initialize locals for cache/session
+		this.app.locals.cache = undefined
+		this.app.locals.sessionStore = undefined
+		this.app.locals.cacheDefaultTTL = config.cache?.defaultTTL
+
+		// Apply middleware based on configuration
+		this.setupMiddleware()
+
+		// Setup periodic health monitoring
+		this.setupPeriodicHealthMonitoring()
+	}
+
+	private setupMiddleware(): void {
+		// Apply CORS if enabled
+		if (this.config.cors) {
+			try {
+				const cors = require('cors')
+				const corsOptions =
+					typeof this.config.cors === 'object' ? this.config.cors : undefined
+				this.app.use(cors(corsOptions))
+			} catch (_error) {
+				console.warn(
+					`${this.config.name}: CORS middleware not available. Install cors package.`,
+				)
+			}
+		}
+
+		// Apply Helmet if enabled
+		if (this.config.helmet) {
+			try {
+				const helmet = require('helmet')
+				this.app.use(helmet())
+			} catch (_error) {
+				console.warn(
+					`${this.config.name}: Helmet middleware not available. Install helmet package.`,
+				)
+			}
+		}
+
+		// Apply JSON parser if enabled
+		if (this.config.json) {
+			this.app.use(json())
+		}
+
+		// Apply cookie parser if enabled
+		if (this.config.cookieParser) {
+			try {
+				const cookieParser = require('cookie-parser')
+				this.app.use(cookieParser())
+			} catch (_error) {
+				console.warn(
+					`${this.config.name}: Cookie parser middleware not available. Install cookie-parser package.`,
+				)
+			}
+		}
+
+		// Apply custom middleware
+		if (
+			this.config.customMiddleware &&
+			this.config.customMiddleware.length > 0
+		) {
+			this.config.customMiddleware.forEach((middleware) => {
+				this.app.use(middleware)
+			})
+		}
+
+		// Add health check if enabled
+		if (this.config.healthCheck) {
+			const healthPath =
+				typeof this.config.healthCheck === 'string'
+					? this.config.healthCheck
+					: '/health'
+			this.app.get(healthPath, async (req, res) => {
+				const base = {
+					status: 'healthy',
+					service: this.config.name,
+					version: this.config.version,
+					uptime: Date.now() - this.config.startTime.getTime(),
+					timestamp: new Date().toISOString(),
+				} as Record<string, unknown>
+
+				// If cache is enabled, include its health
+				const cache = req.app.locals.cache
+				if (cache && typeof (cache as any).isAlive === 'function') {
+					try {
+						base.cache = await (cache as any).isAlive()
+					} catch (e) {
+						base.cache = {
+							isAlive: false,
+							adapter: 'unknown',
+							timestamp: new Date(),
+							error: (e as Error).message,
+						}
+					}
+				}
+
+				res.status(200).json(base)
+			})
+		}
+	}
+
+	private async setupCacheAndSession(
+		config: ServerConfig,
+		serverName: string,
+	): Promise<void> {
+		try {
+			// Initialize cache if enabled
+			if (config.cache && config.cache.enabled) {
+				try {
+					const provided = config.cache?.options as
+						| Record<string, unknown>
+						| undefined
+					let cacheConfig: Record<string, unknown> | undefined =
+						provided && typeof provided === 'object' ? provided : undefined
+					if (!cacheConfig) {
+						cacheConfig = { adapter: config.cache.adapter || 'memory' }
+					}
+
+					console.log(
+						`🔄 [${serverName}] Initializing cache adapter: ${config.cache.adapter || 'memory'}...`,
+					)
+
+					// Use createWithFallback to prefer primary and fall back to memory when configured
+					const cfg = {
+						...((cacheConfig as Record<string, any>) || {}),
+						ttl:
+							(cacheConfig as Record<string, any>)?.ttl ??
+							config.cache?.defaultTTL,
+					} as unknown as CacheConfig
+					const cache = await CacheFactory.createWithFallback<unknown>(cfg)
+
+					this.app.locals.cache = cache as unknown
+					this.cache = cache as ICache<unknown>
+					this.app.locals.cacheDefaultTTL = config.cache?.defaultTTL
+
+					// attach per-request helper middleware
+					this.app.use((req, _res, next) => {
+						req.cache = cache as unknown
+						next()
+					})
+
+					console.log(
+						`✅ [${serverName}] Cache initialized successfully (adapter: ${cacheConfig.adapter || 'memory'})`,
+					)
+				} catch (error) {
+					console.error(
+						`❌ [${serverName}] Failed to initialize cache (fallback to memory if enabled):`,
+						error instanceof Error ? error.message : error,
+					)
+					// Cache initialization error is critical but we continue to allow graceful fallback
+				}
+			}
+
+			// Initialize session if enabled
+			if (config.session && config.session.enabled) {
+				const cookieName =
+					config.session.cookieName ||
+					`${serverName.replace(/\s+/g, '_').toLowerCase()}.sid`
+				const ttl = config.session.ttl ?? 3600
+				let cache = this.app.locals.cache as ICache<unknown> | undefined
+
+				if (!cache) {
+					// fallback to in-memory cache for session store
+					try {
+						cache = CacheFactory.create({ adapter: 'memory' })
+						this.app.locals.cache = cache
+						this.cache = cache as ICache<unknown>
+						console.log(
+							`📝 [${serverName}] Session store using in-memory cache`,
+						)
+					} catch (e) {
+						console.error(
+							`❌ [${serverName}] Failed to create in-memory cache for sessions:`,
+							e instanceof Error ? e.message : e,
+						)
+					}
+				} else {
+					console.log(
+						`📝 [${serverName}] Session store initialized with configured cache adapter`,
+					)
+				}
+
+				if (!cache) {
+					console.error(
+						`❌ [${serverName}] CRITICAL: Session enabled but no cache available to store sessions. Session functionality will be unavailable.`,
+					)
+				} else {
+					const store = new SessionStore(cache as ICache<SessionData>, { ttl })
+					this.app.locals.sessionStore = store
+					this.app.locals.sessionCookieName = cookieName
+					this.sessionStore = store
+
+					// attach session middleware globally so req.sessionStore is available
+					try {
+						this.app.use(useSession(cookieName))
+						console.log(
+							`✅ [${serverName}] Session middleware enabled (cookie: ${cookieName}, TTL: ${ttl}s)`,
+						)
+					} catch (error) {
+						console.error(
+							`❌ [${serverName}] Session middleware not available:`,
+							error instanceof Error ? error.message : error,
+						)
+					}
+				}
+			}
+		} catch (error) {
+			console.error(
+				`❌ [${serverName}] Error during cache/session setup:`,
+				error instanceof Error ? error.message : error,
+			)
+		}
+	}
+
+	private setupPeriodicHealthMonitoring(): void {
+		if (this.config.periodicHealthCheck?.enabled) {
+			this.healthMonitor = new PeriodicHealthMonitor(
+				this.config.periodicHealthCheck,
+				this.config.name,
+			)
+		}
+	}
+
+	async start(): Promise<ServerInstance> {
+		this.status = 'starting'
+
+		// Initialize cache and session before starting the server
+		await this.setupCacheAndSession(this.config, this.config.name)
+
+		return new Promise((resolve, reject) => {
+			try {
+				this.server = this.app.listen(this.config.port, () => {
+					this.status = 'running'
+					console.log(
+						`🚀 ${this.config.name} v${this.config.version} running on http://localhost:${this.config.port}`,
+					)
+
+					if (this.config.gracefulShutdown) {
+						createGracefulShutdown(this.server!, {
+							onShutdown: async () => {
+								this.status = 'stopping'
+								// Stop health monitoring during shutdown
+								if (this.healthMonitor) {
+									this.healthMonitor.stop()
+								}
+								// Close cache and session store if present
+								try {
+									const cache = this.app.locals.cache as
+										| ICache<unknown>
+										| undefined
+									if (cache && typeof cache.close === 'function') {
+										await cache.close()
+									}
+								} catch (e) {
+									console.warn(`${this.config.name}: Error closing cache`, e)
+								}
+
+								try {
+									const store = this.app.locals.sessionStore as
+										| SessionStore
+										| undefined
+									if (store && typeof (store as any).close === 'function') {
+										await (store as any).close()
+									}
+								} catch (_e) {
+									// SessionStore may not have close; ignore
+								}
+							},
+						})
+					}
+
+					// Start periodic health monitoring after server is running
+					if (this.healthMonitor) {
+						this.healthMonitor.start()
+					}
+
+					resolve(this)
+				})
+
+				this.server.on('error', reject)
+			} catch (error: unknown) {
+				this.status = 'stopped'
+				reject(error)
+			}
+		})
+	}
+
+	async stop(): Promise<void> {
+		this.status = 'stopping'
+
+		// Stop gRPC server if running
+		if (this.grpcServer) {
+			this.grpcServer.forceShutdown()
+		}
+
+		// Stop periodic health monitoring
+		if (this.healthMonitor) {
+			this.healthMonitor.stop()
+		}
+
+		// Stop Socket.IO server if running
+		if (this.socketIO) {
+			this.socketIO.close()
+		}
+
+		if (!this.server) {
+			this.status = 'stopped'
+			return
+		}
+
+		return new Promise((resolve) => {
+			this.server!.close(() => {
+				this.status = 'stopped'
+				console.log(`👋 ${this.config.name} stopped`)
+				resolve()
+			})
+		})
+	}
+
+	getInfo(): ServerInfo {
+		return {
+			name: this.config.name,
+			version: this.config.version,
+			port: this.config.port,
+			uptime: Date.now() - this.config.startTime.getTime(),
+			status: this.status,
+			startTime: this.config.startTime,
+		}
+	}
+
+	addGrpcService(
+		service: Record<string, unknown>,
+		implementation: Record<string, (...args: unknown[]) => unknown>,
+		port = 50051,
+	): void {
+		this.grpcServices.push({ service, implementation })
+
+		// Lazy load gRPC to avoid dependency issues
+		if (!this.grpcServer) {
+			try {
+				const grpc = require('@grpc/grpc-js') as {
+					Server: new () => {
+						start(): void
+						forceShutdown(): void
+						addService(service: unknown, implementation: unknown): void
+						bindAsync(
+							address: string,
+							credentials: unknown,
+							callback: () => void,
+						): void
+					}
+					ServerCredentials: { createInsecure(): unknown }
+				}
+				this.grpcServer = new grpc.Server()
+
+				// Add all services
+				this.grpcServices.forEach(({ service, implementation }) => {
+					this.grpcServer!.addService(service, implementation)
+				})
+
+				this.grpcServer.bindAsync(
+					`0.0.0.0:${port}`,
+					grpc.ServerCredentials.createInsecure(),
+					() => {
+						this.grpcServer!.start()
+						console.log(
+							`🔗 ${this.config.name} gRPC server running on port ${port}`,
+						)
+					},
+				)
+			} catch (_error: unknown) {
+				console.warn(
+					`${this.config.name}: gRPC not available. Install @grpc/grpc-js to use gRPC features.`,
+				)
+			}
+		}
+	}
+
+	addRpcMethods(methods: RpcMethod, path = '/rpc'): void {
+		Object.assign(this.rpcMethods, methods)
+
+		try {
+			const jayson = require('jayson') as {
+				server: (methods: RpcMethod) => {
+					middleware(): RequestHandler
+				}
+			}
+			const rpcServer = jayson.server(this.rpcMethods)
+			this.app.use(path, rpcServer.middleware())
+			console.log(`📡 ${this.config.name} JSON-RPC server mounted on ${path}`)
+		} catch (_error: unknown) {
+			console.warn(
+				`${this.config.name}: JSON-RPC not available. Install jayson to use RPC features.`,
+			)
+		}
+	}
+
+	addWebhook(config: WebhookConfig): void {
+		this.app.post(
+			config.path,
+			raw({ type: 'application/json' }),
+			async (req, res) => {
+				try {
+					// Verify signature if secret provided
+					if (config.secret) {
+						const signature =
+							req.headers['x-hub-signature-256'] ||
+							req.headers['x-signature-256']
+						if (signature) {
+							const expectedSignature = crypto
+								.createHmac('sha256', config.secret)
+								.update(req.body)
+								.digest('hex')
+
+							const providedSignature = Array.isArray(signature)
+								? signature[0]
+								: signature
+							if (!providedSignature.includes(expectedSignature)) {
+								return res.status(401).json({ error: 'Invalid signature' })
+							}
+						}
+					}
+
+					// Parse JSON payload
+					const payload = JSON.parse(req.body.toString())
+
+					// Call handler
+					await config.handler(
+						payload,
+						req.headers as Record<string, string | string[]>,
+					)
+
+					res.status(200).json({ success: true })
+				} catch (error: unknown) {
+					console.error('Webhook error:', error)
+					res.status(500).json({ error: 'Webhook processing failed' })
+				}
+			},
+		)
+
+		console.log(
+			`🪝 ${this.config.name} webhook registered at ${config.path}${config.secret ? ' (with signature verification)' : ''}`,
+		)
+	}
+
+	addSocketIO(config: SocketIOConfig = {}): unknown {
+		if (!this.server) {
+			throw new Error(
+				`${this.config.name}: Server must be started before adding Socket.IO`,
+			)
+		}
+
+		try {
+			const { Server } = require('socket.io') as {
+				Server: new (
+					server: Server,
+					options?: {
+						cors?: {
+							origin?: string | string[] | boolean
+							methods?: string[]
+							credentials?: boolean
+						}
+						path?: string
+					},
+				) => {
+					on: (event: string, handler: (socket: unknown) => void) => void
+					close: () => void
+				}
+			}
+
+			// Configure CORS
+			const corsConfig =
+				config.cors === true
+					? { origin: '*', methods: ['GET', 'POST'] }
+					: config.cors || undefined
+
+			// Create Socket.IO server
+			const io = new Server(this.server, {
+				cors: config.cors ? corsConfig : undefined,
+				path: config.path || '/socket.io',
+			})
+
+			// Store reference for cleanup
+			this.socketIO = io
+
+			// Handle connections
+			io.on('connection', (socket: unknown) => {
+				const typedSocket = socket as SocketInstance
+				console.log(
+					`🔌 ${this.config.name}: Socket connected [${typedSocket.id}]`,
+				)
+
+				// Call user-defined connection handler
+				if (config.onConnection) {
+					config.onConnection(socket)
+				}
+
+				// Handle disconnection
+				typedSocket.on('disconnect', (reason) => {
+					console.log(
+						`🔌 ${this.config.name}: Socket disconnected [${typedSocket.id}] - ${reason}`,
+					)
+
+					// Call user-defined disconnection handler
+					if (config.onDisconnection) {
+						config.onDisconnection(socket, reason as string)
+					}
+				})
+			})
+
+			console.log(
+				`🔌 ${this.config.name} Socket.IO server attached${config.path ? ` at ${config.path}` : ''}${config.cors ? ' (CORS enabled)' : ''}`,
+			)
+			return io
+		} catch (_error: unknown) {
+			console.warn(
+				`${this.config.name}: Socket.IO not available. Install socket.io to use WebSocket features.`,
+			)
+			return null
+		}
+	}
+}
+
+export function createServer(
+	name?: string,
+	version?: string,
+	config?: ServerConfig,
+): ServerInstance {
+	return new ExpressServer(name, version, config)
+}
+
+===== ./src/express-augment.d.ts =====
+// Express augmentation to type runtime properties we attach in middleware
+declare global {
+	namespace Express {
+		interface Request {
+			// cache instance attached at runtime (may be provided by server setup)
+			cache?: unknown
+			// session store attached at runtime
+			sessionStore?: unknown
+			// session id extracted from cookie/header
+			sessionId?: string | undefined
+			// user
+			user?: unknown
+			// request id
+			requestId?: string
+			// helper helpers
+			getSession?: () => Promise<unknown>
+			createSession?: (
+				id: string,
+				data: Record<string, unknown>,
+				ttl?: number,
+			) => Promise<unknown>
+		}
+
+		interface Application {
+			locals: Record<string, unknown> & {
+				cache?: unknown
+				cacheDefaultTTL?: number
+				sessionStore?: unknown
+				sessionCookieName?: string
+			}
+		}
+	}
+}
+
+export {}
+
+===== ./src/types/index.ts =====
+import type express from 'express'
+
+export interface CorsOptions {
+	origin?:
+		| string
+		| string[]
+		| boolean
+		| RegExp
+		| ((
+				origin: string | undefined,
+				callback: (err: Error | null, allow?: boolean) => void,
+		  ) => void)
+	methods?: string | string[]
+	allowedHeaders?: string | string[]
+	exposedHeaders?: string | string[]
+	credentials?: boolean
+	maxAge?: number
+	preflightContinue?: boolean
+	optionsSuccessStatus?: number
+}
+
+export interface ServerConfig {
+	port?: number
+	cors?: boolean | CorsOptions
+	helmet?: boolean
+	json?: boolean
+	cookieParser?: boolean
+	customMiddleware?: express.RequestHandler[]
+	healthCheck?: boolean | string
+	gracefulShutdown?: boolean
+	socketIO?: SocketIOConfig
+	periodicHealthCheck?: PeriodicHealthCheckConfig
+	name?: string
+	version?: string
+	// Cache integration (disabled by default)
+	cache?: {
+		enabled?: boolean
+		// adapter specific options passed to CacheFactory.create
+		adapter?: 'redis' | 'memcache' | 'memory'
+		options?: unknown
+		defaultTTL?: number
+	}
+	// Session integration (disabled by default)
+	session?: {
+		enabled?: boolean
+		// cookie name pattern will be generated as {servername}.sid unless overridden
+		cookieName?: string
+		ttl?: number
+		cookieOptions?: {
+			path?: string
+			httpOnly?: boolean
+			secure?: boolean
+			sameSite?: 'lax' | 'strict' | 'none'
+		}
+	}
+}
+
+export interface PeriodicHealthCheckConfig {
+	enabled?: boolean
+	interval?: number
+	services?: HealthCheckService[]
+}
+
+export interface HealthCheckService {
+	name: string
+	url: string
+	timeout?: number
+}
+
+export interface SocketIOConfig {
+	enabled?: boolean
+	cors?:
+		| boolean
+		| {
+				origin?: string | string[] | boolean
+				methods?: string[]
+				credentials?: boolean
+		  }
+	onConnection?: (socket: unknown) => void
+	onDisconnection?: (socket: unknown, reason: string) => void
+	path?: string
+}
+
+export interface HealthCheckConfig {
+	path?: string
+	customChecks?: HealthCheck[]
+}
+
+export interface HealthCheck {
+	name: string
+	check: () => Promise<boolean>
+}
+
+export interface GracefulShutdownConfig {
+	timeout?: number
+	onShutdown?: () => Promise<void>
+	serverName?: string
+	serverVersion?: string
+}
+
+export interface SocketInstance {
+	id: string
+	emit: (event: string, data?: unknown) => void
+	on: (event: string, handler: (...args: unknown[]) => void) => void
+	broadcast: {
+		emit: (event: string, data?: unknown) => void
+	}
+	disconnect: () => void
+}
+
+export type ServerPlugin = (
+	app: express.Application,
+	config: ServerConfig,
+) => void
+
+===== ./tsconfig.cjs.json =====
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "rootDir": "./src",
+    "outDir": "./dist/cjs"
+  }
+}
+===== ./tsconfig.esm.json =====
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "rootDir": "./src",
+    "outDir": "./dist/esm"
+  }
+}

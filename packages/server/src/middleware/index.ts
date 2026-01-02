@@ -1,32 +1,32 @@
 // Authentication Middleware
-export { AuthConfig, createAuthMiddleware } from './auth.middleware'
+export { type AuthConfig, createAuthMiddleware } from './auth.middleware.js'
 
 // Cache Middleware
-export { cacheResponse } from './cache.middleware'
+export { cacheResponse } from './cache.middleware.js'
 
 // Error Handler Middleware
-export { createErrorHandler } from './errorHandler.middleware'
+export { createErrorHandler } from './errorHandler.middleware.js'
 
 // Logging Middleware
-export { createLoggingMiddleware } from './logging.middleware'
+export { createLoggingMiddleware } from './logging.middleware.js'
 
 // Rate Limiter Middleware
 export {
-	RateLimitConfig,
+	type RateLimitConfig,
 	createRateLimitMiddleware,
-} from './rateLimiter.middleware'
+} from './rateLimiter.middleware.js'
 
 // Request ID Middleware
-export { createRequestIdMiddleware } from './requestId.middleware'
+export { createRequestIdMiddleware } from './requestId.middleware.js'
 
 // Session Middleware
-export { useSession } from './session.middleware'
+export { useSession } from './session.middleware.js'
 
 // Validation Middleware
 export {
-	ValidationRule,
+	type ValidationRule,
 	createValidationMiddleware,
-} from './validation.middleware'
+} from './validation.middleware.js'
 
 // Plugin middleware functions (for application-level middleware)
 export {
@@ -36,11 +36,11 @@ export {
 	withValidation,
 	withRateLimit,
 	withAuth,
-} from './plugins.middleware'
+} from './plugins.middleware.js'
 
 // Convenience middleware functions (for route-level middleware)
 export {
 	validateFields,
 	rateLimit,
 	requireAuth,
-} from './plugins.middleware'
+} from './plugins.middleware.js'

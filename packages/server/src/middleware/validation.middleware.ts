@@ -1,10 +1,5 @@
 import { ValidationError } from '@naman_deep_singh/errors'
-import type {
-	NextFunction,
-	Request,
-	RequestHandler,
-	Response,
-} from 'node_modules/@types/express'
+import type { NextFunction, Request, RequestHandler, Response } from 'express'
 
 // Validation middleware
 export interface ValidationRule {

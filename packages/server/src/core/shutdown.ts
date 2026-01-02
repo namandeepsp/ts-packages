@@ -1,5 +1,5 @@
 import type { Server } from 'http'
-import type { GracefulShutdownConfig, ServerPlugin } from '../types'
+import type { GracefulShutdownConfig, ServerPlugin } from '../types.js'
 
 export function createGracefulShutdown(
 	server: Server,

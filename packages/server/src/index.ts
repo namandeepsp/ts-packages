@@ -1,12 +1,12 @@
 // Core server utilities
-export { ExpressServer, createServer } from './core/server'
+export { ExpressServer, createServer } from './core/server.js'
 export type {
 	ServerInstance,
 	ServerInfo,
 	GrpcService,
 	RpcMethod,
 	WebhookConfig,
-} from './core/server'
+} from './core/server.js'
 
 // Express re-exports (to avoid direct Express dependency in services)
 export { Request, Response, NextFunction, Router, Application } from 'express'
@@ -17,14 +17,14 @@ export {
 	createHealthCheck,
 	withHealthCheck,
 	addHealthCheck,
-} from './core/health'
+} from './core/health.js'
 
 // Graceful shutdown utilities
 export {
 	createGracefulShutdown,
 	withGracefulShutdown,
 	startServerWithShutdown,
-} from './core/shutdown'
+} from './core/shutdown.js'
 
 // Middleware utilities
 export {
@@ -48,17 +48,17 @@ export {
 	type ValidationRule,
 	type RateLimitConfig,
 	type AuthConfig,
-} from './middleware'
+} from './middleware/index.js'
 
 // Utility functions
 export {
 	getEnv,
 	getEnvNumber,
 	getEnvBoolean,
-} from './utils/utils'
+} from './utils/utils.js'
 
 // Periodic health monitoring
-export { PeriodicHealthMonitor } from './core/periodic-health'
+export { PeriodicHealthMonitor } from './core/periodic-health.js'
 
 // Types
 export type {
@@ -71,21 +71,21 @@ export type {
 	SocketInstance,
 	PeriodicHealthCheckConfig,
 	HealthCheckService,
-} from './types'
+} from './types.js'
 
 import {
 	addHealthCheck,
 	createHealthCheck,
 	withHealthCheck,
-} from './core/health'
-import { PeriodicHealthMonitor } from './core/periodic-health'
+} from './core/health.js'
+import { PeriodicHealthMonitor } from './core/periodic-health.js'
 // Import all exports for default export
-import { ExpressServer, createServer } from './core/server'
+import { ExpressServer, createServer } from './core/server.js'
 import {
 	createGracefulShutdown,
 	startServerWithShutdown,
 	withGracefulShutdown,
-} from './core/shutdown'
+} from './core/shutdown.js'
 import {
 	createAuthMiddleware,
 	createErrorHandler,
@@ -102,8 +102,8 @@ import {
 	withRateLimit,
 	withRequestId,
 	withValidation,
-} from './middleware'
-import { getEnv, getEnvBoolean, getEnvNumber } from './utils/utils'
+} from './middleware/index.js'
+import { getEnv, getEnvBoolean, getEnvNumber } from './utils/utils.js'
 
 // Default export for namespace usage
 const ServerUtils = {

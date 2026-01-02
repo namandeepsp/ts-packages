@@ -1,5 +1,5 @@
 import type { Application, Request, RequestHandler, Response } from 'express'
-import type { HealthCheckConfig, ServerPlugin } from '../types'
+import type { HealthCheckConfig, ServerPlugin } from '../types.js'
 
 export function createHealthCheck(
 	config: HealthCheckConfig = {},

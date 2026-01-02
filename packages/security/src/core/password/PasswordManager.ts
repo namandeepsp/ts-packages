@@ -7,7 +7,7 @@ import type {
 	PasswordConfig,
 	PasswordStrength,
 	PasswordValidationResult,
-} from '../../interfaces/index.js'
+} from '../../interfaces/password.interface.js'
 
 import { BadRequestError, ValidationError } from '@naman_deep_singh/errors'
 import { ensureValidPassword, estimatePasswordEntropy } from './utils.js'

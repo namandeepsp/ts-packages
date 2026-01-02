@@ -11,8 +11,9 @@ import type {
 	JWTConfig,
 	RefreshToken,
 	TokenPair,
-} from '../../interfaces/index.js'
-import { safeVerifyToken, signToken } from './index.js'
+} from '../../interfaces/jwt.interface.js'
+import { signToken } from './signToken.js'
+import { safeVerifyToken } from './verify.js'
 
 export class JWTManager implements ITokenManager {
 	private accessSecret: Secret

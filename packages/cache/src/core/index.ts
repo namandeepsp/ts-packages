@@ -1,3 +1,3 @@
-export * from './interfaces/index.js'
-export * from './BaseCache.js'
-export * from './factory.js'
+export { type ICache, type ISession } from './interfaces/index.js'
+export { BaseCache } from './BaseCache.js'
+export { CacheFactory } from './factory.js'

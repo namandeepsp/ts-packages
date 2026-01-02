@@ -1,2 +1,2 @@
-export * from './ICache.js'
-export * from './ISession.js'
+export { type ICache } from './ICache.js'
+export { type ISession } from './ISession.js'

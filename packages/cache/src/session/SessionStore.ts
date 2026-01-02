@@ -1,5 +1,6 @@
-import type { ICache } from '../core/index.js'
-import { CACHE_ERROR_CODES, CacheError } from '../errors/index.js'
+import type { ICache } from '../core/interfaces/ICache.js'
+import { CacheError } from '../errors/CacheError.js'
+import { CACHE_ERROR_CODES } from '../errors/cacheErrorCodes.js'
 import type { SessionData, SessionOptions } from '../types.js'
 
 /**

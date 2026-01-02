@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from 'express'
-import type { ICache } from '../../core/index.js'
-import type { SessionStore } from '../../session/index.js'
+import type { ICache } from '../../core/interfaces/ICache.js'
+import type { SessionStore } from '../../session/SessionStore.js'
 
 /**
  * Express middleware for session management using cache
@@ -26,7 +26,7 @@ export function cacheSessionMiddleware(
 				const sessionData = await sessionStore.getAndExtend(sessionId)
 
 				if (sessionData) {
-					;(req as any)[sessionDataKey] = sessionData
+					; (req as any)[sessionDataKey] = sessionData
 				}
 			}
 

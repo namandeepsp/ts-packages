@@ -1,1 +1,1 @@
-export * from './express/index.js'
+export { expressErrorHandler, errorConverter } from './express/index.js'

@@ -75,3 +75,6 @@ export class ErrorMessageRegistry {
 		}
 	}
 }
+
+/** Singleton export for easy access */
+export const errorMessageRegistry = ErrorMessageRegistry.getInstance()

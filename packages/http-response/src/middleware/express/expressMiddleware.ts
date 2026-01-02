@@ -1,5 +1,5 @@
-import { type RequestHandler } from 'express'
-import { type ResponderConfig } from '../../core/config.js'
+import type { RequestHandler } from 'express'
+import type { ResponderConfig } from '../../core/config.js'
 import { createResponderFactory } from '../../core/factory.js'
 
 export const responderMiddleware = (
@@ -8,7 +8,7 @@ export const responderMiddleware = (
 	const factory = createResponderFactory(cfg)
 
 	return (_req, res, next) => {
-		; (res as any).responder = <P = unknown>() => factory<P>(res)
+		;(res as any).responder = <P = unknown>() => factory<P>(res)
 		next()
 	}
 }

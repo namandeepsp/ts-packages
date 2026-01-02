@@ -1,5 +1,5 @@
 // Re-export all extensions
-export * from '../string/index.js'
-export * from '../array/index.js'
-export * from '../object/index.js'
-export * from '../number/index.js'
+export { extendString } from '../string/index.js'
+export { extendArray } from '../array/index.js'
+export { extendObject } from '../object/index.js'
+export { extendNumber } from '../number/index.js'

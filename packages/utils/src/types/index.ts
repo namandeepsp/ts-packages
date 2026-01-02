@@ -1,3 +1,5 @@
 // Re-export all types
-export * from './extensionTypes.js'
-export * from './globalAugmentations.js'
+export {
+	type ExtensionOptions,
+	type PerformanceConfig,
+} from './extensionTypes.js'

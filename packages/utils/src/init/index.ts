@@ -1,3 +1,3 @@
 // Re-export initialization logic
-export * from './initializer.js'
-export * from './options.js'
+export { initExtensions, extendAll } from './initializer.js'
+export { validateExtensionOptions, createExtensionOptions } from './options.js'

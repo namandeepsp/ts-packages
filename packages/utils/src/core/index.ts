@@ -1,3 +1,18 @@
 // Re-export core utilities
-export * from './validation.js'
-export * from './performance.js'
+export {
+	validateExtensionInput,
+	validateArrayInput,
+	validateNumberRange,
+	validatePositiveInteger,
+} from './validation.js'
+
+export {
+	type PerformanceConfig,
+	setPerformanceConfig,
+	getPerformanceConfig,
+	LRUCache,
+	makeInternalCacheKey,
+	withCache,
+} from './performance.js'
+
+export { getPackageVersion } from './version.js'

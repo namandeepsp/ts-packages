@@ -18,8 +18,8 @@ importers:
   packages/cache:
     dependencies:
       '@naman_deep_singh/errors':
-        specifier: ^2.2.3
-        version: 2.2.3(express@5.2.1)
+        specifier: ^2.3.0
+        version: 2.3.0(express@5.2.1)
       memcached:
         specifier: ^2.2.2
         version: 2.2.2
@@ -46,11 +46,24 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
+  packages/communication:
+    dependencies:
+      '@naman_deep_singh/errors':
+        specifier: ^2.1.0
+        version: 2.1.0(express@5.2.1)
+    devDependencies:
+      rimraf:
+        specifier: ^5.0.5
+        version: 5.0.10
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
   packages/errors:
     dependencies:
       '@naman_deep_singh/http-response':
-        specifier: ^3.2.1
-        version: 3.2.1(express@5.2.1)
+        specifier: ^3.3.1
+        version: 3.3.1(express@5.2.1)
     devDependencies:
       '@types/express':
         specifier: ^5.0.5
@@ -86,11 +99,11 @@ importers:
   packages/security:
     dependencies:
       '@naman_deep_singh/errors':
-        specifier: ^2.2.3
-        version: 2.2.3(express@5.2.1)
-      '@naman_deep_singh/utils':
         specifier: ^2.3.0
-        version: 2.3.0
+        version: 2.3.0(express@5.2.1)
+      '@naman_deep_singh/utils':
+        specifier: ^2.4.0
+        version: 2.4.0
       bcryptjs:
         specifier: ^3.0.3
         version: 3.0.3
@@ -114,14 +127,14 @@ importers:
   packages/server:
     dependencies:
       '@naman_deep_singh/cache':
-        specifier: ^1.5.0
-        version: 1.5.0(express@5.2.1)
+        specifier: ^1.7.0
+        version: 1.7.0(express@5.2.1)
       '@naman_deep_singh/errors':
-        specifier: ^2.1.0
-        version: 2.1.0(express@5.2.1)
+        specifier: ^2.3.0
+        version: 2.3.0(express@5.2.1)
       '@naman_deep_singh/security':
-        specifier: ^1.6.0
-        version: 1.6.0(express@5.2.1)
+        specifier: ^1.7.0
+        version: 1.7.0(express@5.2.1)
       '@types/express':
         specifier: ^5.0.5
         version: 5.0.6
@@ -220,25 +233,25 @@ packages:
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
     engines: {node: '>=12'}
 
-  '@naman_deep_singh/cache@1.5.0':
-    resolution: {integrity: sha512-03wGo0jHErqDNqLQonKw53PGQbNMPzAwQrXmq0qpgbxN8KTf1sTPfVHsL81WJx4gaLDxMe/eyjtQlYqC1VWCog==}
+  '@naman_deep_singh/cache@1.7.0':
+    resolution: {integrity: sha512-KYHqX73QpmuWK/ikCuCJBQmoLIuM4XAJEa+ZD3/FEuzILQdNtHMwfEHisr3NaNJKR2Zk98jtXvfhDbChtHCNAg==}
 
   '@naman_deep_singh/errors@2.1.0':
     resolution: {integrity: sha512-3c5u5m0uGz9VraQ1xOkjo7ePlW7l6jAPpJhV9hXr3nwZNZ/ciYe1l/w9NOcIKd6dbIZNwTuUP9yofBt5rqTfmA==}
 
-  '@naman_deep_singh/errors@2.2.3':
-    resolution: {integrity: sha512-NuI8kf4/fHEvfOYkF5HkPbus7Ug6V/FycrG0IT4a7B/pBYrFFkucyx1EXfW2EVBA6BOozk1ZGUgKM4CSyCHrvw==}
+  '@naman_deep_singh/errors@2.3.0':
+    resolution: {integrity: sha512-KlY+kAWYUFptHTxGX6a6bTlGrT1EqrO0WAOzElu8Wl4q1hcGefem1OEzmy/slxYY3QofJn+DptVq1+NIUeRmoA==}
 
-  '@naman_deep_singh/http-response@3.2.1':
-    resolution: {integrity: sha512-M54AbRbh0bpuf6khg1T8+zuCr9Fg0Ww088OqSDr/7z+2RHLMGTHKmTTdFALyBBe360Nbg3o07STuaEkBkCBmDA==}
+  '@naman_deep_singh/http-response@3.3.1':
+    resolution: {integrity: sha512-kUeRoV39MzGf68ohaPvxoACeVKDT8fb/EPx0JfNK//HhhT7/uIUb9pBXdwHgBLu+dDPXTIZdWwjwgYIiyNRNhw==}
     peerDependencies:
       express: ^5.1.0
 
-  '@naman_deep_singh/security@1.6.0':
-    resolution: {integrity: sha512-Zf+BaunWDjCEV9/ZZDRS8VscEnjgCY+BQNFxl0k1OG4omK212NvCh/v55212mmO0x3ufb6VqZj7hRuGC9Ikhvw==}
+  '@naman_deep_singh/security@1.7.0':
+    resolution: {integrity: sha512-N1rQC9Fq6eJAn7aM1XY8mrypW8Z5QDcwfbWWptuFN0NDgulfW/wuXK0+Oi6xuBDekWuNinueTqw0Ryu/DFSibQ==}
 
-  '@naman_deep_singh/utils@2.3.0':
-    resolution: {integrity: sha512-SeYUB3rvetf75+08+YHO+CdtRMAHl3bLyajO/j4JkvptgdC6w/XLNn12tLSro/KCPrvqLgxH+VSsRhnPbYahZg==}
+  '@naman_deep_singh/utils@2.4.0':
+    resolution: {integrity: sha512-GE8qs37MFBe/yCBIM3lTDsBsWhg5jVzBCmCqShSIYdQI/RJTgS5OWPqIjR7L0BWKd+TjhojKNieL3aMRhQ/qBA==}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -856,9 +869,9 @@ snapshots:
       wrap-ansi: 8.1.0
       wrap-ansi-cjs: wrap-ansi@7.0.0
 
-  '@naman_deep_singh/cache@1.5.0(express@5.2.1)':
+  '@naman_deep_singh/cache@1.7.0(express@5.2.1)':
     dependencies:
-      '@naman_deep_singh/errors': 2.1.0(express@5.2.1)
+      '@naman_deep_singh/errors': 2.3.0(express@5.2.1)
       memcached: 2.2.2
       redis: 4.7.1
     transitivePeerDependencies:
@@ -866,30 +879,30 @@ snapshots:
 
   '@naman_deep_singh/errors@2.1.0(express@5.2.1)':
     dependencies:
-      '@naman_deep_singh/http-response': 3.2.1(express@5.2.1)
+      '@naman_deep_singh/http-response': 3.3.1(express@5.2.1)
     transitivePeerDependencies:
       - express
 
-  '@naman_deep_singh/errors@2.2.3(express@5.2.1)':
+  '@naman_deep_singh/errors@2.3.0(express@5.2.1)':
     dependencies:
-      '@naman_deep_singh/http-response': 3.2.1(express@5.2.1)
+      '@naman_deep_singh/http-response': 3.3.1(express@5.2.1)
     transitivePeerDependencies:
       - express
 
-  '@naman_deep_singh/http-response@3.2.1(express@5.2.1)':
+  '@naman_deep_singh/http-response@3.3.1(express@5.2.1)':
     dependencies:
       express: 5.2.1
 
-  '@naman_deep_singh/security@1.6.0(express@5.2.1)':
+  '@naman_deep_singh/security@1.7.0(express@5.2.1)':
     dependencies:
-      '@naman_deep_singh/errors': 2.1.0(express@5.2.1)
-      '@naman_deep_singh/utils': 2.3.0
+      '@naman_deep_singh/errors': 2.3.0(express@5.2.1)
+      '@naman_deep_singh/utils': 2.4.0
       bcryptjs: 3.0.3
       jsonwebtoken: 9.0.3
     transitivePeerDependencies:
       - express
 
-  '@naman_deep_singh/utils@2.3.0':
+  '@naman_deep_singh/utils@2.4.0':
     dependencies:
       '@types/node': 25.0.3
 

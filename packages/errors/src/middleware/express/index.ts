@@ -1,2 +1,2 @@
-export * from './errorHandler.middleware.js'
-export * from './errorConverter.middleware.js'
+export { expressErrorHandler } from './errorHandler.middleware.js'
+export { errorConverter } from './errorConverter.middleware.js'

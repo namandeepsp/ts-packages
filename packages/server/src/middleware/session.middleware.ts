@@ -1,9 +1,4 @@
-import type {
-	NextFunction,
-	Request,
-	RequestHandler,
-	Response,
-} from 'node_modules/@types/express'
+import type { NextFunction, Request, RequestHandler, Response } from 'express'
 
 // Session middleware helper (attaches sessionStore and helpers to req)
 export function useSession(cookieName?: string): RequestHandler {

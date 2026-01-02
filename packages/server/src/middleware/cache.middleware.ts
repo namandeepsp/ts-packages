@@ -1,9 +1,4 @@
-import type {
-	NextFunction,
-	Request,
-	RequestHandler,
-	Response,
-} from 'node_modules/@types/express'
+import type { NextFunction, Request, RequestHandler, Response } from 'express'
 
 // Cache response middleware (per-route opt-in)
 export function cacheResponse(ttl?: number): RequestHandler {

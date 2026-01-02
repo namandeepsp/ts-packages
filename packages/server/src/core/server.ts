@@ -9,13 +9,13 @@ import {
 } from '@naman_deep_singh/cache'
 import express, { json, raw } from 'express'
 
-import { PeriodicHealthMonitor } from './periodic-health'
-import { createGracefulShutdown } from './shutdown'
+import { useSession } from '../middleware/session.middleware.js'
+import type { ServerConfig, SocketIOConfig, SocketInstance } from '../types.js'
+import { PeriodicHealthMonitor } from './periodic-health.js'
+import { createGracefulShutdown } from './shutdown.js'
 
 import type { Server } from 'http'
 import type { Application, RequestHandler } from 'express'
-import { useSession } from '../middleware'
-import type { ServerConfig, SocketIOConfig, SocketInstance } from '../types'
 
 export interface GrpcService {
 	service: Record<string, unknown>

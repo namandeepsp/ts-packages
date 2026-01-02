@@ -1,15 +1,15 @@
-import { createAuthMiddleware } from './auth.middleware'
-import { createErrorHandler } from './errorHandler.middleware'
-import { createLoggingMiddleware } from './logging.middleware'
-import { createRateLimitMiddleware } from './rateLimiter.middleware'
-import { createRequestIdMiddleware } from './requestId.middleware'
-import { createValidationMiddleware } from './validation.middleware'
+import { createAuthMiddleware } from './auth.middleware.js'
+import { createErrorHandler } from './errorHandler.middleware.js'
+import { createLoggingMiddleware } from './logging.middleware.js'
+import { createRateLimitMiddleware } from './rateLimiter.middleware.js'
+import { createRequestIdMiddleware } from './requestId.middleware.js'
+import { createValidationMiddleware } from './validation.middleware.js'
 
 import type { Application, RequestHandler } from 'express'
-import type { ServerPlugin } from '../types'
-import type { AuthConfig } from './auth.middleware'
-import type { RateLimitConfig } from './rateLimiter.middleware'
-import type { ValidationRule } from './validation.middleware'
+import type { ServerPlugin } from '../types.js'
+import type { AuthConfig } from './auth.middleware.js'
+import type { RateLimitConfig } from './rateLimiter.middleware.js'
+import type { ValidationRule } from './validation.middleware.js'
 
 // Plugin versions
 export function withLogging(

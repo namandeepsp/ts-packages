@@ -1,6 +1,6 @@
 # @naman_deep_singh/server
 
-**Version:** 1.6.0 (with integrated cache & session support)
+**Version:** 1.7.0 (with integrated cache & session support)
 
 Extensible server utilities for Express.js microservices with multi-protocol support, integrated caching, session management, and TypeScript.
 

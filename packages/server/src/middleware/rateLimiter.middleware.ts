@@ -1,9 +1,4 @@
-import type {
-	NextFunction,
-	Request,
-	RequestHandler,
-	Response,
-} from 'node_modules/@types/express'
+import type { NextFunction, Request, RequestHandler, Response } from 'express'
 
 // Rate limiting middleware
 export interface RateLimitConfig {

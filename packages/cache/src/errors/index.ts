@@ -3,5 +3,5 @@ import { CACHE_ERROR_CODES } from './cacheErrorCodes.js'
 
 errorMessageRegistry.register(CACHE_ERROR_CODES)
 
-export * from './CacheError.js'
-export * from './cacheErrorCodes.js'
+export { CacheError } from './CacheError.js'
+export { CACHE_ERROR_CODES, type CacheErrorCode } from './cacheErrorCodes.js'

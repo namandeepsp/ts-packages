@@ -1,11 +1,12 @@
-import { CACHE_ERROR_CODES, CacheError } from '../errors/index.js'
+import { CacheError } from '../errors/CacheError.js'
+import { CACHE_ERROR_CODES } from '../errors/cacheErrorCodes.js'
 import type {
 	BatchResult,
 	CacheConfig,
 	CacheStats,
 	HealthCheckResponse,
 } from '../types.js'
-import type { ICache } from './interfaces/index.js'
+import type { ICache } from './interfaces/ICache.js'
 
 /**
  * Abstract base class for all cache adapters

@@ -1,3 +1,3 @@
-export * from './memcache/index.js'
-export * from './memory/index.js'
-export * from './redis/index.js'
+export { MemcacheCache } from './memcache/index.js'
+export { MemoryCache } from './memory/index.js'
+export { RedisCache } from './redis/index.js'

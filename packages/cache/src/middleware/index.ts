@@ -1,1 +1,5 @@
-export * from './express/index.js'
+export {
+    cacheSessionMiddleware,
+    cacheHealthCheckMiddleware,
+    cacheResponseMiddleware,
+} from './express/index.js'

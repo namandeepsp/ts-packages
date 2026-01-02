@@ -1,1 +1,1 @@
-export * from './SessionStore.js'
+export { SessionStore } from './SessionStore.js'

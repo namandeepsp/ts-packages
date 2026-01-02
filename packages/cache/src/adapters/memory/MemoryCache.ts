@@ -1,5 +1,6 @@
-import { BaseCache } from '../../core/index.js'
-import { CACHE_ERROR_CODES, CacheError } from '../../errors/index.js'
+import { BaseCache } from '../../core/BaseCache.js'
+import { CacheError } from '../../errors/CacheError.js'
+import { CACHE_ERROR_CODES } from '../../errors/cacheErrorCodes.js'
 import type { HealthCheckResponse, MemoryCacheConfig } from '../../types.js'
 
 /**

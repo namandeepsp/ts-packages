@@ -19,6 +19,21 @@
       "require": "./dist/cjs/core/index.js",
       "types": "./dist/types/core/index.d.ts"
     },
+    "./core/crypto": {
+      "import": "./dist/esm/core/crypto/index.js",
+      "require": "./dist/cjs/core/crypto/index.js",
+      "types": "./dist/types/core/crypto/index.d.ts"
+    },
+    "./core/jwt": {
+      "import": "./dist/esm/core/jwt/index.js",
+      "require": "./dist/cjs/core/jwt/index.js",
+      "types": "./dist/types/core/jwt/index.d.ts"
+    },
+    "./core/password": {
+      "import": "./dist/esm/core/password/index.js",
+      "require": "./dist/cjs/core/password/index.js",
+      "types": "./dist/types/core/password/index.d.ts"
+    },
     "./interfaces": {
       "import": "./dist/esm/interfaces/index.js",
       "require": "./dist/cjs/interfaces/index.js",
@@ -434,7 +449,7 @@ Use secure random generation for cryptographic operations
 export * from './core/index.js'
 
 // Public interfaces
-export * from './interfaces/index.js'
+// export * from './interfaces/index.js'
 
 ===== ./src/interfaces/index.ts =====
 export * from './jwt.interface.js'
@@ -560,6 +575,7 @@ export interface ITokenManager {
 export * from './crypto/index.js'
 export * from './jwt/index.js'
 export * from './password/index.js'
+
 ===== ./src/core/jwt/decode.ts =====
 import { BadRequestError } from '@naman_deep_singh/errors'
 import { type JwtPayload, decode } from 'jsonwebtoken'
@@ -1680,338 +1696,127 @@ export interface PasswordStrengthOptions {
 	requireSymbols?: boolean
 }
 
-===== ./src/core/crypto/CryptoManager.ts =====
-import { CryptoIntegrityError } from '@naman_deep_singh/errors'
-import {
-	decrypt as functionalDecrypt,
-	encrypt as functionalEncrypt,
-	hmacSign as functionalHmacSign,
-	hmacVerify as functionalHmacVerify,
-	randomToken as functionalRandomToken,
-} from './index.js'
-
-/**
- * Configuration options for CryptoManager
- */
-export interface CryptoManagerConfig {
-	defaultAlgorithm?: string
-	defaultEncoding?: BufferEncoding
-	hmacAlgorithm?: string
-}
-
-/**
- * Default configuration
- */
-const DEFAULT_CONFIG: Required<CryptoManagerConfig> = {
-	defaultAlgorithm: 'aes-256-gcm',
-	defaultEncoding: 'utf8',
-	hmacAlgorithm: 'sha256',
-}
-
-/**
- * CryptoManager - Class-based wrapper for all cryptographic operations
- * Provides a consistent interface for encryption, decryption, HMAC generation, and secure random generation
- */
-export class CryptoManager {
-	private config: Required<CryptoManagerConfig>
-
-	constructor(config: CryptoManagerConfig = {}) {
-		this.config = { ...DEFAULT_CONFIG, ...config }
-	}
-
-	/**
-	 * Update configuration
-	 */
-	public updateConfig(config: Partial<CryptoManagerConfig>): void {
-		this.config = { ...this.config, ...config }
-	}
-
-	/**
-	 * Get current configuration
-	 */
-	public getConfig(): Required<CryptoManagerConfig> {
-		return { ...this.config }
-	}
-
-	/**
-	 * Encrypt data using the default or specified algorithm
-	 */
-	public encrypt(
-		plaintext: string,
-		key: string,
-		_options?: {
-			algorithm?: string
-			encoding?: BufferEncoding
-			iv?: string
-		},
-	): string {
-		try {
-			return functionalEncrypt(plaintext, key)
-		} catch (error) {
-			throw new CryptoIntegrityError(
-				{
-					reason: 'Encryption failed',
-				},
-				error instanceof Error ? error : undefined,
-			)
-		}
-	}
-
-	/**
-	 * Decrypt data using the default or specified algorithm
-	 */
-	public decrypt(
-		encryptedData: string,
-		key: string,
-		_options?: {
-			algorithm?: string
-			encoding?: BufferEncoding
-			iv?: string
-		},
-	): string {
-		try {
-			return functionalDecrypt(encryptedData, key)
-		} catch (error) {
-			throw new CryptoIntegrityError(
-				{
-					reason: 'Decryption failed',
-				},
-				error instanceof Error ? error : undefined,
-			)
-		}
-	}
-
-	/**
-	 * Generate HMAC signature
-	 */
-	public generateHmac(
-		data: string,
-		secret: string,
-		_options?: {
-			algorithm?: string
-			encoding?: BufferEncoding
-		},
-	): string {
-		// Use the basic HMAC sign function for now
-		// TODO: Add support for different algorithms
-		return functionalHmacSign(data, secret)
-	}
-
-	/**
-	 * Generate cryptographically secure random bytes
-	 */
-	public generateSecureRandom(
-		length: number,
-		_encoding: BufferEncoding = 'hex',
-	): string {
-		// Use the basic random token function
-		return functionalRandomToken(length)
-	}
-
-	/**
-	 * Verify HMAC signature
-	 */
-	public verifyHmac(
-		data: string,
-		secret: string,
-		signature: string,
-		_options?: {
-			algorithm?: string
-			encoding?: BufferEncoding
-		},
-	): boolean {
-		// Use the basic HMAC verify function
-		return functionalHmacVerify(data, secret, signature)
-	}
-
-	/**
-	 * Create a key derivation function using PBKDF2
-	 */
-	public deriveKey(
-		password: string,
-		salt: string,
-		iterations = 100000,
-		keyLength = 32,
-	): Promise<string> {
-		return new Promise((resolve, reject) => {
-			const crypto = require('crypto')
-
-			crypto.pbkdf2(
-				password,
-				salt,
-				iterations,
-				keyLength,
-				'sha256',
-				(error: Error | null, derivedKey: Buffer) => {
-					if (error) {
-						reject(
-							new CryptoIntegrityError(
-								{
-									reason: 'Key derivation failed',
-								},
-								error instanceof Error ? error : undefined,
-							),
-						)
-					} else {
-						resolve(derivedKey.toString('hex'))
-					}
-				},
-			)
-		})
-	}
-
-	/**
-	 * Hash data using SHA-256
-	 */
-	public sha256(data: string, encoding: BufferEncoding = 'hex'): string {
-		const crypto = require('crypto')
-		return crypto.createHash('sha256').update(data).digest(encoding)
-	}
-
-	/**
-	 * Hash data using SHA-512
-	 */
-	public sha512(data: string, encoding: BufferEncoding = 'hex'): string {
-		const crypto = require('crypto')
-		return crypto.createHash('sha512').update(data).digest(encoding)
-	}
-
-	/**
-	 * Generate a secure key pair for asymmetric encryption
-	 */
-	public generateKeyPair(options?: {
-		modulusLength?: number
-		publicKeyEncoding?: { type: string; format: string }
-		privateKeyEncoding?: { type: string; format: string }
-	}): Promise<{ publicKey: string; privateKey: string }> {
-		return new Promise((resolve, _reject) => {
-			const crypto = require('crypto')
-
-			const keyPair = crypto.generateKeyPairSync('rsa', {
-				modulusLength: options?.modulusLength || 2048,
-				publicKeyEncoding: options?.publicKeyEncoding || {
-					type: 'spki',
-					format: 'pem',
-				},
-				privateKeyEncoding: options?.privateKeyEncoding || {
-					type: 'pkcs8',
-					format: 'pem',
-				},
-			})
-
-			resolve(keyPair)
-		})
-	}
-
-	/**
-	 * Encrypt data using RSA public key
-	 */
-	public rsaEncrypt(data: string, publicKey: string): Promise<string> {
-		return new Promise((resolve, _reject) => {
-			const crypto = require('crypto')
-
-			const buffer = Buffer.from(data, 'utf8')
-			const encrypted = crypto.publicEncrypt(publicKey, buffer)
-			resolve(encrypted.toString('base64'))
-		})
-	}
-
-	/**
-	 * Decrypt data using RSA private key
-	 */
-	public rsaDecrypt(
-		encryptedData: string,
-		privateKey: string,
-	): Promise<string> {
-		return new Promise((resolve, _reject) => {
-			const crypto = require('crypto')
-
-			const buffer = Buffer.from(encryptedData, 'base64')
-			const decrypted = crypto.privateDecrypt(privateKey, buffer)
-			resolve(decrypted.toString('utf8'))
-		})
-	}
-
-	/**
-	 * Create digital signature using RSA private key
-	 */
-	public rsaSign(
-		data: string,
-		privateKey: string,
-		algorithm = 'sha256',
-	): Promise<string> {
-		return new Promise((resolve, reject) => {
-			const crypto = require('crypto')
-			try {
-				const sign = crypto.createSign(algorithm)
-				sign.update(data)
-				sign.end()
-				const signature = sign.sign(privateKey, 'base64')
-				resolve(signature)
-			} catch (error) {
-				reject(
-					new CryptoIntegrityError(
-						{
-							reason: 'RSA signing failed',
-						},
-						error instanceof Error ? error : undefined,
-					),
-				)
-			}
-		})
-	}
-
-	/**
-	 * Verify digital signature using RSA public key
-	 */
-	public rsaVerify(
-		data: string,
-		signature: string,
-		publicKey: string,
-		algorithm = 'sha256',
-	): Promise<boolean> {
-		return new Promise((resolve, reject) => {
-			const crypto = require('crypto')
-			try {
-				const verify = crypto.createVerify(algorithm)
-				verify.update(data)
-				verify.end()
-				const isValid = verify.verify(publicKey, signature, 'base64')
-				resolve(isValid)
-			} catch (error) {
-				reject(
-					new CryptoIntegrityError(
-						{
-							reason: 'RSA verification failed',
-						},
-						error instanceof Error ? error : undefined,
-					),
-				)
-			}
-		})
-	}
-}
-
-/**
- * Create a CryptoManager instance with default configuration
- */
-export const createCryptoManager = (
-	config?: CryptoManagerConfig,
-): CryptoManager => {
-	return new CryptoManager(config)
-}
-
-/**
- * Default CryptoManager instance
- */
-export const cryptoManager = new CryptoManager()
-
 ===== ./src/core/crypto/index.ts =====
-export * from './CryptoManager.js'
+export * from './CryptoManger.js'
 export * from './encrypt.js'
 export * from './decrypt.js'
 export * from './hmac.js'
 export * from './random.js'
+
+===== ./src/core/crypto/CryptoManger.ts =====
+import crypto from 'crypto'
+import { BadRequestError } from '@naman_deep_singh/errors'
+
+import { encrypt } from './encrypt.js'
+import { decrypt } from './decrypt.js'
+import { hmacSign, hmacVerify } from './hmac.js'
+
+/**
+ * High-level cryptography manager
+ * Wraps encryption, decryption, HMAC, and random utilities
+ */
+export class CryptoManager {
+    private readonly secret: string
+
+    constructor(secret: string) {
+        if (!secret || typeof secret !== 'string' || secret.length < 16) {
+            throw new BadRequestError({
+                reason: 'CryptoManager secret must be a non-empty string (min 16 chars)',
+            })
+        }
+        this.secret = secret
+    }
+
+    /**
+     * Encrypt data using AES-256-GCM
+     */
+    encrypt(data: string): string {
+        if (!data || typeof data !== 'string') {
+            throw new BadRequestError({
+                reason: 'Data to encrypt must be a non-empty string',
+            })
+        }
+        return encrypt(data, this.secret)
+    }
+
+    /**
+     * Decrypt AES-256-GCM encrypted data
+     */
+    decrypt(encrypted: string): string {
+        if (!encrypted || typeof encrypted !== 'string') {
+            throw new BadRequestError({
+                reason: 'Encrypted value must be a non-empty string',
+            })
+        }
+        return decrypt(encrypted, this.secret)
+    }
+
+    /**
+     * Create HMAC SHA-256 signature
+     */
+    createHMAC(message: string): string {
+        if (!message || typeof message !== 'string') {
+            throw new BadRequestError({
+                reason: 'Message must be a non-empty string',
+            })
+        }
+        return hmacSign(message, this.secret)
+    }
+
+    /**
+     * Verify HMAC SHA-256 signature
+     */
+    verifyHMAC(message: string, signature: string): boolean {
+        if (
+            !message ||
+            typeof message !== 'string' ||
+            !signature ||
+            typeof signature !== 'string'
+        ) {
+            return false
+        }
+        return hmacVerify(message, this.secret, signature)
+    }
+
+    /**
+     * Generate cryptographically secure random bytes
+     */
+    generateRandomBytes(length = 32): Buffer {
+        if (!Number.isInteger(length) || length <= 0) {
+            throw new BadRequestError({
+                reason: 'Random byte length must be a positive integer',
+            })
+        }
+        return crypto.randomBytes(length)
+    }
+
+    /**
+     * Generate secure random hex string
+     */
+    generateRandomHex(length = 32): string {
+        if (!Number.isInteger(length) || length <= 0) {
+            throw new BadRequestError({
+                reason: 'Random hex length must be a positive integer',
+            })
+        }
+        return crypto.randomBytes(length).toString('hex')
+    }
+
+    /**
+     * Generate secure random string (URL-safe base64)
+     */
+    generateRandomString(length = 32): string {
+        if (!Number.isInteger(length) || length <= 0) {
+            throw new BadRequestError({
+                reason: 'Random string length must be a positive integer',
+            })
+        }
+        return crypto
+            .randomBytes(Math.ceil((length * 3) / 4))
+            .toString('base64url')
+            .slice(0, length)
+    }
+}
 
 ===== ./src/core/crypto/random.ts =====
 import crypto from 'crypto'

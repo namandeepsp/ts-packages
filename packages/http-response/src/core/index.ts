@@ -10,10 +10,10 @@ export { defaultConfig } from './config.js'
 
 // Core types (explicit)
 export type {
-    ResponseEnvelope,
-    ErrorShape,
-    PaginationMeta,
-    PlainObject,
-    Sender,
-    TransportResult,
+	ResponseEnvelope,
+	ErrorShape,
+	PaginationMeta,
+	PlainObject,
+	Sender,
+	TransportResult,
 } from './types.js'

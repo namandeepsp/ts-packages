@@ -1,4 +1,16 @@
 // Re-export all utilities
-export * from './config.js'
-export * from './helpers.js'
-export * from './defineExtension.js'
+export {
+	validateConfig,
+	validatePerformanceSettings,
+	mergeConfigs,
+} from './config.js'
+
+export {
+	isValidArrayIndex,
+	ensurePositiveInteger,
+	safeClone,
+	getPathSegments,
+	hasOwnProperty,
+} from './helpers.js'
+
+export { defineExtension } from './defineExtension.js'

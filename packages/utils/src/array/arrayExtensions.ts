@@ -1,4 +1,4 @@
-import { defineExtension } from '../utils/index.js'
+import { defineExtension } from '../utils/defineExtension.js'
 
 let arrayExtended = false
 

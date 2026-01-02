@@ -1,4 +1,4 @@
-import type { PerformanceConfig } from '../core/index.js'
+import type { PerformanceConfig } from '../core/performance.js'
 
 export function validateConfig(
 	config: Partial<PerformanceConfig>,

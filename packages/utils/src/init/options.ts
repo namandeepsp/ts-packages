@@ -1,4 +1,4 @@
-import type { ExtensionOptions } from '../types/index.js'
+import type { ExtensionOptions } from '../types/extensionTypes.js'
 
 export function validateExtensionOptions(
 	options: Partial<ExtensionOptions>,

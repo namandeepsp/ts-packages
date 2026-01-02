@@ -26,7 +26,7 @@ export function cacheSessionMiddleware(
 				const sessionData = await sessionStore.getAndExtend(sessionId)
 
 				if (sessionData) {
-					; (req as any)[sessionDataKey] = sessionData
+					;(req as any)[sessionDataKey] = sessionData
 				}
 			}
 

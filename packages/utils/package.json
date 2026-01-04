@@ -1,6 +1,6 @@
 {
   "name": "@naman_deep_singh/utils",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "description": "Universal JavaScript prototype extensions for common development utilities",
   "type": "module",
   "main": "./dist/cjs/index.js",
@@ -52,6 +52,11 @@
       "types": "./dist/types/extensions/index.d.ts",
       "import": "./dist/esm/extensions/index.js",
       "require": "./dist/cjs/extensions/index.js"
+    },
+    "./errors": {
+      "types": "./dist/types/errors/index.d.ts",
+      "import": "./dist/esm/errors/index.js",
+      "require": "./dist/cjs/errors/index.js"
     },
     "./types": {
       "types": "./dist/types/types/index.d.ts",

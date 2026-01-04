@@ -15,5 +15,8 @@ export * from './utils/index.js'
 export * from './init/index.js'
 export * from './extensions/index.js'
 
+// Error handling
+export * from './errors/index.js'
+
 // Types
 export * from './types/index.js'

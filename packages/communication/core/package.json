@@ -1,0 +1,64 @@
+{
+  "name": "@naman_deep_singh/communication-core",
+  "version": "1.0.0",
+  "description": "@naman_deep_singh/communication-core package",
+  "type": "module",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./interfaces": {
+      "import": "./dist/esm/interfaces/index.js",
+      "require": "./dist/cjs/interfaces/index.js",
+      "types": "./dist/types/interfaces/index.d.ts"
+    },
+    "./abstract": {
+      "import": "./dist/esm/abstract/index.js",
+      "require": "./dist/cjs/abstract/index.js",
+      "types": "./dist/types/abstract/index.d.ts"
+    },
+    "./types": {
+      "import": "./dist/esm/types/index.js",
+      "require": "./dist/cjs/types/index.js",
+      "types": "./dist/types/types/index.d.ts"
+    },
+    "./errors": {
+      "import": "./dist/esm/errors/index.js",
+      "require": "./dist/cjs/errors/index.js",
+      "types": "./dist/types/errors/index.d.ts"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "pnpm run build:types && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json",
+    "build:types": "tsc -p tsconfig.types.json",
+    "clean": "rimraf dist",
+    "prepublishOnly": "npm run clean && npm run build",
+    "clean:js": "find src -type f -name \"*.js\" -delete"
+  },
+  "keywords": [],
+  "author": "Naman Deep Singh",
+  "license": "ISC",
+  "packageManager": "pnpm@10.20.0",
+  "devDependencies": {
+    "rimraf": "^5.0.5",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@naman_deep_singh/errors": "^2.3.0",
+    "@naman_deep_singh/http-response": "^3.3.1",
+    "@types/node": "^25.0.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

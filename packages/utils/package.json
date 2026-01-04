@@ -1,6 +1,6 @@
 {
   "name": "@naman_deep_singh/utils",
-  "version": "2.4.0",
+  "version": "2.6.0",
   "description": "Universal JavaScript prototype extensions for common development utilities",
   "type": "module",
   "main": "./dist/cjs/index.js",
@@ -89,6 +89,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@naman_deep_singh/errors": "^2.3.0",
     "@types/node": "^25.0.1"
   },
   "publishConfig": {

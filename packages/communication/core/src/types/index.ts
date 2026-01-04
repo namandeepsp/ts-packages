@@ -1,0 +1,86 @@
+/**
+ * Type definitions for communication layer
+ * @packageDocumentation
+ */
+
+export type {
+    HttpMethod,
+    ProtocolType,
+    ServiceDiscoveryType,
+    LoadBalanceStrategy,
+    CircuitBreakerState,
+    BackoffStrategy,
+    SerializationFormat,
+    LogLevel,
+    ClientConfig,
+    ServiceDiscoveryConfig,
+    LoadBalancingConfig,
+    ResilienceConfig,
+    CircuitBreakerConfig,
+    RetryPolicyConfig,
+    TimeoutConfig,
+    BulkheadConfig,
+    FallbackConfig,
+    BaseProtocolConfig,
+    HttpProtocolConfig,
+    GrpcProtocolConfig,
+    WebSocketProtocolConfig,
+    InterceptorConfig,
+    SerializationConfig,
+    LoggingConfig,
+    MetricsConfig,
+    CacheConfig,
+} from './config.js';
+
+export type {
+    BaseRequest,
+    HttpRequest,
+    GrpcRequest,
+    WebSocketRequest,
+    RetryConfig,
+    CircuitBreakerRequestConfig,
+    Request,
+    RequestOptions,
+    RequestContext,
+} from './request.js';
+
+export type {
+    BaseResponse,
+    HttpResponse,
+    GrpcResponse,
+    WebSocketResponse,
+    ErrorResponse,
+    PaginatedResponse,
+    StreamResponse,
+    Response,
+} from './response.js';
+
+export type {
+    ServiceInstance,
+    ServiceRegistration,
+    WatchCallback,
+    UnwatchFunction,
+    HealthCheckResult,
+    ServiceEndpoint,
+    ServiceDependency,
+    ServiceMetrics,
+    ServiceRegistryConfig,
+    ServiceInstanceFilter,
+    ServiceDiscoveryResult,
+} from './service.js';
+
+export type {
+    BaseEvent,
+    CircuitBreakerEvent,
+    RetryEvent,
+    ServiceDiscoveryEvent,
+    LoadBalancingEvent,
+    ProtocolEvent,
+    ConnectionEvent,
+    MetricsEvent,
+    CacheEvent,
+    InterceptorEvent,
+    CommunicationEvent,
+    EventListener,
+    EventEmitter,
+} from './events.js';

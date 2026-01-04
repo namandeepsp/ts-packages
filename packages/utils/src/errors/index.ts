@@ -1,0 +1,5 @@
+export { CompressionError } from './CompressionError.js'
+export { ConnectionError } from './ConnectionError.js'
+export { PoolError } from './PoolError.js'
+export { TimeoutError } from './TimeoutError.js'
+export { ValidationError } from './ValidationError.js'

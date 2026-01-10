@@ -18,8 +18,8 @@ importers:
   packages/cache:
     dependencies:
       '@naman_deep_singh/errors':
-        specifier: ^2.3.0
-        version: 2.3.0(express@5.2.1)
+        specifier: ^2.3.1
+        version: 2.3.1(express@5.2.1)
       memcached:
         specifier: ^2.2.2
         version: 2.2.2
@@ -176,8 +176,8 @@ importers:
   packages/utils:
     dependencies:
       '@naman_deep_singh/errors':
-        specifier: ^2.3.0
-        version: 2.3.0(express@5.2.1)
+        specifier: ^2.3.1
+        version: 2.3.1(express@5.2.1)
       '@types/node':
         specifier: ^25.0.1
         version: 25.0.3
@@ -253,6 +253,9 @@ packages:
 
   '@naman_deep_singh/errors@2.3.0':
     resolution: {integrity: sha512-KlY+kAWYUFptHTxGX6a6bTlGrT1EqrO0WAOzElu8Wl4q1hcGefem1OEzmy/slxYY3QofJn+DptVq1+NIUeRmoA==}
+
+  '@naman_deep_singh/errors@2.3.1':
+    resolution: {integrity: sha512-PdDmtj+nHBGHY2U97zlGK5un3yO9p5bK0a2LTczIIWO4HbhWdRmrUgEmlC/0Og9L6wuiafk9h5asSC/PVo41Xg==}
 
   '@naman_deep_singh/http-response@3.3.2':
     resolution: {integrity: sha512-JT3zwnSZMpiarQDm5USAaNQTk7d3P4Jxo2Td9UE70AJK3neSeYX1EAC67a3YdyA8hcDo6Fm9/XzW1FSjV9W/aQ==}
@@ -893,6 +896,12 @@ snapshots:
       - express
 
   '@naman_deep_singh/errors@2.3.0(express@5.2.1)':
+    dependencies:
+      '@naman_deep_singh/http-response': 3.3.2(express@5.2.1)
+    transitivePeerDependencies:
+      - express
+
+  '@naman_deep_singh/errors@2.3.1(express@5.2.1)':
     dependencies:
       '@naman_deep_singh/http-response': 3.3.2(express@5.2.1)
     transitivePeerDependencies:

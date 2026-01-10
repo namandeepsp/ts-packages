@@ -33,7 +33,6 @@ export type {
 export type {
     ILoadBalanceStrategy,
     ILoadBalancerFactory,
-    LoadBalancerSelection,
 } from './LoadBalancer.interface.js';
 
 export type {
@@ -49,3 +48,25 @@ export type {
     IInterceptorFactory,
     InterceptorOrder,
 } from './Interceptor.interface.js';
+
+export type {
+    ITimeoutManager,
+    ITimeoutManagerFactory,
+    TimeoutOptions,
+} from './Timeout.interface.js';
+
+export type {
+    IConnection,
+    IConnectionPool,
+    IConnectionPoolFactory,
+    ConnectionAcquisition,
+} from './ConnectionPool.interface.js';
+
+export type {
+    ICompressionManager,
+    ICompressionManagerFactory,
+    CompressionAlgorithm,
+    CompressionOptions,
+    CompressionResult,
+    DecompressionResult,
+} from './Compression.interface.js';

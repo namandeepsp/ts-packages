@@ -5,22 +5,23 @@
 
 import type { IServiceDiscoverer } from '../interfaces/ServiceDiscovery.interface.js';
 import type {
-    HealthCheckResult,
-    ServiceDiscoveryResult,
     ServiceInstance,
+    ServiceRegistration,
+    ServiceDiscoveryResult,
     ServiceInstanceFilter,
-    ServiceRegistryConfig,
+    HealthCheckResult,
+    WatchCallback,
     UnwatchFunction,
-    WatchCallback
+    ServiceRegistryConfig,
 } from '../types/service.js';
 
 /**
  * Abstract base service discoverer implementation
- * Provides common functionality for all service discoverer implementations
+ * Provides common functionality for all service discovery implementations
  */
 export abstract class BaseServiceDiscoverer implements IServiceDiscoverer {
 
-    /** Discovery type (kubernetes, consul, etc.) */
+    /** Discovery type */
     public readonly type: string;
 
     /** Discovery configuration */
@@ -38,12 +39,11 @@ export abstract class BaseServiceDiscoverer implements IServiceDiscoverer {
     /** Total instances discovered */
     public totalInstancesDiscovered: number = 0;
 
-    /** Service instance cache */
-    protected cache: Map<string, {
-        instances: ServiceInstance[];
-        timestamp: number;
-        ttl: number;
-    }> = new Map();
+    /** Service cache */
+    protected cache: Map<string, ServiceInstance[]> = new Map();
+
+    /** Cache timestamps */
+    protected cacheTimestamps: Map<string, number> = new Map();
 
     /** Watch callbacks */
     protected watchers: Map<string, Set<WatchCallback>> = new Map();
@@ -56,20 +56,21 @@ export abstract class BaseServiceDiscoverer implements IServiceDiscoverer {
         cacheMisses: number;
         cacheHitRate: number;
         averageResolveTime: number;
+        totalResolveTime: number;
         lastError?: string;
         uptime: number;
+        startTime: number;
     } = {
-            totalResolves: 0,
-            totalWatches: 0,
-            cacheHits: 0,
-            cacheMisses: 0,
-            cacheHitRate: 0,
-            averageResolveTime: 0,
-            uptime: 0,
-        };
-
-    /** Start time */
-    protected readonly startTime: number = Date.now();
+        totalResolves: 0,
+        totalWatches: 0,
+        cacheHits: 0,
+        cacheMisses: 0,
+        cacheHitRate: 0,
+        averageResolveTime: 0,
+        totalResolveTime: 0,
+        uptime: 0,
+        startTime: Date.now(),
+    };
 
     /**
      * Create a new base service discoverer instance
@@ -94,7 +95,6 @@ export abstract class BaseServiceDiscoverer implements IServiceDiscoverer {
      * @param serviceName Service name to resolve
      * @param filter Optional filter for instances
      * @returns Promise resolving to service discovery result
-     * @throws {CommunicationError} If discovery fails
      */
     public abstract resolve(
         serviceName: string,
@@ -110,16 +110,16 @@ export abstract class BaseServiceDiscoverer implements IServiceDiscoverer {
         serviceNames: string[]
     ): Promise<Map<string, ServiceInstance[]>> {
         const results = new Map<string, ServiceInstance[]>();
-        const promises = serviceNames.map(async (serviceName) => {
+        
+        for (const serviceName of serviceNames) {
             try {
                 const result = await this.resolve(serviceName);
                 results.set(serviceName, result.instances);
             } catch (error) {
                 results.set(serviceName, []);
             }
-        });
-
-        await Promise.all(promises);
+        }
+        
         return results;
     }
 
@@ -129,33 +129,20 @@ export abstract class BaseServiceDiscoverer implements IServiceDiscoverer {
      * @param callback Callback function for changes
      * @returns Unwatch function
      */
-    public watch(
-        serviceName: string,
-        callback: WatchCallback
-    ): UnwatchFunction {
-        if (!this.watchers.has(serviceName)) {
-            this.watchers.set(serviceName, new Set());
+    public watch(serviceName: string, callback: WatchCallback): UnwatchFunction {
+        let watchers = this.watchers.get(serviceName);
+        if (!watchers) {
+            watchers = new Set();
+            this.watchers.set(serviceName, watchers);
         }
-
-        const watcherSet = this.watchers.get(serviceName)!;
-        watcherSet.add(callback);
+        
+        watchers.add(callback);
         this.stats.totalWatches++;
-
-        // ✅ Correct - call directly
-        const instances = this.getCachedInstances(serviceName);
-        try {
-            callback(instances);
-        } catch {
-            // Ignore errors in initial callback
-        }
-
+        
         return () => {
-            const watchers = this.watchers.get(serviceName);
-            if (watchers) {
-                watchers.delete(callback);
-                if (watchers.size === 0) {
-                    this.watchers.delete(serviceName);
-                }
+            watchers?.delete(callback);
+            if (watchers?.size === 0) {
+                this.watchers.delete(serviceName);
             }
         };
     }
@@ -176,44 +163,13 @@ export abstract class BaseServiceDiscoverer implements IServiceDiscoverer {
     }
 
     /**
-     * Notify watchers of service instance changes
-     * @param serviceName Service name
-     * @param instances Updated instances
+     * Perform health check on service instances
+     * @param serviceName Optional service name to check
+     * @returns Promise resolving to health check results
      */
-    protected notifyWatchers(
-        serviceName: string,
-        instances: ServiceInstance[]
-    ): void {
-        const watchers = this.watchers.get(serviceName);
-        if (watchers) {
-            for (const callback of watchers) {
-                try {
-                    callback(instances);
-                } catch (error) {
-                    // Ignore errors in watcher callbacks
-                }
-            }
-        }
-    }
-
-    /**
-     * Cache service instances
-     * @param serviceName Service name
-     * @param instances Service instances
-     * @param ttl Cache TTL in milliseconds
-     */
-    protected cacheInstances(
-        serviceName: string,
-        instances: ServiceInstance[],
-        ttl?: number
-    ): void {
-        const cacheTTL = ttl || this.config.cache?.ttl || 30000;
-        this.cache.set(serviceName, {
-            instances,
-            timestamp: Date.now(),
-            ttl: cacheTTL,
-        });
-    }
+    public abstract healthCheck(
+        serviceName?: string
+    ): Promise<Map<string, HealthCheckResult[]>>;
 
     /**
      * Get cached service instances
@@ -221,35 +177,7 @@ export abstract class BaseServiceDiscoverer implements IServiceDiscoverer {
      * @returns Cached instances or empty array
      */
     public getCachedInstances(serviceName: string): ServiceInstance[] {
-        const cached = this.cache.get(serviceName);
-
-        if (!cached) {
-            this.stats.cacheMisses++;
-            return [];
-        }
-
-        // Check if cache is expired
-        const isExpired = Date.now() - cached.timestamp > cached.ttl;
-        if (isExpired) {
-            this.cache.delete(serviceName);
-            this.stats.cacheMisses++;
-            return [];
-        }
-
-        this.stats.cacheHits++;
-        return [...cached.instances];
-    }
-
-    /**
-     * Check if cache is valid for a service
-     * @param serviceName Service name
-     * @returns True if cache is valid
-     */
-    protected isCacheValid(serviceName: string): boolean {
-        const cached = this.cache.get(serviceName);
-        if (!cached) return false;
-
-        return Date.now() - cached.timestamp <= cached.ttl;
+        return this.cache.get(serviceName) || [];
     }
 
     /**
@@ -259,8 +187,10 @@ export abstract class BaseServiceDiscoverer implements IServiceDiscoverer {
     public clearCache(serviceName?: string): void {
         if (serviceName) {
             this.cache.delete(serviceName);
+            this.cacheTimestamps.delete(serviceName);
         } else {
             this.cache.clear();
+            this.cacheTimestamps.clear();
         }
     }
 
@@ -271,74 +201,58 @@ export abstract class BaseServiceDiscoverer implements IServiceDiscoverer {
      */
     public async refreshCache(serviceName?: string): Promise<void> {
         if (serviceName) {
+            this.clearCache(serviceName);
             await this.resolve(serviceName);
         } else {
-            // Get all cached service names
             const serviceNames = Array.from(this.cache.keys());
-            await Promise.allSettled(
-                serviceNames.map(name => this.resolve(name))
-            );
+            this.clearCache();
+            await this.resolveAll(serviceNames);
         }
     }
 
     /**
-     * Filter service instances based on filter criteria
-     * @param instances Instances to filter
-     * @param filter Filter criteria
-     * @returns Filtered instances
+     * Check if cache is valid for a service
+     * @param serviceName Service name
+     * @returns True if cache is valid
      */
-    protected filterInstances(
-        instances: ServiceInstance[],
-        filter?: ServiceInstanceFilter
-    ): ServiceInstance[] {
-        if (!filter) return instances;
-
-        return instances.filter(instance => {
-            // Filter by status
-            if (filter.status && instance.status !== filter.status) {
-                return false;
-            }
-
-            // Filter by tags
-            if (filter.tags && filter.tags.length > 0) {
-                if (!instance.tags || !filter.tags.every(tag => instance.tags!.includes(tag))) {
-                    return false;
-                }
-            }
-
-            // Filter by zone
-            if (filter.zone && instance.zone !== filter.zone) {
-                return false;
-            }
-
-            // Filter by version
-            if (filter.version && instance.version !== filter.version) {
-                return false;
-            }
-
-            // Custom filter function
-            if (filter.filter && !filter.filter(instance)) {
-                return false;
-            }
-
-            return true;
-        }).slice(0, filter.limit || instances.length);
+    protected isCacheValid(serviceName: string): boolean {
+        if (!this.config.cache?.enabled) return false;
+        
+        const timestamp = this.cacheTimestamps.get(serviceName);
+        if (!timestamp) return false;
+        
+        const ttl = this.config.cache.ttl;
+        return (Date.now() - timestamp) < ttl;
     }
 
     /**
-     * Update service discovery statistics
-     * @param resolveTime Resolve time in milliseconds
-     * @param cacheHit Whether it was a cache hit
+     * Update cache for a service
+     * @param serviceName Service name
+     * @param instances Service instances
      */
-    protected updateStats(resolveTime: number, cacheHit: boolean): void {
-        this.stats.totalResolves++;
-        this.stats.averageResolveTime = (
-            (this.stats.averageResolveTime * (this.stats.totalResolves - 1) + resolveTime) /
-            this.stats.totalResolves
-        );
-        this.stats.cacheHitRate = this.stats.totalResolves > 0 ?
-            this.stats.cacheHits / this.stats.totalResolves : 0;
-        this.stats.uptime = Date.now() - this.startTime;
+    protected updateCache(serviceName: string, instances: ServiceInstance[]): void {
+        if (this.config.cache?.enabled) {
+            this.cache.set(serviceName, instances);
+            this.cacheTimestamps.set(serviceName, Date.now());
+        }
+    }
+
+    /**
+     * Notify watchers of service changes
+     * @param serviceName Service name
+     * @param instances Updated instances
+     */
+    protected notifyWatchers(serviceName: string, instances: ServiceInstance[]): void {
+        const watchers = this.watchers.get(serviceName);
+        if (watchers) {
+            for (const callback of watchers) {
+                try {
+                    callback(instances);
+                } catch (error) {
+                    // Log error but continue
+                }
+            }
+        }
     }
 
     /**
@@ -354,6 +268,11 @@ export abstract class BaseServiceDiscoverer implements IServiceDiscoverer {
         lastError?: string;
         uptime: number;
     } {
+        this.stats.uptime = Date.now() - this.stats.startTime;
+        this.stats.cacheHitRate = this.stats.totalResolves > 0 
+            ? this.stats.cacheHits / this.stats.totalResolves 
+            : 0;
+        
         return { ...this.stats };
     }
 
@@ -368,7 +287,9 @@ export abstract class BaseServiceDiscoverer implements IServiceDiscoverer {
             cacheMisses: 0,
             cacheHitRate: 0,
             averageResolveTime: 0,
-            uptime: Date.now() - this.startTime,
+            totalResolveTime: 0,
+            uptime: 0,
+            startTime: Date.now(),
         };
     }
 
@@ -381,104 +302,6 @@ export abstract class BaseServiceDiscoverer implements IServiceDiscoverer {
     }
 
     /**
- * Perform health check on service instances
- * @param serviceName Optional service name to check
- * @returns Promise resolving to health check results
- */
-    public async healthCheck(
-        serviceName?: string
-    ): Promise<Map<string, HealthCheckResult[]>> {
-        const results = new Map<string, HealthCheckResult[]>();
-
-        if (serviceName) {
-            // Health check specific service
-            const instances = await this.getInstancesForHealthCheck(serviceName);
-            const serviceResults = await this.checkInstancesHealth(instances);
-            results.set(serviceName, serviceResults);
-        } else {
-            // Health check all cached services
-            const serviceNames = Array.from(this.cache.keys());
-            const promises = serviceNames.map(async (name) => {
-                const instances = await this.getInstancesForHealthCheck(name);
-                const serviceResults = await this.checkInstancesHealth(instances);
-                results.set(name, serviceResults);
-            });
-
-            await Promise.all(promises);
-        }
-
-        return results;
-    }
-
-    /**
-     * Get instances for health check
-     * @param serviceName Service name
-     * @returns Service instances
-     */
-    protected async getInstancesForHealthCheck(
-        serviceName: string
-    ): Promise<ServiceInstance[]> {
-        // Try cache first, then resolve if needed
-        const cached = this.getCachedInstances(serviceName);
-        if (cached.length > 0) {
-            return cached;
-        }
-
-        try {
-            const result = await this.resolve(serviceName);
-            return result.instances;
-        } catch {
-            return [];
-        }
-    }
-
-    /**
-     * Check health of service instances
-     * @param instances Service instances
-     * @returns Health check results
-     */
-    protected async checkInstancesHealth(
-        instances: ServiceInstance[]
-    ): Promise<HealthCheckResult[]> {
-        const promises = instances.map(async (instance) => {
-            const startTime = Date.now();
-
-            try {
-                // Default health check: instance is healthy if status is 'healthy'
-                const isHealthy = instance.status === 'healthy';
-                const responseTime = Date.now() - startTime;
-
-                return {
-                    healthy: isHealthy,
-                    timestamp: Date.now(),
-                    responseTime,
-                    instanceId: instance.id,
-                    details: {
-                        host: instance.host,
-                        port: instance.port,
-                        status: instance.status,
-                        lastHealthCheck: instance.lastHealthCheck,
-                    },
-                };
-            } catch (error) {
-                return {
-                    healthy: false,
-                    timestamp: Date.now(),
-                    error: error instanceof Error ? error.message : String(error),
-                    instanceId: instance.id,
-                    details: {
-                        host: instance.host,
-                        port: instance.port,
-                        status: instance.status,
-                    },
-                };
-            }
-        });
-
-        return Promise.all(promises);
-    }
-
-    /**
      * Health check for the service discoverer itself
      */
     public async healthCheckSelf(): Promise<{
@@ -486,16 +309,18 @@ export abstract class BaseServiceDiscoverer implements IServiceDiscoverer {
         message?: string;
         details?: Record<string, unknown>;
     }> {
-        const healthy = this.isActive !== false;
-
+        const healthy = this.isActive;
+        
         return {
             healthy,
-            message: healthy ? 'Service discoverer is healthy' : 'Service discoverer is not active',
+            message: healthy ? 'Service discoverer is operational' : 'Service discoverer is not active',
             details: {
                 type: this.type,
                 isActive: this.isActive,
+                totalServices: this.totalServicesDiscovered,
+                totalInstances: this.totalInstancesDiscovered,
                 cacheSize: this.cache.size,
-                watchers: this.watchers.size,
+                watchersCount: this.watchers.size,
                 stats: this.getStats(),
             },
         };
@@ -506,13 +331,13 @@ export abstract class BaseServiceDiscoverer implements IServiceDiscoverer {
      */
     public async close(): Promise<void> {
         this.isActive = false;
-        this.watchers.clear();
-        this.cache.clear();
+        this.unwatchAll();
+        this.clearCache();
         await this.onClose();
     }
 
     /**
-     * Hook for service discoverer close
+     * Hook for cleanup logic
      */
     protected async onClose(): Promise<void> {
         // Can be overridden by subclasses

@@ -3,10 +3,11 @@
  * @packageDocumentation
  */
 
+import { CommunicationError } from '../errors/CommunicationError.js';
 import type {
     ILoadBalanceStrategy,
-    LoadBalancerSelection
 } from '../interfaces/LoadBalancer.interface.js';
+import type { LoadBalancerSelection } from '../types/config.js';
 import type {
     LoadBalancingConfig,
 } from '../types/config.js';

@@ -3,7 +3,7 @@
  * @packageDocumentation
  */
 
-import type { CommunicationError } from '../errors/CommunicationError.js';
+import type { CommunicationErrorType } from '../errors/CommunicationError.js';
 import type {
     Request,
     RequestContext
@@ -121,9 +121,9 @@ export abstract class BaseInterceptor<TRequest = Request, TResponse = Response>
      * @returns Modified error, new response, or void
      */
     public abstract onError?(
-        error: CommunicationError,
+        error: CommunicationErrorType,
         context: RequestContext
-    ): CommunicationError | TResponse | void | Promise<CommunicationError | TResponse | void>;
+    ): CommunicationErrorType | TResponse | void | Promise<CommunicationErrorType | TResponse | void>;
 
     /**
      * Initialize interceptor (called when added to client/protocol)
@@ -274,9 +274,9 @@ export abstract class BaseInterceptor<TRequest = Request, TResponse = Response>
      * @returns Modified error or response, or original error if not modified
      */
     protected async executeOnError(
-        error: CommunicationError,
+        error: CommunicationErrorType,
         context: RequestContext
-    ): Promise<CommunicationError | TResponse> {
+    ): Promise<CommunicationErrorType | TResponse> {
         if (!this.enabled || !this.onError) {
             return error;
         }

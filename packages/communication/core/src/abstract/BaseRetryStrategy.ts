@@ -3,7 +3,7 @@
  * @packageDocumentation
  */
 
-import type { CommunicationError } from '../errors/CommunicationError.js';
+import type { CommunicationError, CommunicationErrorType } from '../errors/CommunicationError.js';
 import type {
     IRetryStrategy,
     RetryContext,
@@ -92,7 +92,7 @@ export abstract class BaseRetryStrategy implements IRetryStrategy {
      */
     public abstract executeWithDecision<T>(
         fn: () => Promise<T>,
-        shouldRetry: (error: CommunicationError, context: RetryContext) => RetryDecision,
+        shouldRetry: (error: CommunicationErrorType, context: RetryContext) => RetryDecision,
         context?: Partial<RetryContext>
     ): Promise<T>;
 
@@ -103,7 +103,7 @@ export abstract class BaseRetryStrategy implements IRetryStrategy {
      * @returns Retry decision
      */
     public shouldRetry(
-        error: CommunicationError,
+        error: CommunicationErrorType,
         context: RetryContext
     ): RetryDecision {
         // Check max attempts
@@ -152,7 +152,7 @@ export abstract class BaseRetryStrategy implements IRetryStrategy {
      * @param error Error to check
      * @returns True if error is retryable
      */
-    protected isRetryableError(error: CommunicationError): boolean {
+    protected isRetryableError(error: CommunicationErrorType): boolean {
         // Default implementation: retry on network errors, timeouts, and 5xx errors
         const networkErrors = ['ECONNREFUSED', 'ECONNRESET', 'ETIMEDOUT', 'ENOTFOUND'];
         const timeoutErrors = ['TIMEOUT', 'TIMEOUT_EXCEEDED'];
@@ -260,7 +260,7 @@ export abstract class BaseRetryStrategy implements IRetryStrategy {
      */
     protected updateRetryContext(
         context: RetryContext,
-        error?: CommunicationError
+        error?: CommunicationErrorType
     ): RetryContext {
         return {
             ...context,

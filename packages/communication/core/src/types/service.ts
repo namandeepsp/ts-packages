@@ -51,6 +51,9 @@ export interface ServiceInstance {
 
     /** Custom health check data */
     healthData?: Record<string, unknown>;
+
+    /** Allow additional properties */
+    [key: string]: unknown;
 }
 
 /**

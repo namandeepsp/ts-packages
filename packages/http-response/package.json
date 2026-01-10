@@ -1,6 +1,6 @@
 {
   "name": "@naman_deep_singh/http-response",
-  "version": "3.3.1",
+  "version": "3.3.2",
   "description": "TypeScript utilities for standardized API responses",
   "author": "Naman Deep Singh",
   "license": "MIT",
@@ -54,6 +54,7 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.5",
+    "@types/node": "^25.0.1",
     "express": "^5.1.0",
     "typescript": "^5.9.3",
     "rimraf": "^5.0.5"

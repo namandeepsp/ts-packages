@@ -1,7 +1,7 @@
 ```bash
 # 🚀 Naman's TypeScript Utilities Monorepo
 
-**Version: 5.0.0**
+**Version: 5.1.0**
 
 A curated collection of production-ready TypeScript packages designed to help developers build scalable Node.js, Express, and microservice-based applications with clean architecture and best practices.
 
@@ -32,6 +32,15 @@ text
 - **Features**: LRU support, TTL-based expiration, cluster support
 - **Use Cases**: API responses, session storage, computed data caching
 - **Integration**: Built-in health checks, graceful shutdown support
+
+### 📡 **@naman_deep_singh/communication-core** (`v1.0.0+`)
+**Core interfaces and abstract classes for service-to-service communication**
+- **Architecture**: Foundation for 5 specialized communication subpackages
+- **Protocols**: HTTP, gRPC, WebSocket interface definitions
+- **Resilience**: Circuit breaker and retry strategy interfaces
+- **Features**: Service discovery, load balancing, connection pooling
+- **Patterns**: Abstract base classes with common functionality
+- **Extensibility**: Build custom protocols and strategies on solid foundations
 
 ### ⚠️ **@naman_deep_singh/errors** (`v2.3.0+`)
 **Standardized error handling framework**
@@ -71,6 +80,8 @@ text
 ## 🏗️ Monorepo Structure
 packages/
 ├── cache/ # Caching utilities
+├── communication/
+│   └── core/ # Communication layer foundation
 ├── errors/ # Error handling framework
 ├── http-response/ # HTTP response utilities
 ├── security/ # Security utilities
@@ -128,9 +139,11 @@ Each package follows these strict patterns:
 npm install @naman_deep_singh/server
 npm install @naman_deep_singh/errors
 npm install @naman_deep_singh/cache
+npm install @naman_deep_singh/communication-core
 
 # Or install all packages
 npm install @naman_deep_singh/cache \
+            @naman_deep_singh/communication-core \
             @naman_deep_singh/errors \
             @naman_deep_singh/http-response \
             @naman_deep_singh/security \
@@ -176,6 +189,7 @@ pnpm -r publish
 Package Relationships
 text
 cache → (no internal dependencies)
+communication-core → errors + http-response + utils
 errors → (no internal dependencies)
 security → errors
 http-response → errors
@@ -247,13 +261,15 @@ Include tests for new functionality
 Update documentation for all changes
 
 📊 Version Compatibility
-Package	Version	Node.js	TypeScript
-cache	1.7.0+	18+	5.0+
-errors	2.3.0+	18+	5.0+
-http-response	latest	18+	5.0+
-security	1.7.0+	18+	5.0+
-server	1.6.0+	18+	5.0+
-utils	latest	18+	5.0+
+| Package | Version | Node.js | TypeScript |
+|---------|---------|---------|------------|
+| cache | 1.7.0+ | 18+ | 5.0+ |
+| communication-core | 1.0.0+ | 18+ | 5.0+ |
+| errors | 2.3.0+ | 18+ | 5.0+ |
+| http-response | latest | 18+ | 5.0+ |
+| security | 1.7.0+ | 18+ | 5.0+ |
+| server | 1.6.0+ | 18+ | 5.0+ |
+| utils | latest | 18+ | 5.0+ |
 🛡️ License
 ISC License © Naman Deep Singh
 ```

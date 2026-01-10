@@ -1,5 +1,7 @@
 # @naman_deep_singh/communication-core
 
+**Version - 1.0.1**
+
 > Core interfaces and abstract classes for building a comprehensive service-to-service communication layer in TypeScript
 
 ## Overview

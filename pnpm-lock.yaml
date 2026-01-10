@@ -49,14 +49,14 @@ importers:
   packages/communication/core:
     dependencies:
       '@naman_deep_singh/errors':
-        specifier: ^2.3.0
-        version: 2.3.0(express@5.2.1)
+        specifier: ^2.3.1
+        version: 2.3.1(express@5.2.1)
       '@naman_deep_singh/http-response':
         specifier: ^3.3.2
         version: 3.3.2(express@5.2.1)
       '@naman_deep_singh/utils':
-        specifier: ^2.6.1
-        version: 2.6.1(express@5.2.1)
+        specifier: ^2.6.2
+        version: 2.6.2(express@5.2.1)
       '@types/node':
         specifier: ^25.0.1
         version: 25.0.3
@@ -268,8 +268,8 @@ packages:
   '@naman_deep_singh/utils@2.4.0':
     resolution: {integrity: sha512-GE8qs37MFBe/yCBIM3lTDsBsWhg5jVzBCmCqShSIYdQI/RJTgS5OWPqIjR7L0BWKd+TjhojKNieL3aMRhQ/qBA==}
 
-  '@naman_deep_singh/utils@2.6.1':
-    resolution: {integrity: sha512-CWvOP8/OcRr06rRwbUCmRoah3p/Mv/vII2WfzSnLd90fZ+xis+NnMKrHX5kua9OCXCJpzpr5D35fECsVwCtUEw==}
+  '@naman_deep_singh/utils@2.6.2':
+    resolution: {integrity: sha512-FAGdyPk/mZAN8r3SZSjpCVH9gfZmpDeSS7QbOCuaoQERNIkiSQBUt8EXWNeUZAAWPZwC634mW34B1qyy0oNXoQ==}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -914,7 +914,7 @@ snapshots:
   '@naman_deep_singh/security@1.7.0(express@5.2.1)':
     dependencies:
       '@naman_deep_singh/errors': 2.3.0(express@5.2.1)
-      '@naman_deep_singh/utils': 2.4.0
+      '@naman_deep_singh/utils': 2.6.2(express@5.2.1)
       bcryptjs: 3.0.3
       jsonwebtoken: 9.0.3
     transitivePeerDependencies:
@@ -924,9 +924,9 @@ snapshots:
     dependencies:
       '@types/node': 25.0.3
 
-  '@naman_deep_singh/utils@2.6.1(express@5.2.1)':
+  '@naman_deep_singh/utils@2.6.2(express@5.2.1)':
     dependencies:
-      '@naman_deep_singh/errors': 2.3.0(express@5.2.1)
+      '@naman_deep_singh/errors': 2.3.1(express@5.2.1)
       '@types/node': 25.0.3
     transitivePeerDependencies:
       - express
@@ -965,11 +965,11 @@ snapshots:
   '@types/body-parser@1.19.6':
     dependencies:
       '@types/connect': 3.4.38
-      '@types/node': 25.0.3
+      '@types/node': 25.0.1
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 25.0.3
+      '@types/node': 25.0.1
 
   '@types/cors@2.8.19':
     dependencies:
@@ -977,7 +977,7 @@ snapshots:
 
   '@types/express-serve-static-core@5.1.0':
     dependencies:
-      '@types/node': 25.0.3
+      '@types/node': 25.0.1
       '@types/qs': 6.14.0
       '@types/range-parser': 1.2.7
       '@types/send': 1.2.1
@@ -1015,12 +1015,12 @@ snapshots:
 
   '@types/send@1.2.1':
     dependencies:
-      '@types/node': 25.0.3
+      '@types/node': 25.0.1
 
   '@types/serve-static@2.2.0':
     dependencies:
       '@types/http-errors': 2.0.5
-      '@types/node': 25.0.3
+      '@types/node': 25.0.1
 
   accepts@2.0.0:
     dependencies:

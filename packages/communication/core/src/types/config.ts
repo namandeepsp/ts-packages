@@ -329,6 +329,15 @@ export interface ClientConfig {
     /** Resilience configuration */
     resilience?: ResilienceConfig;
 
+    /** Connection pool configuration */
+    connectionPool?: ConnectionPoolConfig;
+
+    /** Compression configuration */
+    compression?: CompressionConfig;
+
+    /** Rate limiting configuration */
+    rateLimit?: RateLimitConfig;
+
     /** Interceptors */
     interceptors?: InterceptorConfig[];
 
@@ -415,6 +424,9 @@ export interface ResilienceConfig {
 
     /** Fallback configuration */
     fallback?: FallbackConfig;
+
+    /** Rate limiting configuration */
+    rateLimit?: RateLimitConfig; // Moved from ClientConfig for better organization
 }
 
 /**
@@ -655,4 +667,91 @@ interface ServiceInstance {
     port: number;
     status: 'healthy' | 'unhealthy' | 'unknown';
     [key: string]: unknown;
+}
+
+/**
+ * Connection pool configuration
+ */
+export interface ConnectionPoolConfig {
+    /** Enable connection pooling */
+    enabled?: boolean;
+
+    /** Minimum connections in pool */
+    minConnections?: number;
+
+    /** Maximum connections in pool */
+    maxConnections?: number;
+
+    /** Connection idle timeout in milliseconds */
+    idleTimeout?: number;
+
+    /** Connection lifetime in milliseconds */
+    maxLifetime?: number;
+
+    /** Connection acquisition timeout in milliseconds */
+    acquireTimeout?: number;
+
+    /** Connection validation interval in milliseconds */
+    validationInterval?: number;
+
+    /** Enable connection warmup */
+    warmup?: boolean;
+
+    /** Custom pool options */
+    options?: Record<string, unknown>;
+}
+
+/**
+ * Compression configuration
+ */
+export interface CompressionConfig {
+    /** Enable compression */
+    enabled?: boolean;
+
+    /** Compression algorithm */
+    algorithm?: 'gzip' | 'deflate' | 'brotli' | 'none';
+
+    /** Compression level (1-11) */
+    level?: number;
+
+    /** Minimum size to compress in bytes */
+    minSize?: number;
+
+    /** Maximum size to compress in bytes */
+    maxSize?: number;
+
+    /** Content types to compress */
+    contentTypes?: string[];
+
+    /** Custom compression options */
+    options?: Record<string, unknown>;
+}
+
+/**
+ * Rate limiting configuration
+ */
+export interface RateLimitConfig {
+    /** Enable rate limiting */
+    enabled?: boolean;
+
+    /** Maximum requests per window */
+    maxRequests?: number;
+
+    /** Time window in milliseconds */
+    windowMs?: number;
+
+    /** Rate limit key generator */
+    keyGenerator?: (request: unknown) => string;
+
+    /** Skip successful requests */
+    skipSuccessfulRequests?: boolean;
+
+    /** Enable request queue */
+    queue?: boolean;
+
+    /** Maximum queue size */
+    maxQueueSize?: number;
+
+    /** Custom rate limit options */
+    options?: Record<string, unknown>;
 }

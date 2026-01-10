@@ -54,6 +54,9 @@ importers:
       '@naman_deep_singh/http-response':
         specifier: ^3.3.1
         version: 3.3.1(express@5.2.1)
+      '@naman_deep_singh/utils':
+        specifier: ^2.6.1
+        version: 2.6.1(express@5.2.1)
       '@types/node':
         specifier: ^25.0.1
         version: 25.0.3
@@ -258,6 +261,9 @@ packages:
 
   '@naman_deep_singh/utils@2.4.0':
     resolution: {integrity: sha512-GE8qs37MFBe/yCBIM3lTDsBsWhg5jVzBCmCqShSIYdQI/RJTgS5OWPqIjR7L0BWKd+TjhojKNieL3aMRhQ/qBA==}
+
+  '@naman_deep_singh/utils@2.6.1':
+    resolution: {integrity: sha512-CWvOP8/OcRr06rRwbUCmRoah3p/Mv/vII2WfzSnLd90fZ+xis+NnMKrHX5kua9OCXCJpzpr5D35fECsVwCtUEw==}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -905,6 +911,13 @@ snapshots:
   '@naman_deep_singh/utils@2.4.0':
     dependencies:
       '@types/node': 25.0.3
+
+  '@naman_deep_singh/utils@2.6.1(express@5.2.1)':
+    dependencies:
+      '@naman_deep_singh/errors': 2.3.0(express@5.2.1)
+      '@types/node': 25.0.3
+    transitivePeerDependencies:
+      - express
 
   '@pkgjs/parseargs@0.11.0':
     optional: true

@@ -3,30 +3,11 @@
  * @packageDocumentation
  */
 import type {
-    LoadBalancingConfig
+    LoadBalancingConfig,
 } from '../types/config.js';
+import type { LoadBalancerSelection } from '../types/config.js';
 import type { LoadBalancingEvent } from '../types/events.js';
 import type { ServiceInstance } from '../types/service.js';
-
-/**
- * Load balancer selection result
- */
-export interface LoadBalancerSelection {
-    /** Selected service instance */
-    selectedInstance: ServiceInstance;
-
-    /** All available instances */
-    availableInstances: ServiceInstance[];
-
-    /** Selection timestamp */
-    timestamp: number;
-
-    /** Selection duration in milliseconds */
-    selectionDuration: number;
-
-    /** Selection metadata */
-    metadata?: Record<string, unknown>;
-}
 
 /**
  * Load balancing strategy interface for selecting service instances

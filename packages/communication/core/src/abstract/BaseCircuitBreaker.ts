@@ -3,7 +3,7 @@
  * @packageDocumentation
  */
 
-import type { CommunicationError } from '../errors/CommunicationError.js';
+import type { CommunicationErrorType } from '../errors/CommunicationError.js';
 import type { ICircuitBreaker } from '../interfaces/CircuitBreaker.interface.js';
 import type { CircuitBreakerConfig } from '../types/config.js';
 
@@ -139,7 +139,7 @@ export abstract class BaseCircuitBreaker implements ICircuitBreaker {
      * Transition circuit breaker to open state
      * @param error Optional error that caused the transition
      */
-    protected transitionToOpen(error?: CommunicationError): void {
+    protected transitionToOpen(error?: CommunicationErrorType): void {
         const previousState = this.state;
         this.state = 'open';
         this.nextResetTime = Date.now() + (this.config.resetTimeout || 30000);
@@ -186,7 +186,7 @@ export abstract class BaseCircuitBreaker implements ICircuitBreaker {
     protected onStateChange(
         newState: string,
         previousState: string,
-        error?: CommunicationError
+        error?: CommunicationErrorType
     ): void {
         // Can be overridden by subclasses
         // Emit events, log, etc.
@@ -212,7 +212,7 @@ export abstract class BaseCircuitBreaker implements ICircuitBreaker {
      * Manually trip the circuit breaker to open state
      * @param error Error that caused the trip
      */
-    public trip(error?: CommunicationError): void {
+    public trip(error?: CommunicationErrorType): void {
         this.transitionToOpen(error);
     }
 
@@ -261,7 +261,7 @@ export abstract class BaseCircuitBreaker implements ICircuitBreaker {
      * Record a failed execution
      * @param error Error that occurred
      */
-    public recordFailure(error: CommunicationError): void {
+    public recordFailure(error: CommunicationErrorType): void {
         this.failureCount++;
         this.lastFailureTime = Date.now();
         this.stats.totalFailures++;

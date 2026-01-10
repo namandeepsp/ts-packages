@@ -111,11 +111,11 @@ importers:
   packages/security:
     dependencies:
       '@naman_deep_singh/errors':
-        specifier: ^2.3.0
-        version: 2.3.0(express@5.2.1)
+        specifier: ^2.3.1
+        version: 2.3.1(express@5.2.1)
       '@naman_deep_singh/utils':
-        specifier: ^2.4.0
-        version: 2.4.0
+        specifier: ^2.6.2
+        version: 2.6.2(express@5.2.1)
       bcryptjs:
         specifier: ^3.0.3
         version: 3.0.3
@@ -265,9 +265,6 @@ packages:
   '@naman_deep_singh/security@1.7.0':
     resolution: {integrity: sha512-N1rQC9Fq6eJAn7aM1XY8mrypW8Z5QDcwfbWWptuFN0NDgulfW/wuXK0+Oi6xuBDekWuNinueTqw0Ryu/DFSibQ==}
 
-  '@naman_deep_singh/utils@2.4.0':
-    resolution: {integrity: sha512-GE8qs37MFBe/yCBIM3lTDsBsWhg5jVzBCmCqShSIYdQI/RJTgS5OWPqIjR7L0BWKd+TjhojKNieL3aMRhQ/qBA==}
-
   '@naman_deep_singh/utils@2.6.2':
     resolution: {integrity: sha512-FAGdyPk/mZAN8r3SZSjpCVH9gfZmpDeSS7QbOCuaoQERNIkiSQBUt8EXWNeUZAAWPZwC634mW34B1qyy0oNXoQ==}
 
@@ -339,6 +336,9 @@ packages:
 
   '@types/node@25.0.3':
     resolution: {integrity: sha512-W609buLVRVmeW693xKfzHeIV6nJGGz98uCPfeXI1ELMLXVeKYZ9m15fAMSaUPBHYLGFsVRcMmSCksQOrZV9BYA==}
+
+  '@types/node@25.0.6':
+    resolution: {integrity: sha512-NNu0sjyNxpoiW3YuVFfNz7mxSQ+S4X2G28uqg2s+CzoqoQjLPsWSbsFFyztIAqt2vb8kfEAsJNepMGPTxFDx3Q==}
 
   '@types/qs@6.14.0':
     resolution: {integrity: sha512-eOunJqu0K1923aExK6y8p6fsihYEn/BYuQ4g0CxAAgFc4b/ZLN4CrsRZ55srTdqoiLzU2B2evC+apEIxprEzkQ==}
@@ -920,14 +920,10 @@ snapshots:
     transitivePeerDependencies:
       - express
 
-  '@naman_deep_singh/utils@2.4.0':
-    dependencies:
-      '@types/node': 25.0.3
-
   '@naman_deep_singh/utils@2.6.2(express@5.2.1)':
     dependencies:
       '@naman_deep_singh/errors': 2.3.1(express@5.2.1)
-      '@types/node': 25.0.3
+      '@types/node': 25.0.6
     transitivePeerDependencies:
       - express
 
@@ -1006,6 +1002,10 @@ snapshots:
       undici-types: 7.16.0
 
   '@types/node@25.0.3':
+    dependencies:
+      undici-types: 7.16.0
+
+  '@types/node@25.0.6':
     dependencies:
       undici-types: 7.16.0
 

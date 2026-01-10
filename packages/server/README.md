@@ -1,6 +1,6 @@
 # @naman_deep_singh/server
 
-**Version:** 1.7.0 (with integrated cache & session support)
+**Version:** 1.8.0 (with integrated cache & session support)
 
 Extensible server utilities for Express.js microservices with multi-protocol support, integrated caching, session management, and TypeScript.
 
@@ -20,7 +20,7 @@ npm install @naman_deep_singh/server
 - ✅ **Health checks** with custom checks and cache health integration
 - ✅ **TypeScript support** with full type safety
 
-- ✅ **Built-in middleware** - logging, validation, rate limiting, auth, caching, sessions
+- ✅ **Built-in middleware** - logging, validation, rate limiting, auth, caching, sessions, request ID, error handling
 
 
 ## Quick Start
@@ -124,6 +124,66 @@ server.addWebhook({
 
 ## Built-in Middleware
 
+### Request ID Middleware
+```typescript
+import { createRequestIdMiddleware } from '@naman_deep_singh/server';
+
+// Adds unique request ID to each request
+server.app.use(createRequestIdMiddleware());
+
+// Access in routes
+server.app.get('/users', (req, res) => {
+  console.log('Request ID:', req.id); // Auto-generated UUID
+  res.json({ requestId: req.id });
+});
+```
+
+### Error Handler Middleware
+```typescript
+import { createErrorHandler } from '@naman_deep_singh/server';
+
+// Global error handling (should be last middleware)
+server.app.use(createErrorHandler());
+
+// Handles AppError instances and unknown errors
+// Integrates with @naman_deep_singh/http-response if available
+```
+
+### Cache Response Middleware
+```typescript
+import { cacheResponse } from '@naman_deep_singh/server';
+
+// Cache GET responses (requires cache to be enabled in server config)
+server.app.get('/expensive-data', 
+  cacheResponse(300), // Cache for 5 minutes
+  (req, res) => {
+    // Expensive operation
+    res.json({ data: 'expensive result' });
+  }
+);
+```
+
+### Session Middleware
+```typescript
+import { useSession } from '@naman_deep_singh/server';
+
+// Session handling (requires session to be enabled in server config)
+server.app.use(useSession('my-app.sid'));
+
+server.app.post('/login', async (req, res) => {
+  // Get existing session
+  const session = await req.getSession();
+  
+  // Create new session
+  const newSession = await req.createSession('user-123', {
+    userId: 123,
+    role: 'admin'
+  }, 3600); // 1 hour TTL
+  
+  res.json({ sessionId: newSession.id });
+});
+```
+
 
 ### Logging Middleware
 ```typescript
@@ -169,20 +229,44 @@ server.app.use('/protected', requireAuth({
 }));
 ```
 
-**Advanced Configuration:**
-```typescript
-import { createAuthMiddleware } from '@naman_deep_singh/server';
+## Plugin-Style Middleware Usage
 
-server.app.use('/api', createAuthMiddleware({
-  secret: process.env.JWT_SECRET!,
-  unauthorizedMessage: 'Access denied',
-  tokenExtractor: (req) => {
-    // Custom token extraction logic
-    // By default, uses sophisticated extractToken from @naman_deep_singh/security
-    // that checks Authorization headers, cookies, query params, and body
-    return req.headers.authorization?.substring(7);
+### Application-Level Plugins
+```typescript
+import { 
+  withLogging, 
+  withErrorHandler, 
+  withRequestId, 
+  withAuth 
+} from '@naman_deep_singh/server';
+
+const server = createServer('My API', '1.0.0', {
+  customMiddleware: [
+    withRequestId(),
+    withLogging('detailed'),
+    withAuth({ secret: process.env.JWT_SECRET! }),
+    withErrorHandler() // Should be last
+  ]
+});
+```
+
+### Route-Level Middleware
+```typescript
+import { validateFields, rateLimit, requireAuth } from '@naman_deep_singh/server';
+
+// Combine multiple middleware
+server.app.post('/api/users',
+  rateLimit({ maxRequests: 10, windowMs: 60000 }),
+  requireAuth({ secret: process.env.JWT_SECRET! }),
+  validateFields([
+    { field: 'email', required: true, type: 'email' },
+    { field: 'password', required: true, minLength: 8 }
+  ]),
+  (req, res) => {
+    // All middleware passed
+    res.json({ success: true });
   }
-}));
+);
 ```
 
 ## Health Checks
@@ -323,16 +407,41 @@ import type { RequestHandler, ErrorRequestHandler } from '@naman_deep_singh/serv
 
 ### Middleware Functions
 - `createLoggingMiddleware(format?)` - Request logging
-- `createErrorHandler()` - Error handling
+- `createErrorHandler()` - Global error handling
+- `createRequestIdMiddleware()` - Request ID generation
 - `createValidationMiddleware(rules)` - Input validation
 - `createRateLimitMiddleware(config?)` - Rate limiting
 - `createAuthMiddleware(config)` - Authentication
+- `cacheResponse(ttl?)` - Response caching
+- `useSession(cookieName?)` - Session management
+
+### Plugin Middleware (Application-level)
+- `withLogging(format?)` - Add logging to entire app
+- `withErrorHandler()` - Add error handling to entire app
+- `withRequestId()` - Add request ID to entire app
+- `withValidation(rules)` - Add validation to entire app
+- `withRateLimit(config?)` - Add rate limiting to entire app
+- `withAuth(config)` - Add authentication to entire app
+
+### Route-level Middleware
+- `validateFields(rules)` - Validate specific route fields
+- `rateLimit(config?)` - Rate limit specific routes
+- `requireAuth(config)` - Require auth for specific routes
 
 ### Health & Monitoring
 - `createHealthCheck(config?)` - Create health check middleware
 - `withHealthCheck(path?, config?)` - Health check plugin
 - `addHealthCheck(app, path?, config?)` - Add health check to app
 - `PeriodicHealthMonitor` - Automated service health checking
+
+### Graceful Shutdown
+- `createGracefulShutdown(server, config?)` - Setup graceful shutdown
+- `withGracefulShutdown(config?)` - Graceful shutdown plugin
+- `startServerWithShutdown(server, config?)` - Start with shutdown handling
+
+## License
+
+MIThMonitor` - Automated service health checking
 
 ### Graceful Shutdown
 - `createGracefulShutdown(server, config?)` - Setup graceful shutdown

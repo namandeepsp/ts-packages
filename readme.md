@@ -1,7 +1,7 @@
 ```bash
 # 🚀 Naman's TypeScript Utilities Monorepo
 
-**Version: 5.1.0**
+**Version: 5.2.0**
 
 A curated collection of production-ready TypeScript packages designed to help developers build scalable Node.js, Express, and microservice-based applications with clean architecture and best practices.
 

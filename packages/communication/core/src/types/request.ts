@@ -3,7 +3,7 @@
  * @packageDocumentation
  */
 
-import type { HttpMethod } from './config.js';
+import type { HTTPMethod } from './config.js';
 
 /**
  * Base request interface for all protocols
@@ -34,9 +34,9 @@ export interface BaseRequest {
 /**
  * HTTP-specific request
  */
-export interface HttpRequest extends BaseRequest {
+export interface HTTPRequest extends BaseRequest {
     /** HTTP method */
-    method: HttpMethod;
+    method: HTTPMethod;
 
     /** Request URL */
     url: string;
@@ -57,7 +57,7 @@ export interface HttpRequest extends BaseRequest {
 /**
  * gRPC-specific request
  */
-export interface GrpcRequest extends BaseRequest {
+export interface GRPCRequest extends BaseRequest {
     /** gRPC service name */
     service: string;
 
@@ -137,7 +137,7 @@ export interface CircuitBreakerRequestConfig {
 /**
  * Union type of all request types
  */
-export type Request = HttpRequest | GrpcRequest | WebSocketRequest;
+export type Request = HTTPRequest | GRPCRequest | WebSocketRequest;
 
 /**
  * Request options for client calls

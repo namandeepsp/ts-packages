@@ -40,7 +40,7 @@ export interface BaseResponse<T = unknown> {
 /**
  * HTTP-specific response
  */
-export interface HttpResponse<T = unknown> extends BaseResponse<T> {
+export interface HTTPResponse<T = unknown> extends BaseResponse<T> {
     /** HTTP status code */
     status: HttpStatusCode;
 
@@ -60,7 +60,7 @@ export interface HttpResponse<T = unknown> extends BaseResponse<T> {
 /**
  * gRPC-specific response
  */
-export interface GrpcResponse<T = unknown> extends BaseResponse<T> {
+export interface GRPCResponse<T = unknown> extends BaseResponse<T> {
     /** gRPC status code */
     grpcCode: number;
 
@@ -206,6 +206,6 @@ export interface StreamResponse<T = unknown> {
  * Union type of all response types
  */
 export type Response<T = unknown> =
-    | HttpResponse<T>
-    | GrpcResponse<T>
+    | HTTPResponse<T>
+    | GRPCResponse<T>
     | WebSocketResponse<T>;

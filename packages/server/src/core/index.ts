@@ -3,8 +3,8 @@ export { ExpressServer, createServer } from './server.js'
 export type {
 	ServerInstance,
 	ServerInfo,
-	GrpcService,
-	RpcMethod,
+	GRPCService,
+	RPCMethod,
 	WebhookConfig,
 	ServerInstanceConfig,
 } from './server.js'

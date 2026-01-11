@@ -1,6 +1,6 @@
 # @naman_deep_singh/server
 
-**Version:** 1.8.1 (with integrated cache & session support)
+**Version:** 1.8.2 (with integrated cache & session support)
 
 Extensible server utilities for Express.js microservices with multi-protocol support, integrated caching, session management, and TypeScript.
 
@@ -60,7 +60,7 @@ await server.start();
 ### gRPC Support
 ```typescript
 // Add gRPC service (requires @grpc/grpc-js)
-server.addGrpcService(userProto.UserService.service, {
+server.addGRPCService(userProto.UserService.service, {
   getUser: (call, callback) => {
     callback(null, { id: call.request.id, name: 'John' });
   }
@@ -70,7 +70,7 @@ server.addGrpcService(userProto.UserService.service, {
 ### JSON-RPC Support
 ```typescript
 // Add JSON-RPC methods (requires jayson)
-server.addRpcMethods({
+server.addRPCMethods({
   add: (params, callback) => {
     callback(null, params[0] + params[1]);
   },

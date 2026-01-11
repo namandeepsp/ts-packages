@@ -79,9 +79,9 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@naman_deep_singh/errors": "^2.3.1",
-    "@naman_deep_singh/http-response": "^3.3.2",
-    "@naman_deep_singh/utils": "^2.6.2",
+    "@naman_deep_singh/errors": "^2.3.2",
+    "@naman_deep_singh/http-response": "^3.3.4",
+    "@naman_deep_singh/utils": "^2.6.3",
     "@types/node": "^25.0.1"
   },
   "publishConfig": {

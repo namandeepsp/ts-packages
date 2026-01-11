@@ -1,6 +1,6 @@
 {
   "name": "@naman_deep_singh/http-response",
-  "version": "3.3.3",
+  "version": "3.3.4",
   "description": "TypeScript utilities for standardized API responses",
   "author": "Naman Deep Singh",
   "license": "MIT",
@@ -39,7 +39,9 @@
   "scripts": {
     "build": "pnpm run build:types && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json",
     "build:types": "tsc -p tsconfig.types.json",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "prepublishOnly": "pnpm run clean && pnpm run build",
+    "clean:js": "find src -type f -name '*.js' -delete"
   },
   "keywords": [
     "response",

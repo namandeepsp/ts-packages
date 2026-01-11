@@ -35,7 +35,7 @@ export class HTTPInterceptor extends BaseInterceptor<HttpRequest, HttpResponse> 
 
     // Add request ID if not present
     const requestId = request.id || context.requestId || `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     // Add timestamp
     const timestamp = request.timestamp || Date.now();
 
@@ -112,7 +112,7 @@ export class LoggingHTTPInterceptor extends HTTPInterceptor {
       headers: request.headers,
       timestamp: new Date().toISOString()
     });
-    
+
     return super.onRequest(request, context);
   }
 
@@ -122,7 +122,7 @@ export class LoggingHTTPInterceptor extends HTTPInterceptor {
       duration: response.duration,
       timestamp: new Date().toISOString()
     });
-    
+
     return super.onResponse(response, context);
   }
 
@@ -132,7 +132,7 @@ export class LoggingHTTPInterceptor extends HTTPInterceptor {
       details: error.details,
       timestamp: new Date().toISOString()
     });
-    
+
     return super.onError(error, context);
   }
 }
@@ -158,13 +158,13 @@ export class AuthHTTPInterceptor extends HTTPInterceptor {
         ...request.headers,
         'Authorization': `${this.tokenType} ${this.token}`
       };
-      
+
       return {
         ...request,
         headers
       };
     }
-    
+
     return super.onRequest(request, context);
   }
 }

@@ -49,7 +49,7 @@ const packageJson = {
         build: 'pnpm run build:types && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json',
         'build:types': 'tsc -p tsconfig.types.json',
         clean: 'rimraf dist',
-        prepublishOnly: 'npm run clean && npm run build',
+        "prepublishOnly": "pnpm run clean && pnpm run build",
         'clean:js': 'find src -type f -name "*.js" -delete',
     },
     keywords: [],

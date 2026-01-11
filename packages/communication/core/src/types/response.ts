@@ -3,7 +3,7 @@
  * @packageDocumentation
  */
 
-import type { HttpStatusCode } from '@naman_deep_singh/http-response';
+import type { HTTPStatusCode } from "@naman_deep_singh/http-response";
 
 /**
  * Base response interface for all protocols
@@ -40,9 +40,9 @@ export interface BaseResponse<T = unknown> {
 /**
  * HTTP-specific response
  */
-export interface HTTPResponse<T = unknown> extends BaseResponse<T> {
+export interface HttpResponse<T = unknown> extends BaseResponse<T> {
     /** HTTP status code */
-    status: HttpStatusCode;
+    status: HTTPStatusCode;
 
     /** Response URL */
     url: string;
@@ -60,7 +60,7 @@ export interface HTTPResponse<T = unknown> extends BaseResponse<T> {
 /**
  * gRPC-specific response
  */
-export interface GRPCResponse<T = unknown> extends BaseResponse<T> {
+export interface GrpcResponse<T = unknown> extends BaseResponse<T> {
     /** gRPC status code */
     grpcCode: number;
 
@@ -206,6 +206,6 @@ export interface StreamResponse<T = unknown> {
  * Union type of all response types
  */
 export type Response<T = unknown> =
-    | HTTPResponse<T>
-    | GRPCResponse<T>
+    | HttpResponse<T>
+    | GrpcResponse<T>
     | WebSocketResponse<T>;

@@ -38,7 +38,7 @@ export type {
 export type {
     BaseRequest,
     HTTPRequest,
-    GRPCRequest,
+    GrpcRequest,
     WebSocketRequest,
     RetryConfig,
     CircuitBreakerRequestConfig,
@@ -50,7 +50,7 @@ export type {
 export type {
     BaseResponse,
     HTTPResponse,
-    GRPCResponse,
+    GrpcResponse,
     WebSocketResponse,
     ErrorResponse,
     PaginatedResponse,

@@ -90,8 +90,8 @@ importers:
   packages/errors:
     dependencies:
       '@naman_deep_singh/http-response':
-        specifier: ^3.3.2
-        version: 3.3.2(express@5.2.1)
+        specifier: ^3.3.3
+        version: 3.3.3(express@5.2.1)
     devDependencies:
       '@types/express':
         specifier: ^5.0.5
@@ -281,6 +281,11 @@ packages:
 
   '@naman_deep_singh/http-response@3.3.2':
     resolution: {integrity: sha512-JT3zwnSZMpiarQDm5USAaNQTk7d3P4Jxo2Td9UE70AJK3neSeYX1EAC67a3YdyA8hcDo6Fm9/XzW1FSjV9W/aQ==}
+    peerDependencies:
+      express: ^5.1.0
+
+  '@naman_deep_singh/http-response@3.3.3':
+    resolution: {integrity: sha512-uB2GvHrplDphizE2NZ2VYGqSigHJ0g2mzHQxXvWWeVIV6f8UTzoabsLjFAUlMmKNb+wbEqbTPGIg7oCFncxVPA==}
     peerDependencies:
       express: ^5.1.0
 
@@ -966,7 +971,7 @@ snapshots:
   '@naman_deep_singh/communication-core@1.2.0(express@5.2.1)':
     dependencies:
       '@naman_deep_singh/errors': 2.3.1(express@5.2.1)
-      '@naman_deep_singh/http-response': 3.3.2(express@5.2.1)
+      '@naman_deep_singh/http-response': 3.3.3(express@5.2.1)
       '@naman_deep_singh/utils': 2.6.2(express@5.2.1)
       '@types/node': 25.0.6
     transitivePeerDependencies:
@@ -974,11 +979,15 @@ snapshots:
 
   '@naman_deep_singh/errors@2.3.1(express@5.2.1)':
     dependencies:
-      '@naman_deep_singh/http-response': 3.3.2(express@5.2.1)
+      '@naman_deep_singh/http-response': 3.3.3(express@5.2.1)
     transitivePeerDependencies:
       - express
 
   '@naman_deep_singh/http-response@3.3.2(express@5.2.1)':
+    dependencies:
+      express: 5.2.1
+
+  '@naman_deep_singh/http-response@3.3.3(express@5.2.1)':
     dependencies:
       express: 5.2.1
 

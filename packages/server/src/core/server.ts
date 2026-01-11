@@ -17,12 +17,12 @@ import { createGracefulShutdown } from './shutdown.js'
 import type { Server } from 'http'
 import type { Application, RequestHandler } from 'express'
 
-export interface GrpcService {
+export interface GRPCService {
 	service: Record<string, unknown>
 	implementation: Record<string, (...args: unknown[]) => unknown>
 }
 
-export interface RpcMethod {
+export interface RPCMethod {
 	[key: string]: (
 		params: unknown[],
 		callback: (error: Error | null, result?: unknown) => void,
@@ -38,7 +38,7 @@ export interface WebhookConfig {
 	) => void | Promise<void>
 }
 
-export interface GrpcServerInstance {
+export interface GRPCServerInstance {
 	start(): void
 	forceShutdown(): void
 	addService(service: unknown, implementation: unknown): void
@@ -62,12 +62,12 @@ export interface ServerInstance {
 	getInfo(): ServerInfo
 
 	// Multi-protocol support
-	addGrpcService(
+	addGRPCService(
 		service: Record<string, unknown>,
 		implementation: Record<string, (...args: unknown[]) => unknown>,
 		port?: number,
 	): void
-	addRpcMethods(methods: RpcMethod, path?: string): void
+	addRPCMethods(methods: RPCMethod, path?: string): void
 	addWebhook(config: WebhookConfig): void
 	addSocketIO(config?: SocketIOConfig): unknown
 }
@@ -88,9 +88,9 @@ export class ExpressServer implements ServerInstance {
 	public cache?: ICache<unknown>
 	public sessionStore?: SessionStore | undefined
 	private status: 'starting' | 'running' | 'stopping' | 'stopped' = 'stopped'
-	private grpcServices: GrpcService[] = []
-	private grpcServer?: GrpcServerInstance
-	private rpcMethods: RpcMethod = {}
+	private grpcServices: GRPCService[] = []
+	private grpcServer?: GRPCServerInstance
+	private rpcMethods: RPCMethod = {}
 	private socketIO?: { close(): void }
 	private healthMonitor?: PeriodicHealthMonitor
 
@@ -448,7 +448,7 @@ export class ExpressServer implements ServerInstance {
 		}
 	}
 
-	addGrpcService(
+	addGRPCService(
 		service: Record<string, unknown>,
 		implementation: Record<string, (...args: unknown[]) => unknown>,
 		port = 50051,
@@ -496,12 +496,12 @@ export class ExpressServer implements ServerInstance {
 		}
 	}
 
-	addRpcMethods(methods: RpcMethod, path = '/rpc'): void {
+	addRPCMethods(methods: RPCMethod, path = '/rpc'): void {
 		Object.assign(this.rpcMethods, methods)
 
 		try {
 			const jayson = require('jayson') as {
-				server: (methods: RpcMethod) => {
+				server: (methods: RPCMethod) => {
 					middleware(): RequestHandler
 				}
 			}

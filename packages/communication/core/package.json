@@ -1,6 +1,6 @@
 {
   "name": "@naman_deep_singh/communication-core",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Core interfaces and abstract classes for building a comprehensive service-to-service communication layer with protocols, resilience patterns, service discovery, and load balancing",
   "type": "module",
   "main": "./dist/cjs/index.js",

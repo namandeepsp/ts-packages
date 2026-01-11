@@ -6,7 +6,7 @@
 /**
  * HTTP methods
  */
-export type HttpMethod =
+export type HTTPMethod =
     | 'GET'
     | 'POST'
     | 'PUT'
@@ -229,7 +229,7 @@ export interface BaseProtocolConfig {
 /**
  * HTTP protocol configuration
  */
-export interface HttpProtocolConfig extends BaseProtocolConfig {
+export interface HTTPProtocolConfig extends BaseProtocolConfig {
     /** Base URL */
     baseUrl?: string;
 
@@ -255,7 +255,7 @@ export interface HttpProtocolConfig extends BaseProtocolConfig {
 /**
  * gRPC protocol configuration
  */
-export interface GrpcProtocolConfig extends BaseProtocolConfig {
+export interface GRPCProtocolConfig extends BaseProtocolConfig {
     /** gRPC endpoint */
     endpoint: string;
 

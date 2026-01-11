@@ -4,7 +4,7 @@
  */
 
 export type {
-    HttpMethod,
+    HTTPMethod,
     ProtocolType,
     ServiceDiscoveryType,
     LoadBalanceStrategy,
@@ -25,8 +25,8 @@ export type {
     CompressionConfig,
     RateLimitConfig,
     BaseProtocolConfig,
-    HttpProtocolConfig,
-    GrpcProtocolConfig,
+    HTTPProtocolConfig,
+    GRPCProtocolConfig,
     WebSocketProtocolConfig,
     InterceptorConfig,
     SerializationConfig,
@@ -37,8 +37,8 @@ export type {
 
 export type {
     BaseRequest,
-    HttpRequest,
-    GrpcRequest,
+    HTTPRequest,
+    GRPCRequest,
     WebSocketRequest,
     RetryConfig,
     CircuitBreakerRequestConfig,
@@ -49,8 +49,8 @@ export type {
 
 export type {
     BaseResponse,
-    HttpResponse,
-    GrpcResponse,
+    HTTPResponse,
+    GRPCResponse,
     WebSocketResponse,
     ErrorResponse,
     PaginatedResponse,

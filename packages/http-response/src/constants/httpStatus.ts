@@ -35,7 +35,7 @@ export const HTTP_STATUS = Object.freeze({
 } as const)
 
 // flattened union type if needed:
-export type HttpStatusCode =
+export type HTTPStatusCode =
 	| (typeof SUCCESS)[keyof typeof SUCCESS]
 	| (typeof REDIRECTION)[keyof typeof REDIRECTION]
 	| (typeof CLIENT_ERROR)[keyof typeof CLIENT_ERROR]

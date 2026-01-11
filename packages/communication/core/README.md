@@ -1,6 +1,6 @@
 # @naman_deep_singh/communication-core
 
-**Version** - 1.2.0
+**Version** - 1.2.1
 
 > Core interfaces and abstract classes for building a comprehensive service-to-service communication layer in TypeScript
 
@@ -88,17 +88,20 @@ This core package enables building 5 specialized subpackages:
 communication-protocols/
 ├── src/
 │   ├── http/
-│   │   ├── HttpProtocol.ts          # extends BaseProtocol
-│   │   ├── HttpConnectionPool.ts    # extends BaseConnectionPool
-│   │   └── HttpInterceptor.ts       # implements IInterceptor
+│   │   ├── HTTPProtocol.ts          # extends BaseProtocol
+│   │   ├── HTTPConnectionPool.ts    # extends BaseConnectionPool
+│   │   └── HTTPInterceptor.ts       # implements BaseInterceptor
+|   |   └── index.ts
 │   ├── grpc/
-│   │   ├── GrpcProtocol.ts          # extends BaseProtocol
-│   │   ├── GrpcConnectionPool.ts    # extends BaseConnectionPool
-│   │   └── GrpcInterceptor.ts       # implements IInterceptor
+│   │   ├── GRPCProtocol.ts          # extends BaseProtocol
+│   │   ├── GRPCConnectionPool.ts    # extends BaseConnectionPool
+│   │   └── GRPCInterceptor.ts       # implements IInterceptor
+|   |   └── index.ts
 │   ├── websocket/
 │   │   ├── WebSocketProtocol.ts     # extends BaseProtocol
 │   │   ├── WebSocketConnectionPool.ts
 │   │   └── WebSocketInterceptor.ts
+|   |   └── index.ts
 │   └── index.ts
 ├── package.json
 └── README.md
@@ -108,8 +111,8 @@ communication-protocols/
 
 **Usage**:
 ```typescript
-import { HttpProtocol } from '@naman_deep_singh/communication-protocols/http';
-import { GrpcProtocol } from '@naman_deep_singh/communication-protocols/grpc';
+import { HTTPProtocol } from '@naman_deep_singh/communication-protocols/http';
+import { GRPCProtocol } from '@naman_deep_singh/communication-protocols/grpc';
 ```
 
 ### 2. **@naman_deep_singh/communication-resilience**
@@ -123,14 +126,17 @@ communication-resilience/
 │   │   ├── CircuitBreakerImpl.ts    # implements ICircuitBreaker
 │   │   ├── CircuitBreakerState.ts   # State management
 │   │   └── CircuitBreakerMetrics.ts # Failure tracking
+|   |   └── index.ts
 │   ├── retry/
 │   │   ├── ExponentialBackoffRetry.ts   # implements IRetryStrategy
 │   │   ├── LinearBackoffRetry.ts        # implements IRetryStrategy
 │   │   ├── FixedDelayRetry.ts           # implements IRetryStrategy
 │   │   └── JitterRetry.ts               # implements IRetryStrategy
+|   |   └── index.ts
 │   ├── policies/
 │   │   ├── RetryPolicy.ts
 │   │   └── CircuitBreakerPolicy.ts
+|   |   └── index.ts
 │   └── index.ts
 ├── package.json
 └── README.md
@@ -153,16 +159,20 @@ communication-discovery/
 │   │   ├── ConsulServiceDiscoverer.ts   # extends BaseServiceDiscoverer
 │   │   ├── ConsulHealthChecker.ts
 │   │   └── ConsulWatcher.ts
+|   |   └── index.ts
 │   ├── etcd/
 │   │   ├── EtcdServiceDiscoverer.ts     # extends BaseServiceDiscoverer
 │   │   ├── EtcdHealthChecker.ts
 │   │   └── EtcdWatcher.ts
+|   |   └── index.ts
 │   ├── kubernetes/
 │   │   ├── K8sServiceDiscoverer.ts      # extends BaseServiceDiscoverer
 │   │   ├── K8sHealthChecker.ts
 │   │   └── K8sWatcher.ts
+|   |   └── index.ts
 │   ├── static/
 │   │   └── StaticServiceDiscoverer.ts   # For testing/development
+|   |   └── index.ts
 │   └── index.ts
 ├── package.json
 └── README.md
@@ -189,12 +199,15 @@ communication-load-balancing/
 │   │   ├── LeastConnectionsStrategy.ts   # implements ILoadBalanceStrategy
 │   │   ├── RandomStrategy.ts            # implements ILoadBalanceStrategy
 │   │   └── ConsistentHashStrategy.ts    # implements ILoadBalanceStrategy
+|   |   └── index.ts
 │   ├── health/
 │   │   ├── HealthAwareLoadBalancer.ts
 │   │   └── HealthScorer.ts
+|   |   └── index.ts
 │   ├── metrics/
 │   │   ├── LoadBalancerMetrics.ts
 │   │   └── ConnectionTracker.ts
+|   |   └── index.ts
 │   └── index.ts
 ├── package.json
 └── README.md
@@ -217,18 +230,22 @@ communication-client/
 │   │   ├── CommunicationClient.ts       # implements IClient
 │   │   ├── ClientFactory.ts             # implements IClientFactory
 │   │   └── ClientBuilder.ts             # Fluent builder pattern
+|   |   └── index.ts
 │   ├── pipeline/
 │   │   ├── RequestPipeline.ts
 │   │   ├── ResponsePipeline.ts
 │   │   └── InterceptorChain.ts
+|   |   └── index.ts
 │   ├── middleware/
 │   │   ├── LoggingInterceptor.ts
 │   │   ├── MetricsInterceptor.ts
 │   │   ├── TracingInterceptor.ts
 │   │   └── AuthInterceptor.ts
+|   |   └── index.ts
 │   ├── events/
 │   │   ├── ClientEventEmitter.ts
 │   │   └── ClientEvents.ts
+|   |   └── index.ts
 │   └── index.ts
 ├── package.json
 └── README.md
@@ -240,7 +257,7 @@ import { CommunicationClient, ClientBuilder } from '@naman_deep_singh/communicat
 
 // Fluent builder pattern
 const client = new ClientBuilder()
-  .withProtocol(new HttpProtocol())
+  .withProtocol(new HTTPProtocol())
   .withServiceDiscovery(new ConsulServiceDiscoverer(consulConfig))
   .withLoadBalancer(new RoundRobinStrategy())
   .withCircuitBreaker(new CircuitBreakerImpl(cbConfig))
@@ -251,7 +268,7 @@ const client = new ClientBuilder()
 ## Development Roadmap
 
 ### Phase 1: Protocols Foundation (Week 1-2)
-- Implement `HttpProtocol` with connection pooling
+- Implement `HTTPProtocol` with connection pooling
 - Add basic interceptor support
 - Create comprehensive tests
 
@@ -291,7 +308,7 @@ import {
 // Implementations come from subpackages:
 
 // From communication-protocols
-const protocol: IProtocol = new HttpProtocol({
+const protocol: IProtocol = new HTTPProtocol({
   timeout: 5000,
   maxConnections: 100
 });

@@ -1,0 +1,49 @@
+{
+  "name": "@naman_deep_singh/communication-protocols",
+  "version": "1.0.0",
+  "description": "communication-protocols package",
+  "type": "module",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./http": {
+      "import": "./dist/esm/http/index.js",
+      "require": "./dist/cjs/http/index.js",
+      "types": "./dist/types/http/index.d.ts"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "pnpm run build:types && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json",
+    "build:types": "tsc -p tsconfig.types.json",
+    "clean": "rimraf dist",
+    "prepublishOnly": "npm run clean && npm run build",
+    "clean:js": "find src -type f -name \"*.js\" -delete"
+  },
+  "keywords": [],
+  "author": "Naman Deep Singh",
+  "license": "ISC",
+  "packageManager": "pnpm@10.20.0",
+  "devDependencies": {
+    "rimraf": "^5.0.5",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@naman_deep_singh/communication-core": "^1.2.0",
+    "@types/node": "^25.0.1",
+    "axios": "^1.7.9"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

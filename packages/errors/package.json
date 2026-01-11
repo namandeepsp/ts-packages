@@ -1,6 +1,6 @@
 {
     "name": "@naman_deep_singh/errors",
-    "version": "2.3.3",
+    "version": "2.3.4",
     "description": "Standardized error classes and Express middleware for consistent error handling with TypeScript",
     "type": "module",
     "main": "./dist/cjs/index.js",

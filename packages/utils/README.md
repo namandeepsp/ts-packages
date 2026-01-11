@@ -1,7 +1,7 @@
 ```bash
 @naman_deep_singh/utils
 
-**Version:** 2.6.3
+**Version:** 2.6.4
 
 Universal JavaScript prototype extensions for common development utilities. Works in both Node.js and browser environments with 70+ utility methods, plus timeout management, connection pooling, and compression utilities.
 

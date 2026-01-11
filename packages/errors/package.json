@@ -1,6 +1,6 @@
 {
     "name": "@naman_deep_singh/errors",
-    "version": "2.3.2",
+    "version": "2.3.4",
     "description": "Standardized error classes and Express middleware for consistent error handling with TypeScript",
     "type": "module",
     "main": "./dist/cjs/index.js",
@@ -42,7 +42,8 @@
         "build": "pnpm run build:types && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json",
         "build:types": "tsc -p tsconfig.types.json",
         "clean": "rimraf dist",
-        "prepublishOnly": "npm run clean && npm run build"
+        "prepublishOnly": "pnpm run clean && pnpm run build",
+        "clean:js": "find src -type f -name '*.js' -delete"
     },
     "keywords": [
         "errors"
@@ -58,7 +59,7 @@
         "typescript": "^5.9.3"
     },
     "dependencies": {
-        "@naman_deep_singh/http-response": "^3.3.3"
+        "@naman_deep_singh/http-response": "^3.3.4"
     },
     "publishConfig": {
         "access": "public"

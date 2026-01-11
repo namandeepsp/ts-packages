@@ -18,8 +18,8 @@ importers:
   packages/cache:
     dependencies:
       '@naman_deep_singh/errors':
-        specifier: ^2.3.1
-        version: 2.3.1(express@5.2.1)
+        specifier: ^2.3.2
+        version: 2.3.2(express@5.2.1)
       memcached:
         specifier: ^2.2.2
         version: 2.2.2

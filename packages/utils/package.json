@@ -1,6 +1,6 @@
 {
   "name": "@naman_deep_singh/utils",
-  "version": "2.6.3",
+  "version": "2.6.4",
   "description": "Universal JavaScript prototype extensions for common development utilities",
   "type": "module",
   "main": "./dist/cjs/index.js",
@@ -73,8 +73,8 @@
     "build": "pnpm run build:types && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json",
     "build:types": "tsc -p tsconfig.types.json",
     "clean": "rimraf dist",
-    "prepublishOnly": "npm run clean && npm run build",
-    "clean:js": "find src -type f -name \"*.js\" -delete"
+    "prepublishOnly": "pnpm run clean && pnpm run build",
+    "clean:js": "find src -type f -name '*.js' -delete"
   },
   "keywords": [
     "javascript",
@@ -94,7 +94,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@naman_deep_singh/errors": "^2.3.2",
+    "@naman_deep_singh/errors": "^2.3.4",
     "@types/node": "^25.0.1"
   },
   "publishConfig": {

@@ -161,14 +161,14 @@ importers:
   packages/server:
     dependencies:
       '@naman_deep_singh/cache':
-        specifier: ^1.7.2
-        version: 1.7.2(express@5.2.1)
+        specifier: ^1.7.3
+        version: 1.7.3(express@5.2.1)
       '@naman_deep_singh/errors':
-        specifier: ^2.3.2
-        version: 2.3.2(express@5.2.1)
+        specifier: ^2.3.4
+        version: 2.3.4(express@5.2.1)
       '@naman_deep_singh/security':
-        specifier: ^1.7.2
-        version: 1.7.2(express@5.2.1)
+        specifier: ^1.7.3
+        version: 1.7.3(express@5.2.1)
       '@types/express':
         specifier: ^5.0.5
         version: 5.0.6
@@ -270,8 +270,8 @@ packages:
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
     engines: {node: '>=12'}
 
-  '@naman_deep_singh/cache@1.7.2':
-    resolution: {integrity: sha512-XCh/q/5YzoRJHAMvXS9z0EzEC92YInDJ6GsPa1OuzzjOMJu2S8DUa/1bPsh9vgGYkFfcIXNm1zldgLrwsvg89Q==}
+  '@naman_deep_singh/cache@1.7.3':
+    resolution: {integrity: sha512-6Da8Gsypw9970T0P5SYAXvsmUJxXt0JmseDm6e47hwDBDa0mQ/tv/zrSwKpSn/Wwo0FLooO/Ijf+RSorAPIFfw==}
 
   '@naman_deep_singh/communication-core@1.2.0':
     resolution: {integrity: sha512-6PlbW0pAOczcqTUUNotw4o4GSS1xZHpeFtMYv2CaQG8ofYaXeMWt78XgiziawQuooSDwU7YcLjcVZtzoQQYZgg==}
@@ -287,8 +287,8 @@ packages:
     peerDependencies:
       express: ^5.1.0
 
-  '@naman_deep_singh/security@1.7.2':
-    resolution: {integrity: sha512-3veiipeiBpqKZoTAoM00rr4jwOIsS/PipB7+msMAPQ8M5fqNhWZrUecF/Nuq0jEQs1y9AHSvfzWXOc5WmkVIHQ==}
+  '@naman_deep_singh/security@1.7.3':
+    resolution: {integrity: sha512-kh+5b13+q6dmpAAqIPwW9aWV91j2hd05VwpRlCf3L5VP9/AKbJfGWuxVpjlX/h32U1C+mF15MU0IYpHHBx6srw==}
 
   '@naman_deep_singh/utils@2.6.3':
     resolution: {integrity: sha512-wbLzUyVyUGEQePqUL0daisuX0yY6IOB1KLJcGFhBFg4LqkmOBAfTHceJUURQiYmYzy+8uKZ2dgRQal1H1+nZPw==}
@@ -961,9 +961,9 @@ snapshots:
       wrap-ansi: 8.1.0
       wrap-ansi-cjs: wrap-ansi@7.0.0
 
-  '@naman_deep_singh/cache@1.7.2(express@5.2.1)':
+  '@naman_deep_singh/cache@1.7.3(express@5.2.1)':
     dependencies:
-      '@naman_deep_singh/errors': 2.3.2(express@5.2.1)
+      '@naman_deep_singh/errors': 2.3.4(express@5.2.1)
       memcached: 2.2.2
       redis: 4.7.1
     transitivePeerDependencies:
@@ -994,9 +994,9 @@ snapshots:
     dependencies:
       express: 5.2.1
 
-  '@naman_deep_singh/security@1.7.2(express@5.2.1)':
+  '@naman_deep_singh/security@1.7.3(express@5.2.1)':
     dependencies:
-      '@naman_deep_singh/errors': 2.3.2(express@5.2.1)
+      '@naman_deep_singh/errors': 2.3.4(express@5.2.1)
       '@naman_deep_singh/utils': 2.6.4(express@5.2.1)
       bcryptjs: 3.0.3
       jsonwebtoken: 9.0.3

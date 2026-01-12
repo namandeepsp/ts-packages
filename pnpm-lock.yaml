@@ -49,14 +49,14 @@ importers:
   packages/communication/core:
     dependencies:
       '@naman_deep_singh/errors':
-        specifier: ^2.3.2
-        version: 2.3.2(express@5.2.1)
+        specifier: ^2.3.4
+        version: 2.3.4(express@5.2.1)
       '@naman_deep_singh/http-response':
         specifier: ^3.3.4
         version: 3.3.4(express@5.2.1)
       '@naman_deep_singh/utils':
-        specifier: ^2.6.3
-        version: 2.6.3(express@5.2.1)
+        specifier: ^2.6.4
+        version: 2.6.4(express@5.2.1)
       '@types/node':
         specifier: ^25.0.1
         version: 25.0.3
@@ -276,9 +276,6 @@ packages:
   '@naman_deep_singh/communication-core@1.2.0':
     resolution: {integrity: sha512-6PlbW0pAOczcqTUUNotw4o4GSS1xZHpeFtMYv2CaQG8ofYaXeMWt78XgiziawQuooSDwU7YcLjcVZtzoQQYZgg==}
 
-  '@naman_deep_singh/errors@2.3.2':
-    resolution: {integrity: sha512-L/vsGYNdJyRJXvx8doRMsq8e7+O5zwi9saByf3DSWBeJ18e9+Awh0KbL7PS2gq02FCU/6pQwUhB4uawjGP27Ag==}
-
   '@naman_deep_singh/errors@2.3.4':
     resolution: {integrity: sha512-do0F2goG/1FeBZsdA02o8dlVr1VvLo/LtHgxJNjGLtOt+ZQuO1q5HVsPfeTMo2jbZNKVWfWotmdwccsMU0usEA==}
 
@@ -289,9 +286,6 @@ packages:
 
   '@naman_deep_singh/security@1.7.3':
     resolution: {integrity: sha512-kh+5b13+q6dmpAAqIPwW9aWV91j2hd05VwpRlCf3L5VP9/AKbJfGWuxVpjlX/h32U1C+mF15MU0IYpHHBx6srw==}
-
-  '@naman_deep_singh/utils@2.6.3':
-    resolution: {integrity: sha512-wbLzUyVyUGEQePqUL0daisuX0yY6IOB1KLJcGFhBFg4LqkmOBAfTHceJUURQiYmYzy+8uKZ2dgRQal1H1+nZPw==}
 
   '@naman_deep_singh/utils@2.6.4':
     resolution: {integrity: sha512-md5s/ATYlxsjDwfb+UY40Q+yKJKXMs2uEPSHu3+ZVWfXoxmjAjqjFJQ8Ey7o3LHdN9loHFOTGafYvTKqh+tY/g==}
@@ -978,12 +972,6 @@ snapshots:
     transitivePeerDependencies:
       - express
 
-  '@naman_deep_singh/errors@2.3.2(express@5.2.1)':
-    dependencies:
-      '@naman_deep_singh/http-response': 3.3.4(express@5.2.1)
-    transitivePeerDependencies:
-      - express
-
   '@naman_deep_singh/errors@2.3.4(express@5.2.1)':
     dependencies:
       '@naman_deep_singh/http-response': 3.3.4(express@5.2.1)
@@ -1003,17 +991,10 @@ snapshots:
     transitivePeerDependencies:
       - express
 
-  '@naman_deep_singh/utils@2.6.3(express@5.2.1)':
-    dependencies:
-      '@naman_deep_singh/errors': 2.3.2(express@5.2.1)
-      '@types/node': 25.0.3
-    transitivePeerDependencies:
-      - express
-
   '@naman_deep_singh/utils@2.6.4(express@5.2.1)':
     dependencies:
       '@naman_deep_singh/errors': 2.3.4(express@5.2.1)
-      '@types/node': 25.0.6
+      '@types/node': 25.0.3
     transitivePeerDependencies:
       - express
 

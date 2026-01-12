@@ -57,7 +57,7 @@ export interface HTTPRequest extends BaseRequest {
 /**
  * gRPC-specific request
  */
-export interface GrpcRequest extends BaseRequest {
+export interface GRPCRequest extends BaseRequest {
     /** gRPC service name */
     service: string;
 
@@ -137,7 +137,7 @@ export interface CircuitBreakerRequestConfig {
 /**
  * Union type of all request types
  */
-export type Request = HTTPRequest | GrpcRequest | WebSocketRequest;
+export type Request = HTTPRequest | GRPCRequest | WebSocketRequest;
 
 /**
  * Request options for client calls

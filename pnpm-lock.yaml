@@ -71,8 +71,8 @@ importers:
   packages/communication/protocols:
     dependencies:
       '@naman_deep_singh/communication-core':
-        specifier: ^1.2.0
-        version: 1.2.0(express@5.2.1)
+        specifier: ^1.2.2
+        version: 1.2.2(express@5.2.1)
       '@types/node':
         specifier: ^25.0.1
         version: 25.0.6
@@ -273,8 +273,8 @@ packages:
   '@naman_deep_singh/cache@1.7.3':
     resolution: {integrity: sha512-6Da8Gsypw9970T0P5SYAXvsmUJxXt0JmseDm6e47hwDBDa0mQ/tv/zrSwKpSn/Wwo0FLooO/Ijf+RSorAPIFfw==}
 
-  '@naman_deep_singh/communication-core@1.2.0':
-    resolution: {integrity: sha512-6PlbW0pAOczcqTUUNotw4o4GSS1xZHpeFtMYv2CaQG8ofYaXeMWt78XgiziawQuooSDwU7YcLjcVZtzoQQYZgg==}
+  '@naman_deep_singh/communication-core@1.2.2':
+    resolution: {integrity: sha512-9NGV26niRzGBVOJtKHocKvso2LnfDU+84q9mqqVdQukG/10xOIs6akiT+wd+/iwkdEFZjqXHf8t3Al/fb/L5fQ==}
 
   '@naman_deep_singh/errors@2.3.4':
     resolution: {integrity: sha512-do0F2goG/1FeBZsdA02o8dlVr1VvLo/LtHgxJNjGLtOt+ZQuO1q5HVsPfeTMo2jbZNKVWfWotmdwccsMU0usEA==}
@@ -963,7 +963,7 @@ snapshots:
     transitivePeerDependencies:
       - express
 
-  '@naman_deep_singh/communication-core@1.2.0(express@5.2.1)':
+  '@naman_deep_singh/communication-core@1.2.2(express@5.2.1)':
     dependencies:
       '@naman_deep_singh/errors': 2.3.4(express@5.2.1)
       '@naman_deep_singh/http-response': 3.3.4(express@5.2.1)

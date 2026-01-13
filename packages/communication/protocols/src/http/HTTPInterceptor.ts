@@ -1,5 +1,5 @@
 import { BaseInterceptor, CommunicationError, COMMUNICATION_ERROR_CODES } from '@naman_deep_singh/communication-core';
-import type { HttpRequest, HttpResponse, RequestContext } from '@naman_deep_singh/communication-core';
+import type { HTTPRequest, HTTPResponse, RequestContext } from '@naman_deep_singh/communication-core';
 
 export interface HTTPInterceptorConfig {
   /** Interceptor name */
@@ -12,7 +12,7 @@ export interface HTTPInterceptorConfig {
   timeout?: number;
 }
 
-export class HTTPInterceptor extends BaseInterceptor<HttpRequest, HttpResponse> {
+export class HTTPInterceptor extends BaseInterceptor<HTTPRequest, HTTPResponse> {
   constructor(config: HTTPInterceptorConfig) {
     super(config.name, {
       enabled: config.enabled !== false,
@@ -22,9 +22,9 @@ export class HTTPInterceptor extends BaseInterceptor<HttpRequest, HttpResponse> 
   }
 
   public async onRequest(
-    request: HttpRequest,
+    request: HTTPRequest,
     context: RequestContext
-  ): Promise<HttpRequest | undefined> {
+  ): Promise<HTTPRequest | undefined> {
     // Add default headers if not present
     const headers = {
       'User-Agent': 'communication-protocols/1.0.0',
@@ -48,11 +48,11 @@ export class HTTPInterceptor extends BaseInterceptor<HttpRequest, HttpResponse> 
   }
 
   public async onResponse(
-    response: HttpResponse,
+    response: HTTPResponse,
     context: RequestContext
-  ): Promise<HttpResponse | undefined> {
+  ): Promise<HTTPResponse | undefined> {
     // Add response processing timestamp
-    const processedResponse: HttpResponse = {
+    const processedResponse: HTTPResponse = {
       ...response,
       metadata: {
         ...response.metadata,
@@ -106,7 +106,7 @@ export class LoggingHTTPInterceptor extends HTTPInterceptor {
     super({ name: 'logging', priority: 100, enabled });
   }
 
-  public async onRequest(request: HttpRequest, context: RequestContext): Promise<HttpRequest | undefined> {
+  public async onRequest(request: HTTPRequest, context: RequestContext): Promise<HTTPRequest | undefined> {
     console.log(`[HTTP] ${request.method} ${request.url}`, {
       requestId: context.requestId,
       headers: request.headers,
@@ -116,7 +116,7 @@ export class LoggingHTTPInterceptor extends HTTPInterceptor {
     return super.onRequest(request, context);
   }
 
-  public async onResponse(response: HttpResponse, context: RequestContext): Promise<HttpResponse | undefined> {
+  public async onResponse(response: HTTPResponse, context: RequestContext): Promise<HTTPResponse | undefined> {
     console.log(`[HTTP] Response ${response.status} ${response.statusText}`, {
       requestId: context.requestId,
       duration: response.duration,
@@ -152,7 +152,7 @@ export class AuthHTTPInterceptor extends HTTPInterceptor {
     this.tokenType = tokenType;
   }
 
-  public async onRequest(request: HttpRequest, context: RequestContext): Promise<HttpRequest | undefined> {
+  public async onRequest(request: HTTPRequest, context: RequestContext): Promise<HTTPRequest | undefined> {
     if (this.token && !request.headers?.['Authorization']) {
       const headers = {
         ...request.headers,

@@ -1,6 +1,6 @@
 import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios';
 import { BaseProtocol, CommunicationError, COMMUNICATION_ERROR_CODES } from '@naman_deep_singh/communication-core';
-import type { HttpRequest, HttpResponse, BaseProtocolConfig } from '@naman_deep_singh/communication-core';
+import type { HTTPRequest, HTTPResponse, BaseProtocolConfig } from '@naman_deep_singh/communication-core';
 import { HTTPConnectionPool } from './HTTPConnectionPool.js';
 
 export interface HTTPProtocolConfig extends BaseProtocolConfig {
@@ -23,13 +23,13 @@ export interface HTTPProtocolConfig extends BaseProtocolConfig {
   };
 }
 
-export class HTTPProtocol extends BaseProtocol<HttpRequest, HttpResponse> {
+export class HTTPProtocol extends BaseProtocol<HTTPRequest, HTTPResponse> {
   private axiosInstance: AxiosInstance;
   private connectionPool?: HTTPConnectionPool;
 
   constructor(config: HTTPProtocolConfig) {
     super('http', config);
-    
+
     this.axiosInstance = axios.create({
       baseURL: config.baseURL,
       timeout: config.timeout || 30000,
@@ -43,14 +43,14 @@ export class HTTPProtocol extends BaseProtocol<HttpRequest, HttpResponse> {
     this.setupInterceptors();
   }
 
-  public async send(request: HttpRequest): Promise<HttpResponse> {
+  public async send(request: HTTPRequest): Promise<HTTPResponse> {
     const startTime = Date.now();
     const context = this.createRequestContext(request);
 
     try {
       // Execute request interceptors
       const processedRequest = await this.executeRequestInterceptors(request, context);
-      
+
       // Convert to axios config
       const axiosConfig: AxiosRequestConfig = {
         method: processedRequest.method,
@@ -64,11 +64,11 @@ export class HTTPProtocol extends BaseProtocol<HttpRequest, HttpResponse> {
 
       // Send request
       const axiosResponse: AxiosResponse = await this.axiosInstance.request(axiosConfig);
-      
+
       // Create HTTP response
-      const response: HttpResponse = {
+      const response: HTTPResponse = {
         data: axiosResponse.data,
-        status: axiosResponse.status as any, // Cast to satisfy HttpStatusCode
+        status: axiosResponse.status as any, // Cast to satisfy HTTPStatusCode
         statusText: axiosResponse.statusText,
         headers: axiosResponse.headers as Record<string, string>,
         url: axiosResponse.config.url || processedRequest.url,
@@ -79,7 +79,7 @@ export class HTTPProtocol extends BaseProtocol<HttpRequest, HttpResponse> {
 
       // Execute response interceptors
       const processedResponse = await this.executeResponseInterceptors(response, context);
-      
+
       this.updateMetrics(true, Date.now() - startTime);
       return processedResponse;
 
@@ -89,12 +89,12 @@ export class HTTPProtocol extends BaseProtocol<HttpRequest, HttpResponse> {
 
       const commError = this.createCommunicationError(error, request, context);
       const errorResult = await this.executeErrorInterceptors(commError, context);
-      
+
       if (errorResult instanceof CommunicationError) {
         throw errorResult;
       }
-      
-      return errorResult as HttpResponse;
+
+      return errorResult as HTTPResponse;
     }
   }
 
@@ -115,11 +115,11 @@ export class HTTPProtocol extends BaseProtocol<HttpRequest, HttpResponse> {
     );
   }
 
-  private createCommunicationError(error: any, request: HttpRequest, context: any): CommunicationError {
+  private createCommunicationError(error: any, request: HTTPRequest, context: any): CommunicationError {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status || 0;
       const message = error.message || 'HTTP request failed';
-      
+
       return new CommunicationError(
         COMMUNICATION_ERROR_CODES.HTTP_PROTOCOL_ERROR,
         status,

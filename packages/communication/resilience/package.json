@@ -1,0 +1,43 @@
+{
+  "name": "@naman_deep_singh/communication-resilience",
+  "version": "1.0.0",
+  "description": "@naman_deep_singh/communication-resilience package",
+  "type": "module",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/types/index.d.ts"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "pnpm run build:types && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json",
+    "build:types": "tsc -p tsconfig.types.json",
+    "clean": "rimraf dist",
+    "prepublishOnly": "pnpm run clean && pnpm run build",
+    "clean:js": "find src -type f -name \"*.js\" -delete"
+  },
+  "keywords": [],
+  "author": "Naman Deep Singh",
+  "license": "ISC",
+  "packageManager": "pnpm@10.20.0",
+  "devDependencies": {
+    "rimraf": "^5.0.5",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@naman_deep_singh/communication-core": "^1.2.2",
+    "@types/node": "^25.0.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -87,6 +87,22 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
+  packages/communication/resilience:
+    dependencies:
+      '@naman_deep_singh/communication-core':
+        specifier: ^1.2.2
+        version: 1.2.2(express@5.2.1)
+      '@types/node':
+        specifier: ^25.0.1
+        version: 25.0.6
+    devDependencies:
+      rimraf:
+        specifier: ^5.0.5
+        version: 5.0.10
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
   packages/errors:
     dependencies:
       '@naman_deep_singh/http-response':
@@ -1032,11 +1048,11 @@ snapshots:
   '@types/body-parser@1.19.6':
     dependencies:
       '@types/connect': 3.4.38
-      '@types/node': 25.0.1
+      '@types/node': 25.0.6
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 25.0.1
+      '@types/node': 25.0.6
 
   '@types/cors@2.8.19':
     dependencies:
@@ -1044,7 +1060,7 @@ snapshots:
 
   '@types/express-serve-static-core@5.1.0':
     dependencies:
-      '@types/node': 25.0.1
+      '@types/node': 25.0.6
       '@types/qs': 6.14.0
       '@types/range-parser': 1.2.7
       '@types/send': 1.2.1
@@ -1086,12 +1102,12 @@ snapshots:
 
   '@types/send@1.2.1':
     dependencies:
-      '@types/node': 25.0.1
+      '@types/node': 25.0.6
 
   '@types/serve-static@2.2.0':
     dependencies:
       '@types/http-errors': 2.0.5
-      '@types/node': 25.0.1
+      '@types/node': 25.0.6
 
   accepts@2.0.0:
     dependencies:

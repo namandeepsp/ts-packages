@@ -11,6 +11,21 @@
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js",
       "types": "./dist/types/index.d.ts"
+    },
+    "./retry": {
+      "import": "./dist/esm/retry/index.js",
+      "require": "./dist/cjs/retry/index.js",
+      "types": "./dist/types/retry/index.d.ts"
+    },
+    "./circuit-breaker": {
+      "import": "./dist/esm/circuit-breaker/index.js",
+      "require": "./dist/cjs/circuit-breaker/index.js",
+      "types": "./dist/types/circuit-breaker/index.d.ts"
+    },
+    "./policies": {
+      "import": "./dist/esm/policies/index.js",
+      "require": "./dist/cjs/policies/index.js",
+      "types": "./dist/types/policies/index.d.ts"
     }
   },
   "sideEffects": false,
